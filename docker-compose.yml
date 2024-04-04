@@ -1,0 +1,63 @@
+version: '3.5'
+
+services:
+  app:
+    build:
+      context: '.'
+      args:
+        uid: ${UID}
+    container_name: app
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - APACHE_RUN_USER=#1001
+      - APACHE_RUN_GROUP=#1001
+    volumes:
+      - .:/var/www/html:cached
+    networks:
+      backend:
+        aliases:
+          - app
+
+  db:
+    image: mysql:8
+    container_name: db
+    restart: unless-stopped
+    ports:
+      - 3306:3306    
+    volumes:
+      - ./docker/var:/var/lib/mysql:cached
+      - ./docker/backups:/db_backups:cached
+      - ./docker/mysql/mysql.cnf:/etc/mysql/conf.d/mysqld.cnf:cached
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    networks:
+      backend:
+        aliases:
+          - db
+          
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    links:
+      - db
+    environment:
+      PMA_HOST: ${PMA_HOST}
+      PMA_PORT: ${PMA_PORT}
+    ports:
+      - '8080:80'
+    networks:
+      backend:
+        aliases:
+          - phpmyadmin
+
+networks:
+  backend:
+    name: app-network

@@ -1,0 +1,83 @@
+{
+    "name": "laravel/lumen",
+    "description": "The Laravel Lumen Framework.",
+    "keywords": [
+        "framework",
+        "laravel",
+        "lumen"
+    ],
+    "license": "MIT",
+    "type": "project",
+    "config": {
+        "github-oauth": {
+            "github.com": "d4c06b9635d31da31bd00ddf5d979a071fcf5f8e"
+        },
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@github.com:pa-ulander/lumen-generators.git"
+        },
+        {
+            "type": "git",
+            "url": "git@github.com:pa-ulander/debug.git"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "cviebrock/eloquent-sluggable": "^6.03",
+        "firebase/php-jwt": "^5.0",
+        "flipbox/lumen-generator": "^6.0",
+        "iak/make-testable": "^1.0",
+        "intervention/image": "^2.5",
+        "laravel/helpers": "^1.2",
+        "laravel/lumen-framework": "^6.0",
+        "league/flysystem": "^1.0",
+        "tymon/jwt-auth": "^1.0",
+        "vlucas/phpdotenv": "^3.3",
+        "wn/lumen-generators-6": "^1.3"
+    },
+    "require-dev": {
+        "fzaninotto/faker": "^1.9.1",
+        "mockery/mockery": "^1.3.1",
+        "pa-ulander/debug": "@dev",
+        "phan/phan": "^2.4",
+        "phpunit/phpunit": "^9.3",
+        "spatie/phpunit-snapshot-assertions": "^4.2",
+        "spatie/phpunit-watcher": "^1.22",
+        "squizlabs/php_codesniffer": "^3.5",
+        "symfony/var-dumper": "^4.3"
+    },
+    "autoload": {
+        "classmap": [
+            "database/seeds",
+            "database/factories"
+        ],
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ]
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit --verbose",
+        "test:update": "vendor/bin/phpunit -d --update-snapshots",
+        "test-report": "mkdir -p build && php -d memory_limit=-1 vendor/bin/phpunit --coverage-clover ../build/lumen.clover --log-junit ../build/lumen.xunit",
+        "lint": "vendor/bin/phpcs --standard=ruleset.xml ./app",
+        "lint-report": "mkdir -p build && php -d memory_limit=-1 vendor/bin/phpcs --report=checkstyle --standard=ruleset.xml ./app > ../build/lumen.cs",
+        "lint-fix": "vendor/bin/phpcbf --standard=ruleset.xml ./app",
+        "analyze": "vendor/bin/phan --color",
+        "analyze-report": "vendor/bin/phan -m checkstyle -o ../build/phan.cs",
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
