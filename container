@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker exec -it lumen-app bash -c "sudo -u devuser /bin/bash"
+docker exec -it app bash -c "sudo -u devuser /bin/bash"
 
