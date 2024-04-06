@@ -47,7 +47,7 @@ build: prerequisite build-containers build-project update-project post-build-act
 
 # Build and launch the containers
 build-containers:
-	- docker-compose -f docker-compose.yml up -d --build
+	- docker-compose -f docker-compose.yml up -d --build --force-recreate
 
 # Build the project
 build-project: prepare-containers
@@ -114,7 +114,7 @@ status: prerequisite
 # Opens a bash prompt to the app container
 bash: prerequisite
 	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` app bash
-	# - docker exec -it pp bash -c "sudo -u devuser /bin/bash"
+	# - docker exec -it app bash -c "sudo -u devuser /bin/bash"
 	- docker exec -it app bash -c "sudo -u root /bin/bash"
 
 # Opens a bash prompt to the db container
@@ -166,3 +166,8 @@ prompt-continue:
     fi
 %:
 	@:
+
+
+
+help: # Show this help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

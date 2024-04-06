@@ -71,7 +71,7 @@ RUN docker-php-ext-install \
 # 5. composer
 COPY --from=composer:2.7.2 /usr/bin/composer /usr/bin/composer
 
-# 6. we need a user with the same UID/GID with host user
+# 6. we need a user with the same UID/GID as the host user
 # so when we execute CLI commands, all the host file's permissions and ownership remains intact
 # otherwise command from inside container will create root-owned files and directories
 ARG uid

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -44,8 +45,8 @@ class SetupDatabase extends Command
                 return;
             }
             ini_set('memory_limit', '-1');
-            DB::unprepared(file_get_contents("docker/mysql/db.sql"));
-            $this->info('Database was (re)created and provided successfully from "docker/mysql/db.sql"');
+            DB::unprepared(file_get_contents("docker/mysql/init.sql"));
+            $this->info('Database was (re)created and provided successfully from "docker/mysql/init.sql"');
         } catch (Exception $e) {
             $this->error("Error: " . $e->getMessage());
         }
