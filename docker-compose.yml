@@ -6,7 +6,7 @@ services:
       context: '.'
       args:
         uid: ${UID}
-    container_name: app
+    container_name: ghvc-app
     restart: unless-stopped
     ports:
       - 80:80
@@ -19,7 +19,7 @@ services:
     networks:
       backend:
         aliases:
-          - app
+          - ghvc-app
 
   db:
     image: mysql:5.7
@@ -60,4 +60,4 @@ services:
 
 networks:
   backend:
-    name: app-network
+    name: ghvc-app-network

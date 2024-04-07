@@ -1,6 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\CounterController;
+use App\Http\Controllers\CountController;
 
-Route::get('/', [CounterController::class, 'index']);
+Route::get('/', [CountController::class, 'index']);

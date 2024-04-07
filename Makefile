@@ -5,7 +5,7 @@ ENVIRONMENT_FILE=$(shell pwd)/.env
 PROJECT_DIRECTORY=$(shell pwd)
 
 # Available docker containers
-CONTAINERS=app db 
+CONTAINERS=ghvc-app db 
 
 #####################################################
 # RUNTIME TARGETS			 						#
@@ -55,37 +55,37 @@ build-project: prepare-containers
 # Update the project and the dependencies
 install-project:
 	# Update the composer dependencies
-	- docker-compose exec app composer --ansi install
+	- docker-compose exec ghvc-app composer --ansi install
 
 # Update the project and the dependencies
 update-project:
 	# Update the composer dependencies
-	- docker-compose exec app composer --ansi update
+	- docker-compose exec ghvc-app composer --ansi update
 
 # Update the project and the dependencies
 upgrade-project:
 	# Upgrade the composer dependencies
-	- docker-compose exec app composer --ansi upgrade
+	- docker-compose exec ghvc-app composer --ansi upgrade
 
 ## Run actions after setup
 post-build-actions:
     # set permissions
-	- docker-compose exec app bash -c "chown -R devuser:devuser ./vendor"
-	- docker-compose exec app bash -c "chown -R devuser:devuser ./run"
+	- docker-compose exec ghvc-app bash -c "chown -R devuser:devuser ./vendor"
+	- docker-compose exec ghvc-app bash -c "chown -R devuser:devuser ./run"
 
 # Setup development database
 setup-db: prompt-continue
 	- docker exec -u root -t -i db /bin/bash -c "chown -R mysql:mysql /var/lib/mysql/ && chmod -R 755 /var/lib/mysql/"
-	- docker-compose exec app bash -c "php artisan command:setup-database"
+	- docker-compose exec ghvc-app bash -c "php artisan command:setup-database"
 
 ## Launch application dependencies
 launch-dependencies:
 	# Launch startup script(s)
-	# - docker-compose exec app bash -c "sh -c '/tmp/run.sh'"
+	# - docker-compose exec ghvc-app bash -c "sh -c '/tmp/run.sh'"
 
 ## inspect/view the network
 inspect-network:
-	- docker network inspect app-network
+	- docker network inspect ghvc-app-network
 
 # Remove the docker containers and deletes project dependencies
 clean: post-build-actions prerequisite prompt-continue
@@ -114,8 +114,8 @@ status: prerequisite
 # Opens a bash prompt to the app container
 bash: prerequisite
 	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` app bash
-	# - docker exec -it app bash -c "sudo -u devuser /bin/bash"
-	- docker exec -it app bash -c "sudo -u root /bin/bash"
+	# - docker exec -it ghvc-app bash -c "sudo -u devuser /bin/bash"
+	- docker exec -it ghvc-app bash -c "sudo -u root /bin/bash"
 
 # Opens a bash prompt to the db container
 bash-mysql: prerequisite
@@ -128,7 +128,7 @@ bash-mysql: prerequisite
 # Launch unit tests
 test-php:
 	@echo "Start phpunit tests";
-	- docker-compose exec app bash -c "cd /var/www/html && composer test"
+	- docker-compose exec ghvc-app bash -c "cd /var/www/html && composer test"
 
 
 #################################################
