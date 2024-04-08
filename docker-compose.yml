@@ -9,7 +9,7 @@ services:
     container_name: ghvc-app
     restart: unless-stopped
     ports:
-      - 80:80
+      - 8080:80
       - 443:443
     environment:
       - APACHE_RUN_USER=#1001
@@ -42,21 +42,21 @@ services:
         aliases:
           - db
           
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: unless-stopped
-    links:
-      - db
-    environment:
-      PMA_HOST: ${PMA_HOST}
-      PMA_PORT: ${PMA_PORT}
-    ports:
-      - '8080:80'
-    networks:
-      backend:
-        aliases:
-          - phpmyadmin
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin
+  #   container_name: phpmyadmin
+  #   restart: unless-stopped
+  #   links:
+  #     - db
+  #   environment:
+  #     PMA_HOST: ${PMA_HOST}
+  #     PMA_PORT: ${PMA_PORT}
+  #   ports:
+  #     - '8080:80'
+  #   networks:
+  #     backend:
+  #       aliases:
+  #         - phpmyadmin
 
 networks:
   backend:

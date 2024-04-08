@@ -54,7 +54,7 @@ RUN a2enmod rewrite headers socache_shmcb ssl
 # 4. start with base php config, then add extensions
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
-EXPOSE 80
+EXPOSE 8080
 EXPOSE 443
 
 RUN docker-php-ext-install \

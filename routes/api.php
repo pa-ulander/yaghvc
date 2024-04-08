@@ -1,6 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CountController;
+use App\Http\Controllers\ProfileViewsController;
 
-Route::get('/', [CountController::class, 'index']);
+Route::get('/', [ProfileViewsController::class, 'index']);
