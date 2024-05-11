@@ -1,4 +1,4 @@
-docker/var
+docker/db/data
 vendor
 .env
 *.cache
