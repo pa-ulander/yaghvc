@@ -5,36 +5,38 @@ ENVIRONMENT_FILE=$(shell pwd)/.env
 PROJECT_DIRECTORY=$(shell pwd)
 
 # Available docker containers
-CONTAINERS=ghvc-app db 
+CONTAINERS=yagvc-app db 
 
 #####################################################
 # RUNTIME TARGETS			 						#
 #####################################################
 default: up
 
-# Start all containers
+##@ Start all containers
 up: post-build-actions prerequisite
 	- docker-compose -f docker-compose.yml up -d
-# Stop all containers
+
+##@ Stop all containers
 down:
 	- docker-compose -f docker-compose.yml down
 
-# Start & rebuild an individual container
-start: prerequisite valid-container
-	- docker-compose -f docker-compose.yml up -d --build $(filter-out $@,$(MAKECMDGOALS))
+##@ Start individual container: $make start container=<name>
+start: prerequisite
+	- docker-compose -f docker-compose.yml up -d $(container)
 
-# Stop individual container
-stop: prerequisite valid-container
-	- docker-compose -f docker-compose.yml down $(filter-out $@,$(MAKECMDGOALS))
+##@ Stop individual container
+stop: prerequisite
+	- docker-compose -f docker-compose.yml down $(container)
 
-# Halts all containers
+##@ Halts all containers
 halt: prerequisite
 	- docker-compose -f docker-compose.yml kill
 
-# Restarts & rebuilds all containers
+##@ Restarts & rebuilds all containers
 restart: prerequisite
 	- docker-compose -f docker-compose.yml kill && docker-compose -f docker-compose.yml up -d
 
+##@ Backup database
 backup:
 	- docker-compose exec db bash -c "mysqldump -udb -pdb -hlocalhost db > "/db_backups/backup-$(shell date +%y-%m-%d_%H%M%S).sql""
 	- cd ../ && zip -r -q "./backups/backup-$(shell date +%y-%m-%d_%H%M%S).zip" .
@@ -42,52 +44,57 @@ backup:
 #####################################################
 # SETUP AND BUILD TARGETS			 				#
 #####################################################
-# Build and prepare the docker containers and the project
+
+##@ Build and prepare the docker containers and the project
 build: prerequisite build-containers build-project update-project post-build-actions launch-dependencies
 
-# Build and launch the containers
+##@ Build and launch the containers
 build-containers:
-	- docker-compose -f docker-compose.yml up -d --build --force-recreate
+	- docker-compose -f docker-compose.yml up -d --build
 
-# Build the project
+##@ Delete and rebuild all from scratch (clean)
+rebuild: clean prerequisite rebuild-containers build-project update-project post-build-actions launch-dependencies
+rebuild-containers:
+	- docker-compose -f docker-compose.yml build --no-cache && docker-compose up -d --build
+
+##@ Build the project
 build-project: prepare-containers
 
-# Update the project and the dependencies
+##@ Install project and dependencies
 install-project:
 	# Update the composer dependencies
-	- docker-compose exec ghvc-app composer --ansi install
+	- docker-compose exec yagvc-app composer --ansi install
 
-# Update the project and the dependencies
+##@ Update project and dependencies
 update-project:
 	# Update the composer dependencies
-	- docker-compose exec ghvc-app composer --ansi update
+	- docker-compose exec yagvc-app composer --ansi update
 
-# Update the project and the dependencies
+##@ Upgrade project and dependencies
 upgrade-project:
-	# Upgrade the composer dependencies
-	- docker-compose exec ghvc-app composer --ansi upgrade
+	# Update the composer dependencies
+	- docker-compose exec yagvc-app composer --ansi upgrade
 
-## Run actions after setup
+##@ Run actions after setup
 post-build-actions:
     # set permissions
-	- docker-compose exec ghvc-app bash -c "chown -R devuser:devuser ./vendor"
-	- docker-compose exec ghvc-app bash -c "chown -R devuser:devuser ./run"
+	- docker-compose exec yagvc-app bash -c "chown -R devuser:devuser ."
 
-# Setup development database
+##@ Setup development database
 setup-db: prompt-continue
-	- docker exec -u root -t -i db /bin/bash -c "chown -R mysql:mysql /var/lib/mysql/ && chmod -R 755 /var/lib/mysql/"
-	- docker-compose exec ghvc-app bash -c "php artisan command:setup-database"
+	- docker exec -u root -it db /bin/bash -c "chown -R mysql:mysql /var/lib/mysql/ && chmod -R 755 /var/lib/mysql/"
+	- docker exec -it -u root yagvc-app /bin/bash -c "php artisan command:setup-database"
 
-## Launch application dependencies
+##@ Launch application dependencies
 launch-dependencies:
 	# Launch startup script(s)
-	# - docker-compose exec ghvc-app bash -c "sh -c '/tmp/run.sh'"
+	# - docker-compose exec yagvc-app bash -c "sh -c '/tmp/run.sh'"
 
-## inspect/view the network
+##@ Inspect/view network
 inspect-network:
-	- docker network inspect ghvc-app-network
+	- docker network inspect backend-network
 
-# Remove the docker containers and deletes project dependencies
+##@ Remove the docker containers and deletes project dependencies
 clean: post-build-actions prerequisite prompt-continue
 	- docker exec -u root -t -i db /bin/bash -c "chown -R devuser:devuser ./docker"
 	# Remove the dependencies
@@ -103,7 +110,7 @@ clean: post-build-actions prerequisite prompt-continue
 	# Remove all unused images
 	- docker images prune -a
 
-# Echos the container status
+##@ View containers status
 status: prerequisite
 	- docker-compose -f docker-compose.yml ps
 
@@ -111,51 +118,51 @@ status: prerequisite
 #####################################################
 # BASH CLI TARGETS			 						#
 #####################################################
-# Opens a bash prompt to the app container
-bash: prerequisite
-	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` app bash
-	# - docker exec -it ghvc-app bash -c "sudo -u devuser /bin/bash"
-	- docker exec -it ghvc-app bash -c "sudo -u root /bin/bash"
 
-# Opens a bash prompt to the db container
-bash-mysql: prerequisite
+##@ Opens a bash prompt to the yagvc-app container
+bash: prerequisite
+	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` yagvc-app bash
+	# - docker exec -it yagvc-app bash -c "sudo -u devuser /bin/bash"
+	- docker exec -it yagvc-app bash -c "sudo -u root /bin/bash"
+
+##@ Opens a bash prompt to the db container
+bash-db: prerequisite
 	- docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` db bash
 	# - docker exec -it db bash -c "sudo -u devuser /bin/bash"
 
 #################################################
 # TEST TARGETS			 						#
 #################################################
-# Launch unit tests
+
+##@ Launch unit tests
 test-php:
 	@echo "Start phpunit tests";
-	- docker-compose exec ghvc-app bash -c "cd /var/www/html && composer test"
+	docker-compose exec yagvc-app bash -c "cd /var/www/html && composer test"
 
 
 #################################################
 # INTERNAL TARGETS			 					#
 #################################################
-# Validates the prerequisites such as environment variables
+
+##@ Validates the prerequisites such as environment variables
 prerequisite: check-environment
-	- @echo "pwd: "$(shell pwd)
--include .env
+	@echo "pwd: "$(shell pwd)
+include .env
 export ENV_FILE = $(ENVIRONMENT_FILE)
 
-# Validates the environment variables
+## Validates the environment variables
 check-environment:
 	@echo "Validating environment";
-
-# Check if docker binary exists
 ifeq (, $(shell which docker-compose))
 	$(error "No docker-compose in $(PATH), consider installing docker")
 endif
 
-# Validate containers
-valid-container:
+##@ Validate containers
+validate-containers:
 ifeq ($(filter $(filter-out $@,$(MAKECMDGOALS)),$(CONTAINERS)),)
 	$(error Invalid container provided "$(filter-out $@,$(MAKECMDGOALS))")
 endif
 
-# Prompt to continue
 prompt-continue:
 	@while [ -z "$$CONTINUE" ]; do \
 		read -r -p "Would you like to continue? [y]" CONTINUE; \
@@ -168,6 +175,11 @@ prompt-continue:
 	@:
 
 
-
-help: # Show this help
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+##@ Show help
+help:
+	@printf "\033[1;33mUsage:\033[0m\n  make \033[36m<target>\033[0m\n"
+	@printf "%-30s %s\n" "Target" "Description"
+	@printf "%-30s %s\n" "------" "-----------"
+	@awk 'BEGIN {FS = ":.*?##@ |^##@ "} /^##@ / {getline x; split(x, a, ":"); \
+	printf "\033[36m%-30s\033[0m %s\n", a[1], $$2}' \
+	$(MAKEFILE_LIST)

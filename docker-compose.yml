@@ -1,63 +1,54 @@
-version: '3.5'
+version: "3.5"
 
 services:
-  app:
-    build:
-      context: '.'
-      args:
-        uid: ${UID}
-    container_name: ghvc-app
-    restart: unless-stopped
-    ports:
-      - 8080:80
-      - 443:443
-    environment:
-      - APACHE_RUN_USER=#1001
-      - APACHE_RUN_GROUP=#1001
-    volumes:
-      - .:/var/www/html:cached
-    networks:
-      backend:
-        aliases:
-          - ghvc-app
+    yagvc-app:
+        build:
+            context: "."
+            args:
+                uid: ${UID}
+                devuser: "${DEVUSER}"
+        container_name: yagvc-app
+        restart: unless-stopped
+        ports:
+            - 80:80
+            - 443:443
+        depends_on:
+            - db
+        environment:
+            - APACHE_RUN_USER=#${UID}
+            - APACHE_RUN_GROUP=#${UID}
+        volumes:
+            - .:/var/www/html:cached
+        networks:
+            backend:
+                aliases:
+                    - yagvc-app
 
-  db:
-    image: mysql:5.7
-    container_name: db
-    restart: unless-stopped
-    ports:
-      - 3306:3306    
-    volumes:
-      - ./docker/var:/var/lib/mysql:cached
-      - ./docker/backups:/db_backups:cached
-      - ./docker/mysql/mysql.cnf:/etc/mysql/conf.d/mysqld.cnf:cached
-      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${DB_DATABASE}
-      - MYSQL_USER=${DB_USERNAME}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-    networks:
-      backend:
-        aliases:
-          - db
-          
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   container_name: phpmyadmin
-  #   restart: unless-stopped
-  #   links:
-  #     - db
-  #   environment:
-  #     PMA_HOST: ${PMA_HOST}
-  #     PMA_PORT: ${PMA_PORT}
-  #   ports:
-  #     - '8080:80'
-  #   networks:
-  #     backend:
-  #       aliases:
-  #         - phpmyadmin
+    db:
+        image: mysql:8.0
+        command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        container_name: db
+        restart: unless-stopped
+        ports:
+            - "${DB_PORT}:3306"
+        expose:
+            - "3306"
+        volumes:
+            - "./docker/db/data:/var/lib/mysql:cached"
+            - "./docker/db/backups:/db_backups:cached"
+            - "./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf:cached"
+            - "./docker/db/sql:/docker-entrypoint-initdb.d"
+            - "./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql"
+        environment:
+            - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_USER=${DB_USERNAME}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+        networks:
+            backend:
+                aliases:
+                    - db
 
 networks:
-  backend:
-    name: ghvc-app-network
+    backend:
+        name: backend-network

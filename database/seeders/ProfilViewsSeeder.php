@@ -13,8 +13,6 @@ class ProfilViewsSeeder extends Seeder
      */
     public function run(): void
     {
-        ProfileViews::factory()->create([
-            'username' => 'Test User',
-        ]);
+        ProfileViews::factory()->count(50)->create();
     }
 }

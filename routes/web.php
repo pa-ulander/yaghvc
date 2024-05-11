@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ProfileViewsController;
 
-Route::get('/', function (Request $request) {
-    return view('welcome');
-});
+Route::get('/', [ProfileViewsController::class, 'index']);

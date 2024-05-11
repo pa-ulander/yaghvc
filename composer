@@ -3,4 +3,4 @@
 args="$@"
 command="composer $args"
 echo "$command"
-docker exec -it ghvc-app bash -c "sudo -u devuser /bin/bash -c \"$command\""
+docker exec -it yagvc-app -c "sudo -u devuser /bin/bash -c \"$command\""

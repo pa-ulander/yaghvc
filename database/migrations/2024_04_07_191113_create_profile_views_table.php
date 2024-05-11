@@ -14,9 +14,7 @@ return new class extends Migration
         Schema::create('profile_views', function (Blueprint $table) {
             $table->id();
             $table->string('username');
-            // $table->string('ip_address', 45)->nullable();
-            // $table->text('user_agent')->nullable();
-            $table->timestamp('created_at');
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 
