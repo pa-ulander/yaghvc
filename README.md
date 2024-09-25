@@ -8,6 +8,6 @@
 
 <br><br>
  
-![](https://3f3c-85-230-194-116.ngrok-free.app/?username=pa-ulander&color=green&style=for-the-badge&label=Views)
+<a href="https://3f3c-85-230-194-116.ngrok-free.app/?username=pa-ulander&color=green&style=for-the-badge&label=Views">Test</a>
 
 
