@@ -14,6 +14,9 @@ default: up
 
 ##@ Start all containers
 up: post-build-actions prerequisite
+	- npx kill-port 3306
+	- npx kill-port 443
+	- npx kill-port 80
 	- docker-compose -f docker-compose.yml up -d
 
 ##@ Stop all containers
@@ -82,7 +85,7 @@ post-build-actions:
 
 ##@ Setup development database
 setup-db: prompt-continue
-	- docker exec -u root -it db /bin/bash -c "chown -R mysql:mysql /var/lib/mysql/ && chmod -R 755 /var/lib/mysql/"
+	- docker exec -it -u root db /bin/bash -c "chown -R mysql:mysql /var/lib/mysql/ && chmod -R 755 /var/lib/mysql/"
 	- docker exec -it -u root yagvc-app /bin/bash -c "php artisan command:setup-database"
 
 ##@ Launch application dependencies
@@ -150,7 +153,7 @@ prerequisite: check-environment
 include .env
 export ENV_FILE = $(ENVIRONMENT_FILE)
 
-## Validates the environment variables
+##@ Validates the environment variables
 check-environment:
 	@echo "Validating environment";
 ifeq (, $(shell which docker-compose))

@@ -6,7 +6,7 @@ use App\Models\ProfileViews;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ProfilViewsSeeder extends Seeder
+class ProfileViewsSeeder extends Seeder
 {
     /**
      * Run the database seeds.

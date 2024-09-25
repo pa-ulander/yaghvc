@@ -15,8 +15,8 @@ class DefaultDatabaseConnectionTest extends TestCase
 
     public function testDefaultDatabaseIsSqliteTesting()
     {
-        dump(database_path('database.sqlite'));
-        dump(database_path('database.sqlite_testing'));
+        // dump(database_path('database.sqlite'));
+        // dump(database_path('database.sqlite_testing'));
         $this->assertSame('sqlite_testing', config('database.default'));
     }
 }
