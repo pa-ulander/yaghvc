@@ -26,14 +26,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
+      - name:  Restore cached composer dependencies
+        id: comoser-cache
+        uses: actions/cache/restore@v4
         with:
           path: vendor
-          key: composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-
-
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+      
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -41,16 +40,18 @@ jobs:
           extensions:  gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
           coverage: none
 
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: vendor
-          key: composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-   
-
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Cache composer dependencies
+        id: composer-cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            path/to/dependencies
+            some/other/dependencies
+          key: ${{ steps.cache-primes-restore.outputs.cache-primary-key }}
+
 
       - name: Prepare Laravel Application
         run: |
