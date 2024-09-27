@@ -1,6 +1,9 @@
 
 
 <h1>Yet Another Github Visitor Counter</h1>
+
+![example event parameter][(https://github.com/pa-ulander/ghvc/actions/workflows/test.yml/badge.svg)]
+[![Actions Status](https://github.com/pa-ulander/ghvc/workflows/tests/badge.svg)](https://github.com/pa-ulsnder/ghvc/actions)
 <h3>yagvc</h3>
 
 <br><br>
