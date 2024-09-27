@@ -9,7 +9,7 @@ on:
     - cron: '0 0 * * *'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   tests:
@@ -26,21 +26,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions:  json, tokenizer, xml, xmlwriter, exif, bcmath, dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          extensions:  gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
           coverage: none
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-   
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Copy environment file
-        run: cp .env.testing .env
-
-      - name: Generate app key
-        run: php artisan key:generate
+      - name: Prepare Laravel Application
+        run: |
+            cp .env.ci.testing .env
+            php artisan key:generate
 
       - name: Execute tests
         run: composer test
