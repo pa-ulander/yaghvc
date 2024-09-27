@@ -2,7 +2,7 @@
 
 <h1>Yet Another Github Visitor Counter</h1>
 
-![example event parameter](https://github.com/pa-ulander/ghcv/workflows/main.yml/badge.svg?event=push)
+![example event parameter](https://github.com/pa-ulander/ghvc/workflows/main.yml/badge.svg?event=push)
 
 <h3>yagvc</h3>
 
