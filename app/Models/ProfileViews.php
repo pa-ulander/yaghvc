@@ -24,7 +24,7 @@ class ProfileViews extends Model
 
     public function count($username)
     {
-        return Cache::remember('count-' . $username, 1, function () use ($username) {
+        return Cache::remember('count-' . $username, 1, function () use ($username): int {
             $tableName = 'profile_views';
             return DB::table($tableName)
                 ->where('username', '=', $username)

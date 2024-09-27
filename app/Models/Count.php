@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Webmozart\Assert\Assert;
 
 class Count extends Model
 {
     use HasFactory;
-
-    private const MAX_COUNT = PHP_INT_MAX;
 
     private int $count;
 
@@ -17,12 +16,12 @@ class Count extends Model
     {
         $this->count = $count;
 
-        if ($count > self::MAX_COUNT) {
-            return ['message' => 'The maximum number of views has been reached'];
+        if ($count > PHP_INT_MAX) {
+            throw new \InvalidArgumentException('The maximum number of views has been reached');
         }
         
         if ($count <= 0) {
-            return ['message' => 'Number of views cannot be negative'];
+            throw new \InvalidArgumentException('Number of views cannot be negative');
         }
     }
 
