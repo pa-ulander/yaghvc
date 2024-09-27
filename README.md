@@ -1,6 +1,9 @@
 
 
 <h1>Yet Another Github Visitor Counter</h1>
+
+[![Actions Status](https://github.com/pa-ulander/ghvc/workflows/CI/badge.svg)](https://github.com/pa-ulander/ghvc/actions)
+
 <h3>yagvc</h3>
 
 <br><br>
