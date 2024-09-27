@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name:  Restore cached composer dependencies
-        id: composer-cache
+        id: composer-cache-restore
         uses: actions/cache/restore@v4
         with:
           path: vendor
