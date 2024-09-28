@@ -38,9 +38,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-composer-v2-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-v2-
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
       
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
@@ -50,7 +48,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-composer-v2-{{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-
 
       - name: Prepare Laravel Application
         run: |
