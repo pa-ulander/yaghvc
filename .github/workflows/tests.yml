@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3]
+        php: [8.1, 8.2, 8.3]
 
     name: PHP ${{ matrix.php }}
 
@@ -38,7 +38,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-v2-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
       
@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-v2-{{ hashFiles('**/composer.lock') }}
 
       - name: Prepare Laravel Application
         run: |
