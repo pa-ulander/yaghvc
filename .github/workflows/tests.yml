@@ -45,9 +45,6 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
 
-      - name: Directory Permissions
-        run: chmod -R 777 storage bootstrap/cache
-
       - name: Cache composer dependencies
         id: composer-cache
         uses: actions/cache/save@v4
