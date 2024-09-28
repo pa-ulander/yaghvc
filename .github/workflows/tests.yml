@@ -34,7 +34,7 @@ jobs:
           coverage: none
 
       - name: Get Composer Cache Directory
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"        
+        run: echo "{name}={dir::$(composer config cache-files-dir)}" >> $GITHUB_OUTPUT        
 
       - name: Debug Cache Directory
         run: echo "Cache directory - ${{ steps.composer-cache.outputs.dir }}"      
