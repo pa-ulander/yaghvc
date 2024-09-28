@@ -26,13 +26,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name:  Restore cached composer dependencies
-        id: composer-cache-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-      
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -40,15 +33,33 @@ jobs:
           extensions:  gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
           coverage: none
 
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"        
+
+      - name: Debug Cache Directory
+        run: echo "Cache directory - ${{ steps.composer-cache.outputs.dir }}"      
+
+      - name:  Restore cached composer dependencies
+        id: composer-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
+
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
 
       - name: Cache composer dependencies
         id: composer-cache
         uses: actions/cache/save@v4
         with:
-          path: |
-            vendor
+          path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
       - name: Prepare Laravel Application
