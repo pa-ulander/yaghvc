@@ -20,15 +20,32 @@ class ProfileViews extends Model
      */
     protected $fillable = [
         'username',
+        'visit_count',
+        'last_visit',
     ];
 
-    public function count($username)
+    public $timestamps = true;
+
+    protected $casts = [
+        'last_visit' => 'datetime',
+    ];
+
+    public function getCount($username)
     {
         return Cache::remember('count-' . $username, 1, function () use ($username): int {
-            $tableName = 'profile_views';
-            return DB::table($tableName)
-                ->where('username', '=', $username)
-                ->count();
+            $profileView = self::where('username', $username)->first();
+            return $profileView->username ? $profileView->visit_count : 0;
         });
+    }
+
+    public function incrementCount()
+    {
+        if ($this->username) {
+            $this->visit_count++;
+            $this->last_visit = now();
+            $this->save();
+        } else {
+            throw new \Exception("Username is missing for this instance.");
+        }
     }
 }

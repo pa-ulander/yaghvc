@@ -8,20 +8,26 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('profile_views', function (Blueprint $table) {
             $table->id();
-            $table->string('username');
-            $table->timestamp('created_at')->useCurrent();
+            $table->string('username')->unique();
+            $table->integer('visit_count')->default(0);
+            $table->timestamp('last_visit')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamps();
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('profile_views');
     }

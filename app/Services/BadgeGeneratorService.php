@@ -8,7 +8,7 @@ class BadgeGeneratorService
 {
     public function generate(string $username): string
     {
-        $count = (new ProfileViews())->count($username);
+        $count = (new ProfileViews())->getCount($username);
 
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="103.45751953125" height="28" role="img" aria-label="VIEWS: ' . $count . '">
             <title>VIEWS: ' . $count . '</title>
