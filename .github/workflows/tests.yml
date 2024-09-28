@@ -48,7 +48,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-composer-
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
       - name: Prepare Laravel Application
         run: |
