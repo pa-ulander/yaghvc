@@ -34,7 +34,6 @@ jobs:
           coverage: none
 
       - name: Get Composer Cache Directory
-        id: composer-cache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"        
 
       - name: Debug Cache Directory
