@@ -31,7 +31,18 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions:  gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
-          coverage: none 
+          coverage: none
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
       - name: Restore cached composer dependencies
         id: composer-cache-restore
@@ -47,11 +58,13 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
 
       - name: Cache composer dependencies
-        id: composer-cache
+        id: composer-cache-save
         uses: actions/cache/save@v4
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
       - name: Prepare Laravel Application
         run: |
