@@ -33,23 +33,23 @@ jobs:
           extensions:  gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
           coverage: none 
 
+      - name: Restore cached composer dependencies
+        id: composer-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+      
+      - name: Install Composer dependencies
+        if: steps.composer-cache-restore.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
+
       - name: Cache composer dependencies
         id: composer-cache
         uses: actions/cache/save@v4
         with:
           path: vendor
-          key: composer-${{ hashFiles('**/composer.lock') }}
-      
-      - name: Install Composer dependencies
-        # if: steps.composer-cache.outputs.cache-hit != 'true'
-        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
-
-      # - name: Restore cached composer dependencies
-      #   id: composer-cache-restore
-      #   uses: actions/cache/restore@v4
-      #   with:
-      #     path: vendor
-      #     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
       - name: Prepare Laravel Application
         run: |
