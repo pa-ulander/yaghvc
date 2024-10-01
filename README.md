@@ -6,11 +6,10 @@
 <h3>yagvc</h3>
 
 <br><br>
-
-<img src="https://8eba-85-230-194-116.ngrok-free.app/?username=pa-ulander&color=green&style=for-the-badge&label=Views" alt="yagvc" />
+<img src="https://7651-85-230-194-116.ngrok-free.app/?username=pa-ulander&color=green&style=for-the-badge&label=Views" alt="yagvc" />
 
 <br><br>
- 
-<a href="https://8eba-85-230-194-116.ngrok-free.app/?username=pa-ulander&color=green&style=for-the-badge&label=Views">Test</a>
+
+<a href="https://7651-85-230-194-116.ngrok-free.app/?username=pa-ulander&color=green&style=for-the-badge&label=Views">Test</a>
 
 
