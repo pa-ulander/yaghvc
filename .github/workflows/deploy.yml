@@ -46,8 +46,8 @@ jobs:
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             cd ${{ secrets.SERVER_PATH }}
-            /opt/alt/php-latest/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
-            /opt/alt/php-latest/usr/bin/php artisan migrate --force
-            /opt/alt/php-latest/usr/bin/php artisan route:cache
-            /opt/alt/php-latest/usr/bin/php artisan optimize
+            /opt/alt/php83/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
+            /opt/alt/php83/usr/bin/php artisan migrate --force
+            /opt/alt/php83/usr/bin/php artisan route:cache
+            /opt/alt/php83/usr/bin/php artisan optimize
           EOF
