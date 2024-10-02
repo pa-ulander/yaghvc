@@ -24,10 +24,22 @@ jobs:
           rsync -avz --delete \
             --exclude='.git*' \
             --exclude='.github*' \
+            --exclude='.phan*' \
             --exclude='.env*' \
             --exclude='vendor' \
             --exclude='docker' \
+            --exclude='.dockerignore' \
             --exclude='tests' \
+            --exclude='db' \
+            --exclude='container' \
+            --exclude='Dockerfile' \
+            --exclude='docker-compose.yml' \
+            --exclude='makefile' \
+            --exclude='php-artisan' \
+            --exclude='phpunit*' \
+            --exclude='composer' \
+            --exclude='vite*' \
+            --exclude='package.json' \
             ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
 
       - name: Post-deployment tasks
@@ -35,7 +47,7 @@ jobs:
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             cd ${{ secrets.SERVER_PATH }}
             composer install --no-dev --optimize-autoloader
-            php artisan migrate --force
-            php artisan route:cache
-            php artisan optimize
+            /opt/alt/php-latest/usr/bin/php artisan migrate --force
+            /opt/alt/php-latest/usr/bin/php artisan route:cache
+            /opt/alt/php-latest/usr/bin/php artisan optimize
           EOF
