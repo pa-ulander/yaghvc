@@ -1,13 +1,14 @@
 docker/db/data
 docker/var
 vendor
-.env
+
 *.cache
 /storage
 /vendor
 .env
 .env.backup
 .env.production
+.env.testing
 .phpunit.result.cache
 auth.json
 yarn-error.log

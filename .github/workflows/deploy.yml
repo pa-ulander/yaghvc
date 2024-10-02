@@ -40,8 +40,7 @@ jobs:
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             cd ${{ secrets.SERVER_PATH }}
             composer install --no-dev --optimize-autoloader
-            php artisan migrate
-            php artisan config:cache
+            php artisan migrate --force
             php artisan route:cache
             php artisan optimize
           EOF
