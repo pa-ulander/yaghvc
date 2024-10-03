@@ -33,5 +33,4 @@ class BadgeGeneratorService
 
         return $svg;
     }
-
 }

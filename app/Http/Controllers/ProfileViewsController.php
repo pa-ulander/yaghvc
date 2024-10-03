@@ -41,6 +41,7 @@ class ProfileViewsController extends Controller
         return response($badgeRender, headers: [
             'Content-Type' => 'image/svg+xml',
             'Cache-Control' => 'Cache-Control: max-age=0, no-cache, no-store, must-revalidate',
-        ]);;
+        ]);
+        ;
     }
 }
