@@ -3,7 +3,7 @@
 <h1>Yet Another Github Visitor Counter</h1>
 
 [![Actions Status](https://github.com/pa-ulander/ghvc/workflows/Tests/badge.svg)](https://github.com/pa-ulander/ghvc/actions)
-[![Actions Status](https://github.com/pa-ulander/ghvc/workflows/Deploy/badge.svg)](https://github.com/pa-ulander/ghvc/actions)
+[![Deploy](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml)
 <h3>yagvc</h3>
 
 <br><br>
