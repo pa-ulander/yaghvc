@@ -1,12 +1,17 @@
+# Yet Another Github Visitor Counter
 
-
-<h1>Yet Another Github Visitor Counter</h1>
-
-[![Tests](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml)
+[![Tests](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml)  
 [![Deploy](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml)
 
-<h3>yagvc</h3>
+### Usage
 
-<br><br>
-<img src="https://ghvc.kabelkultur.se/?username=pa-ulander&color=green&style=for-the-badge&label=Views" alt="yagvc" />
+Put this in your readme.md
 
+```
+![](https://ghvc.kabelkultur.se?username=your-github-username)
+```
+
+
+It will generate a visitor counter badge that looks like this:
+
+![](https://ghvc.kabelkultur.se/?username=pa-ulander&color=green&style=for-the-badge&label=Views)
