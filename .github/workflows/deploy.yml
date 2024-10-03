@@ -67,9 +67,9 @@ jobs:
             ${{ env.COMPOSER_COMMAND }}
             chmod -R 755 storage
             ${{ env.PHP_COMMAND }} artisan migrate --force
+            ${{ env.PHP_COMMAND }} artisan view:clear
             ${{ env.PHP_COMMAND }} artisan config:cache
             ${{ env.PHP_COMMAND }} artisan route:cache
-            ${{ env.PHP_COMMAND }} artisan optimize
           EOF
 
       # - name: Rollback on failure
