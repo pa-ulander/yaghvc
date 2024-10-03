@@ -27,9 +27,9 @@ class ProfileViewsController extends Controller
         $badgeRenderService = new BadgeRenderService();
 
         $badgeRender = $badgeRenderService->renderBadgeWithCount(
-            'Visitors', //+
+            $request?->label ?? 'Visitors', //+
             $profileView?->visit_count ?? 0,
-            $request?->color ?? 'green',
+            $request?->color ?? 'blue',
             $request?->style ?? 'flat',
             $request->style ?? 'default'
         );
