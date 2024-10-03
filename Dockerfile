@@ -37,7 +37,7 @@ apt-get autoremove -y && \
 apt-get clean && \
 rm -rf /var/lib/apt/lists/*
 
-RUN pecl install ast
+# RUN pecl install ast
 
 # 2. apache configs
 RUN echo "ServerName yagvc" >>/etc/apache2/apache2.conf

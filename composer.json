@@ -16,12 +16,12 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "^2.0",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "8.4.0",
         "pestphp/pest": "3.x-dev",
-        "phan/phan": "^5.4",
         "phpunit/phpunit": "^11.0",
         "spatie/laravel-ignition": "^2.4"
     },
@@ -43,8 +43,7 @@
         "test:update": "vendor/bin/pest -d --update-snapshots",
         "lint": "vendor/bin/phpcs --standard=ruleset.xml ./app",
         "lint-fix": "vendor/bin/phpcbf --standard=ruleset.xml ./app",
-        "analyze": "vendor/bin/phan --color",
-        "analyze-report": "vendor/bin/phan -m checkstyle -o ../build/phan.cs",
+        "analyze": "vendor/bin/phpstan analyse --memory-limit=2G",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
