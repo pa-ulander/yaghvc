@@ -6,7 +6,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.2",
         "badges/poser": "^3.1",
         "intervention/image": "^3.6",
         "laravel/framework": "^11.0",
