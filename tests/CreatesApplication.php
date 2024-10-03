@@ -26,6 +26,6 @@ trait CreatesApplication
 
     private function clearCache(): void
     {
-        Artisan::call('cache:clear');
+        Artisan::call(command: 'cache:clear');
     }
 }

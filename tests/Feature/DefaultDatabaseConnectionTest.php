@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -8,15 +10,15 @@ use Tests\TestCase;
 
 class DefaultDatabaseConnectionTest extends TestCase
 {
-    public function testEnvDatabaseConfigurationIsSqliteTesting()
+    public function testEnvDatabaseConfigurationIsSqliteTesting(): void
     {
-        $this->assertSame('sqlite_testing', getenv('DB_CONNECTION'));
+        $this->assertSame(expected: 'sqlite_testing', actual: getenv('DB_CONNECTION'));
     }
 
-    public function testDefaultDatabaseIsSqliteTesting()
+    public function testDefaultDatabaseIsSqliteTesting(): void
     {
         // dump(database_path('database.sqlite'));
         // dump(database_path('database.sqlite_testing'));
-        $this->assertSame('sqlite_testing', config('database.default'));
+        $this->assertSame(expected: 'sqlite_testing', actual: config(key: 'database.default'));
     }
 }

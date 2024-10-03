@@ -11,13 +11,12 @@ use PUGX\Poser\Render\SvgFlatRender;
 use PUGX\Poser\Render\SvgFlatSquareRender;
 use PUGX\Poser\Render\SvgForTheBadgeRenderer;
 use PUGX\Poser\Render\SvgPlasticRender;
-use App\Models\Count;
 
 class BadgeRenderService
 {
     private Poser $poser;
 
-    private const ABBREVIATIONS = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
+    private static $abbreviations = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
 
     public function __construct()
     {
@@ -44,13 +43,13 @@ class BadgeRenderService
         string $badgeStyle,
         bool $isCountAbbreviated,
     ): string {
-        $message = $this->formatNumber($count, $isCountAbbreviated);
+        $message = $this->formatNumber(number: $count, isCountAbbreviated: $isCountAbbreviated);
 
         return $this->renderBadge(
-            $label,
-            $message,
-            $messageBackgroundFill,
-            $badgeStyle,
+            label: $label,
+            message: $message,
+            messageBackgroundFill: $messageBackgroundFill,
+            badgeStyle: $badgeStyle,
         );
     }
 
@@ -62,10 +61,10 @@ class BadgeRenderService
         $messageBackgroundFill = 'red';
 
         return $this->renderBadge(
-            $label,
-            $message,
-            $messageBackgroundFill,
-            $badgeStyle,
+            label: $label,
+            message: $message,
+            messageBackgroundFill: $messageBackgroundFill,
+            badgeStyle: $badgeStyle,
         );
     }
 
@@ -81,11 +80,11 @@ class BadgeRenderService
         string $badgeStyle,
     ): string {
         return (string)$this->poser->generate(
-            $label,
-            $message,
-            $messageBackgroundFill,
-            $badgeStyle,
-            Badge::DEFAULT_FORMAT,
+            subject: $label,
+            status: $message,
+            color: $messageBackgroundFill,
+            style: $badgeStyle,
+            format: Badge::DEFAULT_FORMAT,
         );
     }
 
@@ -98,13 +97,13 @@ class BadgeRenderService
         bool $isCountAbbreviated,
     ): string {
         if ($isCountAbbreviated) {
-            return $this->formatAbbreviatedNumber($number);
+            return $this->formatAbbreviatedNumber(number: $number);
         }
 
-        $reversedString = strrev(strval($number));
-        $formattedNumber = implode(',', str_split($reversedString, 3));
+        $reversedString = strrev(string: strval(value: $number));
+        $formattedNumber = implode(separator: ',', array: str_split(string: $reversedString, length: 3));
 
-        return strrev($formattedNumber);
+        return strrev(string: $formattedNumber);
     }
 
     public function formatAbbreviatedNumber(
@@ -117,6 +116,6 @@ class BadgeRenderService
             $abbreviationIndex++;
         }
 
-        return round($number, 1) . self::ABBREVIATIONS[$abbreviationIndex];
+        return round($number, 1) . self::$abbreviations[$abbreviationIndex];
     }
 }
