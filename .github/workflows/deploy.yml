@@ -42,12 +42,12 @@ jobs:
             --exclude='.env*' \
             --exclude='Makefile' \
             --exclude='.dockerignore' \
+            --exclude='.styleci.yml' \
             --exclude='README.md' \
             --exclude='vendor' \
             --exclude='docker' \
             --exclude='Dockerfile' \
             --exclude='docker-compose.yml' \
-            --exclude='styleci.yml' \
             --exclude='tests' \
             --exclude='db' \
             --exclude='container' \
