@@ -29,6 +29,7 @@ jobs:
             cd ${{ secrets.SERVER_PATH }}
             timestamp=$(date +%Y%m%d_%H%M%S)
             backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
+            mkdir $backup_dir
             cp -R ${{ secrets.SERVER_PATH }} $backup_dir
             echo $backup_dir > /tmp/last_backup_path
           EOF
