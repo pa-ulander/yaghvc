@@ -22,16 +22,16 @@ class BadgeRenderService
     {
         $this->poser = new Poser([
             new SvgPlasticRender(
-                textSizeCalculator: new SvgTextSizeCalculator(),
+                textSizeCalculator: new SvgTextSizeCalculator,
             ),
             new SvgFlatRender(
-                textSizeCalculator: new SvgTextSizeCalculator(),
+                textSizeCalculator: new SvgTextSizeCalculator,
             ),
             new SvgFlatSquareRender(
-                textSizeCalculator: new SvgTextSizeCalculator(),
+                textSizeCalculator: new SvgTextSizeCalculator,
             ),
             new SvgForTheBadgeRenderer(
-                textSizeCalculator: new SvgTextSizeCalculator(),
+                textSizeCalculator: new SvgTextSizeCalculator,
             ),
         ]);
     }
@@ -79,7 +79,7 @@ class BadgeRenderService
         string $messageBackgroundFill,
         string $badgeStyle,
     ): string {
-        return (string)$this->poser->generate(
+        return (string) $this->poser->generate(
             subject: $label,
             status: $message,
             color: $messageBackgroundFill,
@@ -116,6 +116,6 @@ class BadgeRenderService
             $abbreviationIndex++;
         }
 
-        return round($number, 1) . self::$abbreviations[$abbreviationIndex];
+        return round($number, 1).self::$abbreviations[$abbreviationIndex];
     }
 }

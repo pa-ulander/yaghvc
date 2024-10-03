@@ -18,15 +18,15 @@ trait RefreshTestDatabase
 
     /**
      * Migrate fresh only if needed
-     * 
+     *
      * @return void
      */
     protected function refreshTestDatabase()
     {
         config(['app.env' => 'testing']);
-        if (!RefreshDatabaseState::$migrated) {
+        if (! RefreshDatabaseState::$migrated) {
 
-            if (!$this->identicalChecksum()) {
+            if (! $this->identicalChecksum()) {
                 dump('-- Refreshing TestDatabase --');
                 $this->artisan('migrate:fresh', $this->migrateFreshUsing());
                 $this->seed();
@@ -43,8 +43,6 @@ trait RefreshTestDatabase
 
     /**
      * Set checksum of the current migration files
-     * 
-     * @return string
      */
     private function calculateChecksum(): string
     {
@@ -70,8 +68,6 @@ trait RefreshTestDatabase
 
     /**
      * Filepath to store the checksum
-     * 
-     * @return string
      */
     private function checksumFilePath(): string
     {
@@ -80,8 +76,6 @@ trait RefreshTestDatabase
 
     /**
      * Creates the checksum file
-     * 
-     * @return void
      */
     private function createChecksum(): void
     {
@@ -100,8 +94,6 @@ trait RefreshTestDatabase
 
     /**
      * Check if checksum exists
-     * 
-     * @return bool
      */
     private function isChecksumExists(): bool
     {
@@ -111,13 +103,13 @@ trait RefreshTestDatabase
     /**
      * Check if checksum of current database migration files
      * are identical to the one already stored
-     * 
-     * @return bool
      */
     private function identicalChecksum(): bool
     {
-        if (!$this->isChecksumExists()) return false;
+        if (! $this->isChecksumExists()) {
+            return false;
+        }
 
-        return ($this->checksumFileContents() === $this->calculateChecksum());
+        return $this->checksumFileContents() === $this->calculateChecksum();
     }
 }

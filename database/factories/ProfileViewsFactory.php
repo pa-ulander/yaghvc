@@ -2,15 +2,14 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\ProfileViews;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProfileViews>
  */
 class ProfileViewsFactory extends Factory
 {
-
     /**
      * The name of the factory's corresponding model.
      *
@@ -20,8 +19,6 @@ class ProfileViewsFactory extends Factory
 
     /**
      * Holder for username
-     *
-     * @var string|null
      */
     protected static ?string $username;
 

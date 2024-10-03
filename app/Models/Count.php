@@ -21,7 +21,7 @@ class Count extends Model
         if ($count > PHP_INT_MAX) {
             throw new \InvalidArgumentException('The maximum number of views has been reached');
         }
-        
+
         if ($count <= 0) {
             throw new \InvalidArgumentException('Number of views cannot be negative');
         }
@@ -49,7 +49,7 @@ class Count extends Model
     ): self {
         $sum = $this->toInt() + $that->toInt();
 
-        if (!is_int($sum)) {
+        if (! is_int($sum)) {
             throw new \InvalidArgumentException(
                 'The maximum number of views has been reached',
             );

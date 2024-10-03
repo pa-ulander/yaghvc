@@ -8,8 +8,7 @@ class BadgeGenerator
 {
     public function generate(string $username): string
     {
-        $count = (new ProfileViews())->count($username);
-
+        $count = (new ProfileViews)->count($username);
 
         // Create a 300x150 image
         $im = imagecreatetruecolor(300, 150);
@@ -23,31 +22,30 @@ class BadgeGenerator
         $font = './arial.ttf';
 
         // First we create our bounding box for the first text
-        $bbox = imagettfbbox(10, 45, $font, 'Powered by PHP ' . phpversion());
+        $bbox = imagettfbbox(10, 45, $font, 'Powered by PHP '.phpversion());
 
         // This is our cordinates for X and Y
         $x = $bbox[0] + imagesx($im) / 2 - $bbox[4] / 2 - 25;
         $y = $bbox[1] + imagesy($im) / 2 - $bbox[5] / 2 - 5;
 
         // Write it
-        imagettftext($im, 10, 45, $x, $y, $black, $font, 'Powered by PHP ' . phpversion());
+        imagettftext($im, 10, 45, $x, $y, $black, $font, 'Powered by PHP '.phpversion());
 
         // Create the next bounding box for the second text
-        $bbox = imagettfbbox(10, 45, $font, 'and Zend Engine ' . zend_version());
+        $bbox = imagettfbbox(10, 45, $font, 'and Zend Engine '.zend_version());
 
         // Set the cordinates so its next to the first text
         $x = $bbox[0] + imagesx($im) / 2 - $bbox[4] / 2 + 10;
         $y = $bbox[1] + imagesy($im) / 2 - $bbox[5] / 2 - 5;
 
         // Write it
-        imagettftext($im, 10, 45, $x, $y, $black, $font, 'and Zend Engine ' . zend_version());
+        imagettftext($im, 10, 45, $x, $y, $black, $font, 'and Zend Engine '.zend_version());
 
         // Output to browser
         header('Content-Type: image/png');
 
         imagepng($im);
         imagedestroy($im);
-
 
         // Add the proper header
         header('Content-Type: image/svg+xml');
@@ -72,13 +70,11 @@ class BadgeGenerator
             </g>
         </svg>';
 
-
         return response($svg, headers: [
             'Content-Type' => 'image/svg+xml',
             'Cache-Control' => 'max-age=30, s-maxage=30, stale-while-revalidate=30',
         ]);
     }
-
 
     public function getBadgeBoundaries()
     {

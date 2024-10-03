@@ -40,15 +40,16 @@ class SetupDatabase extends Command
     public function handle()
     {
         try {
-            if (!$this->confirm('This command will (re)create and (re)set the entire database. Do you wish to continue?', true)) {
-                $this->info("Process terminated by user");
+            if (! $this->confirm('This command will (re)create and (re)set the entire database. Do you wish to continue?', true)) {
+                $this->info('Process terminated by user');
+
                 return;
             }
             ini_set('memory_limit', '-1');
-            DB::unprepared(file_get_contents("docker/mysql/init.sql"));
+            DB::unprepared(file_get_contents('docker/mysql/init.sql'));
             $this->info('Database was (re)created and provided successfully from "docker/mysql/init.sql"');
         } catch (Exception $e) {
-            $this->error("Error: " . $e->getMessage());
+            $this->error('Error: '.$e->getMessage());
         }
     }
 }

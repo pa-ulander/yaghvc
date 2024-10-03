@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Contracts\Validation\Validator;
 
 class ProfileViewRequest extends FormRequest
 {
     private string $userAgent;
+
     private bool $isCountAbbreviated;
 
     public function authorize(): bool
@@ -40,9 +41,9 @@ class ProfileViewRequest extends FormRequest
     public function failedValidation(Validator $validator): never
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors()
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors(),
         ], 422));
     }
 

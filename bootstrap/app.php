@@ -1,10 +1,9 @@
 <?php
 
+use App\Http\Middleware\ForceJson;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-
-use App\Http\Middleware\ForceJson;
 
 return Application::configure(basePath: dirname(path: __DIR__))
     ->withRouting(
@@ -17,7 +16,7 @@ return Application::configure(basePath: dirname(path: __DIR__))
         $middleware->web(append: [
             ForceJson::class,
         ]);
-     
+
         $middleware->api(prepend: [
             ForceJson::class,
         ]);
