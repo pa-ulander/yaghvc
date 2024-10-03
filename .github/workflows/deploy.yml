@@ -3,6 +3,10 @@ name: Deploy
 on:
   workflow_dispatch:
 
+env:
+  PHP_COMMAND: /opt/alt/php83/usr/bin/php 
+  COMPOSER_COMMAND: /opt/alt/php83/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,6 +23,16 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
+      - name: Backup current deployment
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+            cd ${{ secrets.SERVER_PATH }}
+            timestamp=$(date +%Y%m%d_%H%M%S)
+            backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
+            cp -R ${{ secrets.SERVER_PATH }} $backup_dir
+            echo $backup_dir > /tmp/last_backup_path
+          EOF
+
       - name: Deploy to Webhost
         run: |
           rsync -avz --delete \
@@ -26,28 +40,66 @@ jobs:
             --exclude='.github*' \
             --exclude='.phan*' \
             --exclude='.env*' \
+            --exclude='Makefile' \
+            --exclude='.dockerignore' \
+            --exclude='README.md' \
             --exclude='vendor' \
             --exclude='docker' \
-            --exclude='.dockerignore' \
+            --exclude='Dockerfile' \
+            --exclude='docker-compose.yml' \
+            --exclude='styleci.yml' \
             --exclude='tests' \
             --exclude='db' \
             --exclude='container' \
-            --exclude='Dockerfile' \
-            --exclude='docker-compose.yml' \
-            --exclude='makefile' \
             --exclude='php-artisan' \
             --exclude='phpunit*' \
             --exclude='composer' \
             --exclude='vite*' \
+            --exclude='devcontainer.json' \
             --exclude='package.json' \
+            --exclude='ruleset.xml' \
             ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
 
       - name: Post-deployment tasks
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             cd ${{ secrets.SERVER_PATH }}
-            /opt/alt/php83/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
-            /opt/alt/php83/usr/bin/php artisan migrate --force
-            /opt/alt/php83/usr/bin/php artisan route:cache
-            /opt/alt/php83/usr/bin/php artisan optimize
+            ${{ env.COMPOSER_COMMAND }}
+            chmod -R 755 storage
+            ${{ env.PHP_COMMAND }} artisan migrate --force
+            ${{ env.PHP_COMMAND }} artisan config:cache
+            ${{ env.PHP_COMMAND }} artisan route:cache
+            ${{ env.PHP_COMMAND }} artisan optimize
           EOF
+
+      # - name: Rollback on failure
+      #   if: failure()
+      #   run: |
+      #     ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+      #       backup_dir=$(cat /tmp/last_backup_path)
+      #       rm -rf ${{ secrets.SERVER_PATH }}
+      #       mv $backup_dir ${{ secrets.SERVER_PATH }}
+      #       cd ${{ secrets.SERVER_PATH }}
+      #       ${{ env.PHP_COMMAND }} artisan migrate:rollback
+      #       ${{ env.PHP_COMMAND }} artisan config:clear
+      #       ${{ env.PHP_COMMAND }} artisan route:clear
+      #       ${{ env.PHP_COMMAND }} artisan cache:clear
+      #     EOF
+
+      # - name: Cleanup old backups
+      #   if: always()
+      #   run: |
+      #     ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+      #       find ${{ secrets.SERVER_PATH }}_backup_* -maxdepth 0 -type d -mtime +7 -exec rm -rf {} +
+      #     EOF
+
+      # - name: Notify on success or failure
+      #   if: always()
+      #   run: |
+      #     if [ ${{ job.status }} == 'success' ]; then
+      #       echo "Deployment successful"
+      #       # Add success notification here (e.g., Slack, email)
+      #     else
+      #       echo "Deployment failed, rolled back to previous version"
+      #       # Add failure notification here
+      #     fi
