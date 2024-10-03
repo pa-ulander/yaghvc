@@ -39,12 +39,12 @@ class BadgeRenderService
 
     public function renderBadgeWithCount(
         string $label,
-        Count $count,
+        int $count,
         string $messageBackgroundFill,
         string $badgeStyle,
         bool $isCountAbbreviated,
     ): string {
-        $message = $this->formatNumber($count->toInt(), $isCountAbbreviated);
+        $message = $this->formatNumber($count, $isCountAbbreviated);
 
         return $this->renderBadge(
             $label,

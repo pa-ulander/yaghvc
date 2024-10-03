@@ -22,11 +22,21 @@ class ProfileViewsController extends Controller
         }
 
         $badgeGeneratorService = new BadgeGeneratorService();
-        $badgeRenderService = new BadgeRenderService();
         $badge = $badgeGeneratorService->generate($request->username);
-        // $badgeRender = $badgeRenderService->renderBadgeWithCount();
+        
+        $badgeRenderService = new BadgeRenderService();
 
-        return response($badge, headers: [
+        $badgeRender = $badgeRenderService->renderBadgeWithCount(
+            'Visitors', //+
+            $profileView?->visit_count ?? 0,
+            $request?->color ?? 'green',
+            $request?->style ?? 'flat',
+            $request->style ?? 'default'
+        );
+
+// dd($badgeRender);
+
+        return response($badgeRender, headers: [
             'Content-Type' => 'image/svg+xml',
             'Cache-Control' => 'Cache-Control: max-age=0, no-cache, no-store, must-revalidate',
         ]);;
