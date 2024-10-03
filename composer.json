@@ -23,7 +23,8 @@
         "nunomaduro/collision": "8.4.0",
         "pestphp/pest": "3.x-dev",
         "phpunit/phpunit": "^11.0",
-        "spatie/laravel-ignition": "^2.4"
+        "spatie/laravel-ignition": "^2.4",
+        "squizlabs/php_codesniffer": "*"
     },
     "autoload": {
         "psr-4": {
