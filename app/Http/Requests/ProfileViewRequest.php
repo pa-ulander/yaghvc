@@ -10,8 +10,9 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ProfileViewRequest extends FormRequest
 {
-    private string $userAgent;
+    private const MAX_USERNAME_LENGTH = 255;
 
+    private string $userAgent;
     private bool $abbreviated;
 
     public function authorize(): bool
@@ -19,15 +20,15 @@ class ProfileViewRequest extends FormRequest
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
-            'username' => 'required|max:255',
-            'label' => 'nullable|string',
-            'color' => 'nullable|string',
-            'style' => 'nullable|string',
-            'base' => 'nullable|string',
-            'abbreviated' => 'nullable|string',
+            'username' => ['required', 'max:' . self::MAX_USERNAME_LENGTH],
+            'label' => ['nullable', 'string'],
+            'color' => ['nullable', 'string'],
+            'style' => ['nullable', 'string'],
+            'base' => ['nullable', 'string'],
+            'abbreviated' => ['nullable', 'string'],
         ];
     }
 
@@ -40,11 +41,11 @@ class ProfileViewRequest extends FormRequest
 
     public function failedValidation(Validator $validator): never
     {
-        throw new HttpResponseException(response()->json([
+        throw new HttpResponseException(response: response()->json(data: [
             'success' => false,
             'message' => 'Validation errors',
             'data' => $validator->errors(),
-        ], 422));
+        ], status: 422));
     }
 
     public function getUserAgent(): string
@@ -54,27 +55,27 @@ class ProfileViewRequest extends FormRequest
 
     public function getUsername(): string
     {
-        return $this->input('username');
+        return $this->input(key: 'username');
     }
 
     public function getBadgeLabel(): ?string
     {
-        return $this->input('label');
+        return $this->input(key: 'label');
     }
 
     public function getBadgeColor(): ?string
     {
-        return $this->input('color');
+        return $this->input(key: 'color');
     }
 
     public function getBadgeStyle(): ?string
     {
-        return $this->input('style');
+        return $this->input(key: 'style');
     }
 
     public function getBaseCount(): ?string
     {
-        return $this->input('base');
+        return $this->input(key: 'base');
     }
 
     public function getAbbreviated(): bool
@@ -84,7 +85,15 @@ class ProfileViewRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->userAgent = $this->header('User-Agent', '');
-        $this->abbreviated = $this->boolean('abbreviated', false);
+        $this->userAgent = $this->header(key: 'User-Agent', default: '');
+        $this->abbreviated = $this->boolean(key: 'abbreviated', default: false);
+        
+        $this->merge(input: [
+            'username' => strip_tags(string: $this->input(key: 'username')),
+            'label' => strip_tags(string: $this->input(key: 'label')),
+            'color' => strip_tags(string: $this->input(key: 'color')),
+            'style' => strip_tags(string: $this->input(key: 'style')),
+            'base' => strip_tags(string: $this->input(key: 'base')),
+        ]);
     }
 }
