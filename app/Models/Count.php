@@ -19,11 +19,11 @@ class Count extends Model
         $this->count = $count;
 
         if ($count > PHP_INT_MAX) {
-            throw new \InvalidArgumentException('The maximum number of views has been reached');
+            throw new \InvalidArgumentException(message: 'Max number of views reached');
         }
 
         if ($count <= 0) {
-            throw new \InvalidArgumentException('Number of views cannot be negative');
+            throw new \InvalidArgumentException(message: 'Number of views can\'t be negative');
         }
     }
 
@@ -31,12 +31,12 @@ class Count extends Model
         string $value
     ): self {
         Assert::digits(
-            $value,
-            'The base count must only contain digits',
+            value: $value,
+            message: 'Base count can only be a number',
         );
-        $count = intval($value);
+        $count = intval(value: $value);
 
-        return new self($count);
+        return new self(count: $count);
     }
 
     public function toInt(): int
@@ -49,12 +49,12 @@ class Count extends Model
     ): self {
         $sum = $this->toInt() + $that->toInt();
 
-        if (! is_int($sum)) {
+        if (! is_int(value: $sum)) {
             throw new \InvalidArgumentException(
-                'The maximum number of views has been reached',
+                message: 'Max number of views reached',
             );
         }
 
-        return new self($sum);
+        return new self(count: $sum);
     }
 }

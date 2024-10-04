@@ -41,9 +41,9 @@ class BadgeRenderService
         int $count,
         string $messageBackgroundFill,
         string $badgeStyle,
-        bool $isCountAbbreviated,
+        bool $abbreviated,
     ): string {
-        $message = $this->formatNumber(number: $count, isCountAbbreviated: $isCountAbbreviated);
+        $message = $this->formatNumber(number: $count, abbreviated: $abbreviated);
 
         return $this->renderBadge(
             label: $label,
@@ -94,9 +94,9 @@ class BadgeRenderService
      */
     private function formatNumber(
         int $number,
-        bool $isCountAbbreviated,
+        bool $abbreviated,
     ): string {
-        if ($isCountAbbreviated) {
+        if ($abbreviated) {
             return $this->formatAbbreviatedNumber(number: $number);
         }
 
@@ -106,9 +106,7 @@ class BadgeRenderService
         return strrev(string: $formattedNumber);
     }
 
-    public function formatAbbreviatedNumber(
-        int $number,
-    ): string {
+    public function formatAbbreviatedNumber(int $number): string {
         $abbreviationIndex = 0;
 
         while ($number >= 1000) {
@@ -116,6 +114,6 @@ class BadgeRenderService
             $abbreviationIndex++;
         }
 
-        return round($number, 1).self::$abbreviations[$abbreviationIndex];
+        return round(num: $number, precision: 1).self::$abbreviations[$abbreviationIndex];
     }
 }

@@ -12,7 +12,7 @@ class ProfileViewRequest extends FormRequest
 {
     private string $userAgent;
 
-    private bool $isCountAbbreviated;
+    private bool $abbreviated;
 
     public function authorize(): bool
     {
@@ -27,7 +27,7 @@ class ProfileViewRequest extends FormRequest
             'color' => 'nullable|string',
             'style' => 'nullable|string',
             'base' => 'nullable|string',
-            'abbreviated' => 'boolean',
+            'abbreviated' => 'nullable|string',
         ];
     }
 
@@ -77,14 +77,14 @@ class ProfileViewRequest extends FormRequest
         return $this->input('base');
     }
 
-    public function isCountAbbreviated(): bool
+    public function getAbbreviated(): bool
     {
-        return $this->isCountAbbreviated;
+        return $this->abbreviated;
     }
 
     protected function prepareForValidation(): void
     {
         $this->userAgent = $this->header('User-Agent', '');
-        $this->isCountAbbreviated = $this->boolean('abbreviated', false);
+        $this->abbreviated = $this->boolean('abbreviated', false);
     }
 }
