@@ -23,14 +23,12 @@ class ProfileViewsController extends Controller
         $badgeRenderService = new BadgeRenderService;
         
         $badgeRender = $badgeRenderService->renderBadgeWithCount(
-            label: $request->getBadgeLabel() ?? 'Viewsies',
+            label: $request->getBadgeLabel() ?? 'Views',
             count: $profileView->getCount($request->username) ?? 0,
-            messageBackgroundFill: $request->color ?? 'blue',
+            messageBackgroundFill: $request->color ?? 'green',
             badgeStyle: $request->getBadgeStyle() ?? 'for-the-badge',
             abbreviated: $request?->getAbbreviated() ?? false
         );
-
-        // dd($badgeRender);
 
         return response($badgeRender, headers: [
             'Content-Type' => 'image/svg+xml',

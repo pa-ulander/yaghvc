@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 class ProfileViewRequest extends FormRequest
 {
     private const MAX_USERNAME_LENGTH = 39; // GitHub's max username length
-    
+
     private const ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic']; // example styles
 
     private string $userAgent;
@@ -30,13 +30,10 @@ class ProfileViewRequest extends FormRequest
             'username' => [
                 'required',
                 'max:' . self::MAX_USERNAME_LENGTH,
-                'regex:/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i' // GitHub username regex
+                'regex:/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i'
             ],
             'label' => ['nullable', 'string', 'max:50'],
-
-            // hexadecimal color code or named color regex
-            'color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'], 
-
+            'color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
             'style' => ['nullable', 'string', Rule::in(values: self::ALLOWED_STYLES)],
             'base' => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'abbreviated' => ['nullable', 'boolean'],
@@ -100,23 +97,24 @@ class ProfileViewRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->userAgent = $this->header(key: 'User-Agent', default: '');
-  
-        $mergeData = [
-            'username' => trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username'))),
-        ];
 
-        $optionalFields = ['label', 'color', 'style', 'base'];
+        if ($this->has('username') && !empty($this->input(key: 'username'))) {
+            $mergeData = [
+                'username' => trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username'))),
+            ];
+            $optionalFields = ['label', 'color', 'style', 'base'];
 
-        foreach ($optionalFields as $field) {
-            if ($this->has($field)) {
-                $mergeData[$field] = trim(string: strip_tags(string: $this->input(key: $field)));
+            foreach ($optionalFields as $field) {
+                if ($this->has($field)) {
+                    $mergeData[$field] = trim(string: strip_tags(string: $this->input(key: $field)));
+                }
             }
-        }
 
-        if ($this->has('abbreviated')) {
-            $mergeData['abbreviated'] = $this->boolean('abbreviated');
-        }
+            if ($this->has('abbreviated')) {
+                $mergeData['abbreviated'] = $this->boolean('abbreviated');
+            }
 
-        $this->merge(input: $mergeData);
+            $this->merge(input: $mergeData);
+        }
     }
 }
