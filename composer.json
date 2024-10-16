@@ -41,6 +41,8 @@
     },
     "scripts": {
         "test": "vendor/bin/pest",
+        "test:unit": "vendor/bin/pest tests/Unit",
+        "test:feature": "vendor/bin/pest tests/Feature",
         "test:update": "vendor/bin/pest -d --update-snapshots",
         "lint": "vendor/bin/phpcs --standard=ruleset.xml ./app",
         "lint-fix": "vendor/bin/phpcbf --standard=ruleset.xml ./app",

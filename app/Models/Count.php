@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Webmozart\Assert\Assert;
 
+/**
+ * @method static \Database\Factories\CountFactory factory(...$parameters)
+ */
 class Count extends Model
 {
     use HasFactory;

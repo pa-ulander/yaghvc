@@ -17,16 +17,16 @@ class ProfileViewsController extends Controller
         if ($profileView?->username) {
             $profileView->incrementCount();
         } else {
-            ProfileViews::create(attributes: ['username' => $request->username, 'visit_count' => 1, 'last_visit' => now()]);
+            $profileView = ProfileViews::create(attributes: ['username' => $request->username, 'visit_count' => 1, 'last_visit' => now()]);
         }
-
+        
         $badgeRenderService = new BadgeRenderService;
-
+        
         $badgeRender = $badgeRenderService->renderBadgeWithCount(
-            label: $request?->getBadgeLabel() ?? 'Viewsies',
-            count: $profileView?->getCount($profileView?->username) ?? 0,
-            messageBackgroundFill: $request?->getBadgeColor() ?? 'blue',
-            badgeStyle: $request?->getBadgeStyle() ?? 'for-the-badge',
+            label: $request->getBadgeLabel() ?? 'Viewsies',
+            count: $profileView->getCount($request->username) ?? 0,
+            messageBackgroundFill: $request->color ?? 'blue',
+            badgeStyle: $request->getBadgeStyle() ?? 'for-the-badge',
             abbreviated: $request?->getAbbreviated() ?? false
         );
 
@@ -36,6 +36,5 @@ class ProfileViewsController extends Controller
             'Content-Type' => 'image/svg+xml',
             'Cache-Control' => 'Cache-Control: max-age=0, no-cache, no-store, must-revalidate',
         ]);
-
     }
 }

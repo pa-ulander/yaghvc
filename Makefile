@@ -81,7 +81,7 @@ upgrade-project:
 ##@ Run actions after setup
 post-build-actions:
     # set permissions
-	- docker-compose exec yagvc-app bash -c "chown -R devuser:devuser ."
+	- docker-compose exec yagvc-app bash -c "chown -R $(DEVUSER):$(DEVUSER) ."
 
 ##@ Setup development database
 setup-db: prompt-continue
@@ -99,7 +99,7 @@ inspect-network:
 
 ##@ Remove the docker containers and deletes project dependencies
 clean: post-build-actions prerequisite prompt-continue
-	- docker exec -u root -t -i db /bin/bash -c "chown -R devuser:devuser ./docker"
+	- docker exec -u root -t -i db /bin/bash -c "chown -R $(DEVUSER):$(DEVUSER) ./docker"
 	# Remove the dependencies
 	- rm -rf ./vendor
 	- rm -rf ./docker/var
@@ -125,13 +125,13 @@ status: prerequisite
 ##@ Opens a bash prompt to the yagvc-app container
 bash: prerequisite
 	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` yagvc-app bash
-	# - docker exec -it yagvc-app bash -c "sudo -u devuser /bin/bash"
+	# - docker exec -it yagvc-app bash -c "sudo -u $(DEVUSER) /bin/bash"
 	- docker exec -it yagvc-app bash -c "sudo -u root /bin/bash"
 
 ##@ Opens a bash prompt to the db container
 bash-db: prerequisite
 	- docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` db bash
-	# - docker exec -it db bash -c "sudo -u devuser /bin/bash"
+	# - docker exec -it db bash -c "sudo -u $(DEVUSER) /bin/bash"
 
 #################################################
 # TEST TARGETS			 						#

@@ -106,7 +106,8 @@ class BadgeRenderService
         return strrev(string: $formattedNumber);
     }
 
-    public function formatAbbreviatedNumber(int $number): string {
+    public function formatAbbreviatedNumber(int $number): string
+    {
         $abbreviationIndex = 0;
 
         while ($number >= 1000) {

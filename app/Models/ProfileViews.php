@@ -35,7 +35,6 @@ class ProfileViews extends Model
     {
         return Cache::remember(key: 'count-'.$username, ttl: 1, callback: function () use ($username): int {
             $profileView = self::where(column: 'username', operator: $username)->first();
-
             return $profileView->username ? $profileView->visit_count : 0;
         });
     }
