@@ -7,6 +7,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
@@ -15,9 +16,6 @@ class ProfileViewRequest extends FormRequest
     private const MAX_USERNAME_LENGTH = 39; // GitHub's max username length
 
     private const ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic']; // example styles
-
-    private string $userAgent;
-    private bool $abbreviated;
 
     public function authorize(): bool
     {
@@ -37,6 +35,7 @@ class ProfileViewRequest extends FormRequest
             'style' => ['nullable', 'string', Rule::in(values: self::ALLOWED_STYLES)],
             'base' => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'abbreviated' => ['nullable', 'boolean'],
+            'user_agent' => ['required', 'string'],
         ];
     }
 
@@ -59,44 +58,11 @@ class ProfileViewRequest extends FormRequest
         ], status: 422));
     }
 
-    public function getUserAgent(): string
-    {
-        return $this->userAgent;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->input(key: 'username');
-    }
-
-    public function getBadgeLabel(): ?string
-    {
-        return $this->input(key: 'label');
-    }
-
-    public function getBadgeColor(): ?string
-    {
-        return $this->input(key: 'color');
-    }
-
-    public function getBadgeStyle(): ?string
-    {
-        return $this->input(key: 'style');
-    }
-
-    public function getBaseCount(): ?string
-    {
-        return $this->input(key: 'base');
-    }
-
-    public function getAbbreviated(): bool
-    {
-        return $this->input('abbreviated', false);
-    }
-
     protected function prepareForValidation(): void
     {
-        $this->userAgent = $this->header(key: 'User-Agent', default: '');
+        $mergeData = [
+            'user_agent' => $this->header(key: 'User-Agent', default: ''),
+        ];
 
         if ($this->has('username') && !empty($this->input(key: 'username'))) {
             $mergeData = [
@@ -110,11 +76,35 @@ class ProfileViewRequest extends FormRequest
                 }
             }
 
-            if ($this->has('abbreviated')) {
+            if ($this->has(key: 'abbreviated')) {
                 $mergeData['abbreviated'] = $this->boolean('abbreviated');
             }
 
             $this->merge(input: $mergeData);
         }
+    }
+
+    public function all($keys = null): array
+    {
+        $data = parent::all(keys: $keys);
+        if (!isset($data['user_agent'])) {
+            $data['user_agent'] = $this->header(key: 'User-Agent', default: '');
+        }
+        return $data;
+    }
+
+    // protected function passedValidation(): void
+    // {
+    //     dump('passedValidation method called');
+    // }
+
+    public function validated($key = null, $default = null): mixed
+    {
+        $validated = $this->validator->validated();
+        $all = $this->all();
+
+        $merged = array_merge($validated, ['user_agent' => $all['user_agent']]);
+
+        return $key ? Arr::get($merged, $key, $default) : $merged;
     }
 }
