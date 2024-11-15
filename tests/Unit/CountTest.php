@@ -12,7 +12,7 @@ it('creates a Count instance with a valid count', function () {
 it('throws an exception when count is greater than PHP_INT_MAX', function () {
     $this->expectException(InvalidArgumentException::class);
     $this->expectExceptionMessage('Max number of views reached');
-    new Count(PHP_INT_MAX + 1);
+    new Count(PHP_INT_MAX+1);
 });
 
 it('throws an exception when count is zero or negative', function ($invalidCount) {
@@ -50,9 +50,9 @@ it('adds two Count instances correctly', function () {
 });
 
 it('throws an exception when addition result exceeds PHP_INT_MAX', function () {
-    $count1 = new Count(PHP_INT_MAX);
-    $count2 = new Count(1);
-    $this->expectException(InvalidArgumentException::class);
+    $count1 = new Count(PHP_INT_MAX - 1);
+    $count2 = new Count(2);
+    $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('Max number of views reached');
     $count1->plus($count2);
 });

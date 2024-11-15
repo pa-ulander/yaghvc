@@ -15,19 +15,19 @@ class Count extends Model
 {
     use HasFactory;
 
-    private int $count;
+    private int|float $count;
 
-    public function __construct(int $count)
+    public function __construct(int|float $count)
     {
-        $this->count = $count;
-
-        if ($count > PHP_INT_MAX) {
+        if ($count >= PHP_INT_MAX) {
             throw new \InvalidArgumentException(message: 'Max number of views reached');
         }
 
         if ($count <= 0) {
             throw new \InvalidArgumentException(message: 'Number of views can\'t be negative');
         }
+
+        $this->count = $count;
     }
 
     public static function ofString(
@@ -47,17 +47,13 @@ class Count extends Model
         return $this->count;
     }
 
-    public function plus(
-        self $that
-    ): self {
-        $sum = $this->toInt() + $that->toInt();
-
-        if (! is_int(value: $sum)) {
-            throw new \InvalidArgumentException(
-                message: 'Max number of views reached',
-            );
+    public function plus(self $that): self
+    {
+        if ($this->count > PHP_INT_MAX - $that->count) {
+            throw new \InvalidArgumentException('Max number of views reached');
         }
-
-        return new self(count: $sum);
+        
+        $sum = $this->count + $that->count;
+        return new self($sum);
     }
 }
