@@ -16,7 +16,7 @@ class BadgeRenderService
 {
     private Poser $poser;
 
-    private static $abbreviations = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
+    private static array $abbreviations = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
 
     public function __construct()
     {

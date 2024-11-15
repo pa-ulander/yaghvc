@@ -125,8 +125,8 @@ status: prerequisite
 ##@ Opens a bash prompt to the yagvc-app container
 bash: prerequisite
 	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` yagvc-app bash
-	# - docker exec -it yagvc-app bash -c "sudo -u $(DEVUSER) /bin/bash"
-	- docker exec -it yagvc-app bash -c "sudo -u root /bin/bash"
+	# - docker exec -it yagvc-app bash -c "sudo -u root /bin/bash"
+	- docker exec -it yagvc-app bash -c "sudo -u $(DEVUSER) /bin/bash"
 
 ##@ Opens a bash prompt to the db container
 bash-db: prerequisite

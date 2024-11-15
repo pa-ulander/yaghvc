@@ -32,7 +32,7 @@ class ProfileViews extends Model
         'last_visit' => 'datetime',
     ];
 
-    public function getCount($username)
+    public function getCount(string $username): mixed
     {
         return Cache::remember(key: 'count-' . $username, ttl: 1, callback: function () use ($username): int {
             $profileView = self::where(column: 'username', operator: $username)->first();
@@ -40,16 +40,16 @@ class ProfileViews extends Model
         });
     }
 
-    public function incrementCount()
+    public function incrementCount(): void
     {
         if (!$this->username) {
-            Log::error('Attempt to increment count for ProfileView without username', ['id' => $this->id]);
-            throw new \InvalidArgumentException('Username is missing for this instance.');
+            Log::error(message: 'Attempt to increment count for ProfileView without username', context: ['id' => $this->id]);
+            throw new \InvalidArgumentException(message: 'Username is missing for this instance.');
         }
     
-        $this->increment('visit_count');
-        $this->update(['last_visit' => now()]);
+        $this->increment(column: 'visit_count');
+        $this->update(attributes: ['last_visit' => now()]);
     
-        Cache::forget("count-{$this->username}");
+        Cache::forget(key: "count-{$this->username}");
     }
 }

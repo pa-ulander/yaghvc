@@ -77,14 +77,18 @@ class ProfileViewRequest extends FormRequest
             }
 
             if ($this->has(key: 'abbreviated')) {
-                $mergeData['abbreviated'] = $this->boolean('abbreviated');
+                $mergeData['abbreviated'] = $this->boolean(key: 'abbreviated');
             }
 
             $this->merge(input: $mergeData);
         }
     }
 
-    public function all($keys = null): array
+    /**
+     * @param array|mixed|null $keys
+     * @return array
+     */
+    public function all(mixed $keys = null): array
     {
         $data = parent::all(keys: $keys);
         if (!isset($data['user_agent'])) {
@@ -98,13 +102,19 @@ class ProfileViewRequest extends FormRequest
     //     dump('passedValidation method called');
     // }
 
-    public function validated($key = null, $default = null): mixed
+
+    /**
+     * @param array|int|string|null $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function validated(mixed $key = null, mixed $default = null): mixed
     {
         $validated = $this->validator->validated();
         $all = $this->all();
-
+    
         $merged = array_merge($validated, ['user_agent' => $all['user_agent']]);
-
-        return $key ? Arr::get($merged, $key, $default) : $merged;
+    
+        return $key ? Arr::get(array: $merged, key: $key, default: $default) : $merged;
     }
 }
