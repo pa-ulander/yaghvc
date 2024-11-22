@@ -3,7 +3,7 @@ docker/var
 vendor
 
 *.cache
-/storage
+storage/*
 /vendor
 .env
 .env.backup
@@ -13,7 +13,3 @@ vendor
 auth.json
 yarn-error.log
 /.vscode
-
-storage
-storage/logs
-storage/logs/laravel.log

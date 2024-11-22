@@ -14,5 +14,5 @@ parameters:
 #        - '#PHPDoc tag @var#'
 
     excludePaths:
-        - storage
+        - ./storage?
         - ./routes/console.php
