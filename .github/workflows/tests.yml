@@ -31,7 +31,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions:  gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
-          coverage: none
+          coverage: xdebug
 
       - name: Get Composer Cache Directory
         id: composer-cache
