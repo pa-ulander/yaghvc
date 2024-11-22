@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileViewRequest;
+use App\Http\Requests\ProfileViewsRequest;
 use App\Repositories\ProfileViewsRepository;
 use Illuminate\Support\Facades\Validator;
 use \Illuminate\Support\ValidatedInput;
@@ -24,7 +24,7 @@ class ProfileViewsController extends Controller
         $this->profileViewsRepository = $profileViewsRepository;
     }
 
-    public function index(ProfileViewRequest $request): ResponseFactory|Response
+    public function index(ProfileViewsRequest $request): ResponseFactory|Response
     {
         // /** @var array $safe */
         $safe = $request->safe();

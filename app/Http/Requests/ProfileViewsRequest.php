@@ -11,11 +11,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
-class ProfileViewRequest extends FormRequest
+class ProfileViewsRequest extends FormRequest
 {
-    private const MAX_USERNAME_LENGTH = 39; // GitHub's max username length
+    private const MAX_USERNAME_LENGTH = 39;
 
-    private const ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic']; // example styles
+    private const ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic'];
 
     public function authorize(): bool
     {
@@ -63,25 +63,24 @@ class ProfileViewRequest extends FormRequest
         $mergeData = [
             'user_agent' => $this->header(key: 'User-Agent', default: ''),
         ];
-
+    
         if ($this->has('username') && !empty($this->input(key: 'username'))) {
-            $mergeData = [
-                'username' => trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username'))),
-            ];
+            $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
+            
             $optionalFields = ['label', 'color', 'style', 'base'];
-
+    
             foreach ($optionalFields as $field) {
                 if ($this->has($field)) {
                     $mergeData[$field] = trim(string: strip_tags(string: $this->input(key: $field)));
                 }
             }
-
+    
             if ($this->has(key: 'abbreviated')) {
                 $mergeData['abbreviated'] = $this->boolean(key: 'abbreviated');
             }
-
-            $this->merge(input: $mergeData);
         }
+    
+        $this->merge(input: $mergeData);
     }
 
     /**
