@@ -1,6 +1,7 @@
 # Yet Another Github Visitor Counter
 
 [![Tests](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml)
+[![Test Coverage](https://raw.githubusercontent.com/pa-ulander/ghvc/main/badge-coverage.svg)](https://packagist.org/packages/pa-ulander/ghvc)
 [![Deploy](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml)
 
 ### Usage
