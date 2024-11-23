@@ -57,12 +57,6 @@ jobs:
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
-          coverage_badge_path: output/coverage.svg
-          push_badge: false
-
-      - name: Generate test coverage badge
-        uses: ./
-        with:
-          coverage_badge_path: 'badge.svg'
+          coverage_badge_path: code_coverage.svg
           push_badge: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
