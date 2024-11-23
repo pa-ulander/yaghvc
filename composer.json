@@ -52,9 +52,7 @@
             "vendor/bin/pest tests/Feature"
         ],
         "test:coverage": [
-            "@putenv XDEBUG_MODE=coverage",
-            "vendor/bin/pest tests --coverage",
-            "@putenv XDEBUG_MODE=off"
+            "vendor/bin/pest tests --coverage-clover clover.xml"
         ],
         "test:typecoverage": [
             "vendor/bin/pest tests --type-coverage --min=100"
@@ -63,11 +61,13 @@
             "vendor/bin/pest -d --update-snapshots"
         ],
         "test": [
+            "@putenv XDEBUG_MODE=coverage",
             "@test:lint-fix",
             "@test:analyze",
             "@test:unit",
             "@test:feature",
-            "@test:coverage"
+            "@test:coverage",
+            "@putenv XDEBUG_MODE=off"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
