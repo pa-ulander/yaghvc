@@ -4,6 +4,9 @@
 [![Test Coverage](./code_coverage_badge.svg)](https://github.com/pa-ulander/ghvc)
 [![Deploy](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml)
 
+
+[![Test Coverage](https://raw.githubusercontent.com/pa-ulander/ghvc/refs/heads/image-data/coverage.svg?token=GHSAT0AAAAAAC2Q53QG6OQDKS3OAEMM6HYQZ2DNB4Q)](https://github.com/pa-ulander/ghvc)
+
 ### Usage
 
 Put this in your readme.md
