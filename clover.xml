@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1733697543">
-  <project timestamp="1733697543">
+<coverage generated="1733697745">
+  <project timestamp="1733697745">
     <package name="App\Console">
-      <file name="/home/pa/projects/yagvc/app/Console/Kernel.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Console/Kernel.php">
         <class name="App\Console\Kernel" namespace="App\Console">
           <metrics complexity="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="1" elements="2" coveredelements="2"/>
         </class>
@@ -12,13 +12,13 @@
       </file>
     </package>
     <package name="App\Http\Controllers">
-      <file name="/home/pa/projects/yagvc/app/Http/Controllers/Controller.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Http/Controllers/Controller.php">
         <class name="App\Http\Controllers\Controller" namespace="App\Http\Controllers">
           <metrics complexity="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
         </class>
         <metrics loc="17" ncloc="13" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Http/Controllers/ProfileViewsController.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Http/Controllers/ProfileViewsController.php">
         <class name="App\Http\Controllers\ProfileViewsController" namespace="App\Http\Controllers">
           <metrics complexity="4" methods="4" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="19" coveredstatements="19" elements="23" coveredelements="23"/>
         </class>
@@ -49,7 +49,7 @@
       </file>
     </package>
     <package name="App\Http\Middleware">
-      <file name="/home/pa/projects/yagvc/app/Http/Middleware/ForceJson.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Http/Middleware/ForceJson.php">
         <class name="App\Http\Middleware\ForceJson" namespace="App\Http\Middleware">
           <metrics complexity="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="2" elements="3" coveredelements="3"/>
         </class>
@@ -60,7 +60,7 @@
       </file>
     </package>
     <package name="App\Http\Requests">
-      <file name="/home/pa/projects/yagvc/app/Http/Requests/ProfileViewsRequest.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Http/Requests/ProfileViewsRequest.php">
         <class name="App\Http\Requests\ProfileViewsRequest" namespace="App\Http\Requests">
           <metrics complexity="14" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="44" coveredstatements="44" elements="51" coveredelements="51"/>
         </class>
@@ -119,7 +119,7 @@
       </file>
     </package>
     <package name="App\Models">
-      <file name="/home/pa/projects/yagvc/app/Models/Count.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Models/Count.php">
         <class name="App\Models\Count" namespace="App\Models">
           <metrics complexity="7" methods="4" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="16" coveredstatements="16" elements="20" coveredelements="20"/>
         </class>
@@ -145,7 +145,7 @@
         <line num="57" type="stmt" count="1"/>
         <metrics loc="60" ncloc="57" classes="1" methods="4" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="16" coveredstatements="16" elements="20" coveredelements="20"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Models/ProfileViews.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Models/ProfileViews.php">
         <class name="App\Models\ProfileViews" namespace="App\Models">
           <metrics complexity="4" methods="2" coveredmethods="2" conditionals="0" coveredconditionals="0" statements="10" coveredstatements="10" elements="12" coveredelements="12"/>
         </class>
@@ -165,7 +165,7 @@
       </file>
     </package>
     <package name="App\Providers">
-      <file name="/home/pa/projects/yagvc/app/Providers/AppServiceProvider.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Providers/AppServiceProvider.php">
         <class name="App\Providers\AppServiceProvider" namespace="App\Providers">
           <metrics complexity="2" methods="2" coveredmethods="2" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="2" elements="4" coveredelements="4"/>
         </class>
@@ -177,7 +177,7 @@
       </file>
     </package>
     <package name="App\Repositories">
-      <file name="/home/pa/projects/yagvc/app/Repositories/ProfileViewsRepository.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Repositories/ProfileViewsRepository.php">
         <class name="App\Repositories\ProfileViewsRepository" namespace="App\Repositories">
           <metrics complexity="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="6" coveredstatements="6" elements="7" coveredelements="7"/>
         </class>
@@ -192,7 +192,7 @@
       </file>
     </package>
     <package name="App\Services">
-      <file name="/home/pa/projects/yagvc/app/Services/BadgeRenderService.php">
+      <file name="/home/runner/work/ghvc/ghvc/app/Services/BadgeRenderService.php">
         <class name="App\Services\BadgeRenderService" namespace="App\Services">
           <metrics complexity="9" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="46" coveredstatements="46" elements="53" coveredelements="53"/>
         </class>
