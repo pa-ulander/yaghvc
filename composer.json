@@ -18,12 +18,13 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
-        "larastan/larastan": "^3.0",
+        "larastan/larastan": "^2.9",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "8.5.0",
         "pestphp/pest": "^3.5",
+        "pestphp/pest-plugin-type-coverage": "^3.2",
         "phpunit/phpunit": "^11.0",
         "spatie/laravel-ignition": "^2.4",
         "squizlabs/php_codesniffer": "*"
@@ -67,6 +68,7 @@
             "@test:unit",
             "@test:feature",
             "@test:coverage",
+            "@test:typecoverage",
             "@putenv XDEBUG_MODE=off"
         ],
         "post-autoload-dump": [

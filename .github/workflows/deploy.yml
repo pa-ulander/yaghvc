@@ -53,12 +53,14 @@ jobs:
             --exclude='db' \
             --exclude='container' \
             --exclude='php-artisan' \
+            --exclude='phpstan.neon' \
             --exclude='phpunit*' \
             --exclude='composer' \
             --exclude='vite*' \
             --exclude='devcontainer.json' \
             --exclude='package.json' \
             --exclude='ruleset.xml' \
+            --exclude='clover.xml' \
             ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
 
       - name: Post-deployment tasks
