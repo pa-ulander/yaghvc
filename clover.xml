@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1736122707">
-  <project timestamp="1736122707">
+<coverage generated="1736209084">
+  <project timestamp="1736209084">
     <package name="App\Console">
       <file name="/home/runner/work/ghvc/ghvc/app/Console/Kernel.php">
         <class name="App\Console\Kernel" namespace="App\Console">
