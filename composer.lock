@@ -7354,16 +7354,16 @@
         },
         {
             "name": "pestphp/pest-plugin-type-coverage",
-            "version": "v3.2.1",
+            "version": "v3.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest-plugin-type-coverage.git",
-                "reference": "e6ec9cca8984cdd0baccb563ae123aa60aa966c8"
+                "reference": "0a1bddf74683c19131a375231fdaf32542ae1473"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest-plugin-type-coverage/zipball/e6ec9cca8984cdd0baccb563ae123aa60aa966c8",
-                "reference": "e6ec9cca8984cdd0baccb563ae123aa60aa966c8",
+                "url": "https://api.github.com/repos/pestphp/pest-plugin-type-coverage/zipball/0a1bddf74683c19131a375231fdaf32542ae1473",
+                "reference": "0a1bddf74683c19131a375231fdaf32542ae1473",
                 "shasum": ""
             },
             "require": {
@@ -7406,7 +7406,7 @@
                 "unit"
             ],
             "support": {
-                "source": "https://github.com/pestphp/pest-plugin-type-coverage/tree/v3.2.1"
+                "source": "https://github.com/pestphp/pest-plugin-type-coverage/tree/v3.2.3"
             },
             "funding": [
                 {
@@ -7422,7 +7422,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-12-12T16:47:27+00:00"
+            "time": "2024-12-28T10:25:41+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -7853,16 +7853,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.12",
+            "version": "1.12.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "b5ae1b88f471d3fd4ba1aa0046234b5ca3776dd0"
+                "reference": "9b469068840cfa031e1deaf2fa1886d00e20680f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b5ae1b88f471d3fd4ba1aa0046234b5ca3776dd0",
-                "reference": "b5ae1b88f471d3fd4ba1aa0046234b5ca3776dd0",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9b469068840cfa031e1deaf2fa1886d00e20680f",
+                "reference": "9b469068840cfa031e1deaf2fa1886d00e20680f",
                 "shasum": ""
             },
             "require": {
@@ -7907,7 +7907,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-28T22:13:23+00:00"
+            "time": "2024-12-17T17:00:20+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
