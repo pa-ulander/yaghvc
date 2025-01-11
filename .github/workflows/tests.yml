@@ -46,7 +46,7 @@ jobs:
 
       - name: Install Composer dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
-        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
+        run: composer install --prefer-dist --no-interaction --no-progress 
 
       - name: Prepare Laravel Application
         run: |
