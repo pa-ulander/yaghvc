@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca961bc3b72f721c1da62eacd40f04ad",
+    "content-hash": "262b3a0c3b411d91383c683c0062b6ea",
     "packages": [
         {
             "name": "badges/poser",
@@ -7356,27 +7356,27 @@
         },
         {
             "name": "pestphp/pest-plugin-type-coverage",
-            "version": "v3.2.3",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest-plugin-type-coverage.git",
-                "reference": "0a1bddf74683c19131a375231fdaf32542ae1473"
+                "reference": "5b03a43e055e21c65e1572803c39616d57af5d07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest-plugin-type-coverage/zipball/0a1bddf74683c19131a375231fdaf32542ae1473",
-                "reference": "0a1bddf74683c19131a375231fdaf32542ae1473",
+                "url": "https://api.github.com/repos/pestphp/pest-plugin-type-coverage/zipball/5b03a43e055e21c65e1572803c39616d57af5d07",
+                "reference": "5b03a43e055e21c65e1572803c39616d57af5d07",
                 "shasum": ""
             },
             "require": {
                 "pestphp/pest-plugin": "^3.0.0",
                 "php": "^8.2",
-                "phpstan/phpstan": "^1.12.10|^2.0.0",
-                "tomasvotruba/type-coverage": "^1.0.0|^2.0.0"
+                "phpstan/phpstan": "^1.12.10|^2.1.4",
+                "tomasvotruba/type-coverage": "^1.0.0|^2.0.2"
             },
             "require-dev": {
-                "pestphp/pest": "^3.5.1",
-                "pestphp/pest-dev-tools": "^3.3.0"
+                "pestphp/pest": "^3",
+                "pestphp/pest-dev-tools": "^3.4.0"
             },
             "type": "library",
             "extra": {
@@ -7408,7 +7408,7 @@
                 "unit"
             ],
             "support": {
-                "source": "https://github.com/pestphp/pest-plugin-type-coverage/tree/v3.2.3"
+                "source": "https://github.com/pestphp/pest-plugin-type-coverage/tree/v3.3.0"
             },
             "funding": [
                 {
@@ -7424,7 +7424,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-12-28T10:25:41+00:00"
+            "time": "2025-02-12T02:46:29+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -7855,16 +7855,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.1",
+            "version": "2.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "cd6e973e04b4c2b94c86e8612b5a65f0da0e08e7"
+                "reference": "8f99e18eb775dbaf6460c95fa0b65312da9c746a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/cd6e973e04b4c2b94c86e8612b5a65f0da0e08e7",
-                "reference": "cd6e973e04b4c2b94c86e8612b5a65f0da0e08e7",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/8f99e18eb775dbaf6460c95fa0b65312da9c746a",
+                "reference": "8f99e18eb775dbaf6460c95fa0b65312da9c746a",
                 "shasum": ""
             },
             "require": {
@@ -7909,7 +7909,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-01-05T16:43:48+00:00"
+            "time": "2025-02-10T08:25:21+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
