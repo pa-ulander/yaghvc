@@ -67,12 +67,24 @@ class ProfileViewsRequest extends FormRequest
         if ($this->has('username') && !empty($this->input(key: 'username'))) {
             $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
             
-            $optionalFields = ['label', 'color', 'style', 'base'];
+            $optionalFields = ['label', 'style', 'base'];
     
             foreach ($optionalFields as $field) {
                 if ($this->has($field)) {
                     $mergeData[$field] = trim(string: strip_tags(string: $this->input(key: $field)));
                 }
+            }
+    
+            // Special handling for color parameter
+            if ($this->has('color')) {
+                $color = trim(string: strip_tags(string: $this->input(key: 'color')));
+                
+                // If the color looks like a hex code without the # prefix, add it
+                if (preg_match('/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $color)) {
+                    $color = '#' . $color;
+                }
+                
+                $mergeData['color'] = $color;
             }
     
             if ($this->has(key: 'abbreviated')) {

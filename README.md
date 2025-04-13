@@ -70,9 +70,9 @@ The visitor counter badge can be customized with the following URL parameters:
 
 **Hex Colors**:
 ```markdown
-![](https://ghvc.kabelkultur.se?username=your-github-username&color=#FF5500)
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=FF5500)
 ```
-![](https://ghvc.kabelkultur.se?username=your-github-username&color=#FF5500)
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=FF5500)
 
 > **Note:** You can specify hex colors without the `#` prefix (e.g., `FF5500` instead of `#FF5500`). The system will automatically handle it correctly.
 
