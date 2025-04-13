@@ -26,7 +26,7 @@ The visitor counter badge can be customized with the following URL parameters:
 |-----------|-------------|---------|---------------|
 | `username` | GitHub username (required) | - | `username=octocat` |
 | `label` | Text label displayed on the badge | Visits | `label=Profile Views` |
-| `color` | Badge color | blue | `color=green`, `color=red`, `color=#FF5500` |
+| `color` | Badge color | blue | `color=green`, `color=red`, `color=FF5500` |
 | `style` | Badge style | for-the-badge | `style=flat`, `style=flat-square`, `style=plastic` |
 | `base` | Starting count value | 0 | `base=100` |
 | `abbreviated` | Abbreviate large numbers | false | `abbreviated=true` |
@@ -45,12 +45,13 @@ The visitor counter badge can be customized with the following URL parameters:
 ```markdown
 ![](https://ghvc.kabelkultur.se?username=your-github-username&style=flat-square)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&style=flat-square)
 
 **Plastic Style**:
 ```markdown
 ![](https://ghvc.kabelkultur.se?username=your-github-username&style=plastic)
 ```
-![](https://ghvc.kabelkultur.se?username=your-github-username&style=flat-square)
+![](https://ghvc.kabelkultur.se?username=your-github-username&style=plastic)
 
 ### Custom Colors
 
@@ -73,6 +74,8 @@ The visitor counter badge can be customized with the following URL parameters:
 ```
 ![](https://ghvc.kabelkultur.se?username=your-github-username&color=#FF5500)
 
+> **Note:** You can specify hex colors without the `#` prefix (e.g., `FF5500` instead of `#FF5500`). The system will automatically handle it correctly.
+
 ### Custom Labels
 
 ```markdown
@@ -85,8 +88,10 @@ The visitor counter badge can be customized with the following URL parameters:
 Display large numbers in abbreviated format (1K, 1.5M, etc.):
 
 ```markdown
-![](https://ghvc.kabelkultur.se?username=your-github-username&abbreviated=true)
+![](https://ghvc.kabelkultur.se?username=your-github-username&base=2500&abbreviated=true)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&base=2500&abbreviated=true) 
+
 
 ### Full Customization Example
 
