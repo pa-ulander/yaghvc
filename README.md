@@ -37,53 +37,63 @@ The visitor counter badge can be customized with the following URL parameters:
 
 **Flat Style**:
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&style=flat)
+![](https://ghvc.kabelkultur.se?username=your-github-username&style=flat)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&style=flat)
 
 **Flat Square Style**:
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&style=flat-square)
+![](https://ghvc.kabelkultur.se?username=your-github-username&style=flat-square)
 ```
 
 **Plastic Style**:
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&style=plastic)
+![](https://ghvc.kabelkultur.se?username=your-github-username&style=plastic)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&style=flat-square)
 
 ### Custom Colors
 
 **Named Colors**:
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&color=brightgreen)
-![](https://ghvc.kabelkultur.se?username=pa-ulander&color=red)
-![](https://ghvc.kabelkultur.se?username=pa-ulander&color=orange)
-![](https://ghvc.kabelkultur.se?username=pa-ulander&color=yellow)
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=brightgreen)
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=red)
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=orange)
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=yellow)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=brightgreen)<br>
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=red)<br>
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=orange)<br>
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=yellow)<br>
+
 
 **Hex Colors**:
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&color=#FF5500)
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=#FF5500)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&color=#FF5500)
 
 ### Custom Labels
 
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&label=Profile%20Visitors)
+![](https://ghvc.kabelkultur.se?username=your-github-username&label=Profile%20Visitors)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&label=Profile%20Visitors)
 
 ### Number Abbreviation
 
 Display large numbers in abbreviated format (1K, 1.5M, etc.):
 
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&abbreviated=true)
+![](https://ghvc.kabelkultur.se?username=your-github-username&abbreviated=true)
 ```
 
 ### Full Customization Example
 
 ```markdown
-![](https://ghvc.kabelkultur.se?username=pa-ulander&label=Visitors&color=orange&style=flat-square&abbreviated=true)
+![](https://ghvc.kabelkultur.se?username=your-github-username&label=Visitors&color=orange&style=flat-square&abbreviated=true)
 ```
+![](https://ghvc.kabelkultur.se?username=your-github-username&label=Visitors&color=orange&style=flat-square&abbreviated=true)
 
 ## Self-hosting
 
