@@ -13,9 +13,9 @@ use Illuminate\Validation\Rule;
 
 class ProfileViewsRequest extends FormRequest
 {
-    private const MAX_USERNAME_LENGTH = 39;
+    private const int MAX_USERNAME_LENGTH = 39;
 
-    private const ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic'];
+    private const array ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic'];
 
     public function authorize(): bool
     {
@@ -31,7 +31,7 @@ class ProfileViewsRequest extends FormRequest
                 'regex:/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i'
             ],
             'label' => ['nullable', 'string', 'max:50'],
-            'color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
+            'color' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
             'style' => ['nullable', 'string', Rule::in(values: self::ALLOWED_STYLES)],
             'base' => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'abbreviated' => ['nullable', 'boolean'],
@@ -63,35 +63,26 @@ class ProfileViewsRequest extends FormRequest
         $mergeData = [
             'user_agent' => $this->header(key: 'User-Agent', default: ''),
         ];
-    
+
         if ($this->has('username') && !empty($this->input(key: 'username'))) {
             $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
-            
-            $optionalFields = ['label', 'style', 'base'];
-    
+
+            $optionalFields = ['label', 'color', 'style', 'base'];
+
             foreach ($optionalFields as $field) {
+                if ($this->input(key: $field) === null) {
+                    continue;
+                }
                 if ($this->has($field)) {
                     $mergeData[$field] = trim(string: strip_tags(string: $this->input(key: $field)));
                 }
             }
-    
-            // Special handling for color parameter
-            if ($this->has('color')) {
-                $color = trim(string: strip_tags(string: $this->input(key: 'color')));
-                
-                // If the color looks like a hex code without the # prefix, add it
-                if (preg_match('/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $color)) {
-                    $color = '#' . $color;
-                }
-                
-                $mergeData['color'] = $color;
-            }
-    
+
             if ($this->has(key: 'abbreviated')) {
                 $mergeData['abbreviated'] = $this->boolean(key: 'abbreviated');
             }
         }
-    
+
         $this->merge(input: $mergeData);
     }
 
@@ -123,9 +114,9 @@ class ProfileViewsRequest extends FormRequest
     {
         $validated = $this->validator->validated();
         $all = $this->all();
-    
+
         $merged = array_merge($validated, ['user_agent' => $all['user_agent']]);
-    
+
         return $key ? Arr::get(array: $merged, key: $key, default: $default) : $merged;
     }
 }
