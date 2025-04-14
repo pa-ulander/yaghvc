@@ -23,7 +23,7 @@ it('has correct validation rules', function () {
     expect($rules)->toHaveKeys(['username', 'label', 'color', 'style', 'base', 'abbreviated', 'user_agent']);
     expect($rules['username'])->toContain('required', 'max:39', 'regex:/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i');
     expect($rules['label'])->toContain('nullable', 'string', 'max:50');
-    expect($rules['color'])->toContain('nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/');
+    expect($rules['color'])->toContain('nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/');
     expect($rules['style'])->toContain('nullable', 'string');
     expect($rules['base'])->toContain('nullable', 'integer', 'min:0', 'max:1000000');
     expect($rules['abbreviated'])->toContain('nullable', 'boolean');
@@ -52,7 +52,7 @@ it('prepares data for validation', function () {
     $request->merge([
         'username' => ' test-user123@ ',
         'label' => ' <script>Test Label</script> ',
-        'color' => ' #FF5500 ',
+        'color' => ' FF5500 ',
         'style' => ' flat-square ',
         'base' => ' 100 ',
         'abbreviated' => 'true',
@@ -66,7 +66,7 @@ it('prepares data for validation', function () {
     expect($data)
         ->toHaveKey('username', 'test-user123')
         ->toHaveKey('label', 'Test Label')
-        ->toHaveKey('color', '#FF5500')
+        ->toHaveKey('color', 'FF5500')
         ->toHaveKey('style', 'flat-square')
         ->toHaveKey('base', '100')
         ->toHaveKey('abbreviated', true)
