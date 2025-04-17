@@ -17,14 +17,19 @@ Add this to your profile page README.md to show a visitor counter badge:
 
 It will generate a visitor counter badge that looks like this:
 
-![](https://ghvc.kabelkultur.se/?username=pa-ulander&color=green&style=for-the-badge&label=Views)
+![](https://ghvc.kabelkultur.se/?username=your-github-username&color=green&style=for-the-badge&label=Views)
 
 
 ## Usage per repository
 
 Add this to your repository README.md to show a visitor counter badge for a specific repository:
 
-![](https://ghvc.kabelkultur.se/?username=pa-ulander&color=green&style=for-the-badge&repos=name-of-my-github-repository&label=Repository%20Views)
+```markdown
+![](https://ghvc.kabelkultur.se/?username=your-github-username&color=green&style=for-the-badge&repos=name-of-my-github-repository&label=Repository%20Views)
+```
+
+![](https://ghvc.kabelkultur.se/?username=your-github-username&color=green&style=for-the-badge&repos=name-of-my-github-repository&label=Repository%20Views)
+
 
 ## Badge Customization Options
 
@@ -32,12 +37,13 @@ The visitor counter badge can be customized with the following URL parameters:
 
 | Parameter | Description | Default | Example Values |
 |-----------|-------------|---------|---------------|
-| `username` | GitHub username (required) | - | `username=octocat` |
+| `username` | GitHub username (required) | - | `username=your-github-username` |
 | `label` | Text label displayed on the badge | Visits | `label=Profile Views` |
 | `color` | Badge color | blue | `color=green`, `color=red`, `color=FF5500` |
 | `style` | Badge style | for-the-badge | `style=flat`, `style=flat-square`, `style=plastic` |
 | `base` | Starting count value | 0 | `base=100` |
 | `abbreviated` | Abbreviate large numbers | false | `abbreviated=true` |
+| `repository` | Count visits in a repository | false | `repository=your-github-repositorys-name` |
 
 
 ## Examples
