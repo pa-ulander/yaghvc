@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileViewsRequest;
-use App\Repositories\ProfileViewsRepository;
-use Illuminate\Support\Facades\Validator;
-use \Illuminate\Support\ValidatedInput;
-use \Illuminate\Support\Arr;
 use App\Models\ProfileViews;
+use App\Repositories\ProfileViewsRepository;
 use App\Services\BadgeRenderService;
-use Illuminate\Http\Response;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\ValidatedInput;
 
 class ProfileViewsController extends Controller
 {
@@ -48,10 +49,12 @@ class ProfileViewsController extends Controller
     private function createBadgeResponse(string $badgeRender): Response
     {
         return response(content: $badgeRender)
-        ->header(key: 'Status', values: '200')
-        ->header(key: 'Content-Type', values: 'image/svg+xml')
-        ->header(key: 'Cache-Control', values: 'max-age=0, no-cache, no-store, must-revalidate')
-        ->header(key: 'Pragma', values: 'no-cache')
-        ->header(key: 'Expires', values: '0');
+            ->header(key: 'Status', values: '200')
+            ->header(key: 'Content-Type', values: 'image/svg+xml')
+            ->header(key: 'Cache-Control', values: 'max-age=0, no-cache, no-store, must-revalidate')
+            ->header(key: 'Pragma', values: 'no-cache')
+            ->header(key: 'Expires', values: '0')
+            ->header(key: 'X-RateLimit-Limit', values: config('cache.limiters.profile-views.max_attempts'))
+            ->header(key: 'X-RateLimit-Remaining', values: RateLimiter::remaining('profile-views'));
     }
 }
