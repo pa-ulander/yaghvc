@@ -19,6 +19,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Rate Limiters
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the rate limiters for your API routes
+    |
+    */
+
+    'limiters' => [
+        'profile-views' => [
+            'key' => 'profile-views',
+            'max_attempts' => 5, // Maximum attempts per decay time
+            'decay_minutes' => 1, // Time window in minutes
+        ],
+    ],
+    
+    /*
+    |--------------------------------------------------------------------------
     | Cache Stores
     |--------------------------------------------------------------------------
     |
@@ -102,6 +119,6 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
+    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_cache_'),
 
 ];
