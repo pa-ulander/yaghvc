@@ -56,7 +56,7 @@
             "vendor/bin/pest tests --coverage-clover clover.xml"
         ],
         "test:typecoverage": [
-            "vendor/bin/pest tests --type-coverage --min=100"
+            "vendor/bin/pest tests --memory-limit=2G --type-coverage --min=100"
         ],
         "test:update": [
             "vendor/bin/pest -d --update-snapshots"
