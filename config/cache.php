@@ -29,11 +29,11 @@ return [
     'limiters' => [
         'profile-views' => [
             'key' => 'profile-views',
-            'max_attempts' => 5, // Maximum attempts per decay time
-            'decay_minutes' => 1, // Time window in minutes
+            'max_attempts' => 5,
+            'decay_minutes' => 1,
         ],
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores
