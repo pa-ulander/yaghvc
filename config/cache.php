@@ -29,7 +29,7 @@ return [
     'limiters' => [
         'profile-views' => [
             'key' => 'profile-views',
-            'max_attempts' => 5,
+            'max_attempts' => 12,
             'decay_minutes' => 1,
         ],
     ],
