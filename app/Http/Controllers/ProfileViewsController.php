@@ -31,8 +31,7 @@ class ProfileViewsController extends Controller
         $profileView = $this->profileViewsRepository->findOrCreate(username: Arr::get(array: $safe, key: 'username'));
         $badgeRender = $this->renderBadge(safe: $safe, profileView: $profileView);
 
-        // Get rate limit key for backward compatibility with tests
-        $key = 'profile-views:' . $request->ip();
+        $key = 'profile-views:' . md5($request->input('username') . $request->input('repository'));
         $maxAttempts = Config::get('cache.limiters.profile-views.max_attempts', 5);
 
         // For test compatibility, manually hit the rate limiter
@@ -41,7 +40,7 @@ class ProfileViewsController extends Controller
         return $this->createBadgeResponse(
             badgeRender: $badgeRender,
             rateLimitKey: $key,
-            maxAttempts: $maxAttempts
+            maxAttempts: config('cache.limiters.profile-views.max_attempts')
         );
     }
 
@@ -75,7 +74,7 @@ class ProfileViewsController extends Controller
             // If rate-limited, change response status code to 429 (too many requests)
             if ($remainingAttempts <= 0) {
                 $response->setStatusCode(429);
-                $response->header('Retry-After', RateLimiter::availableIn($rateLimitKey));
+                $response->header('Retry-After', (string) RateLimiter::availableIn($rateLimitKey));
             }
 
             $response->header('X-RateLimit-Limit', (string) $maxAttempts);
