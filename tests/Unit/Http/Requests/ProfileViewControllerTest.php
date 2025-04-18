@@ -83,9 +83,8 @@ it('handles rate limiting correctly', function () {
     $validator->validate();
     $request->setValidator($validator);
 
+    $key = "profile-views:" . md5($request->input('username') . $request->input('repository'));
     $ip = '192.168.1.1';
-    $key = "profile-views:{$ip}";
-
     $request->server->set('REMOTE_ADDR', $ip);
 
     RateLimiter::clear($key);
