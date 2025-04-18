@@ -31,16 +31,17 @@ class ProfileViewsController extends Controller
         $profileView = $this->profileViewsRepository->findOrCreate(username: Arr::get(array: $safe, key: 'username'));
         $badgeRender = $this->renderBadge(safe: $safe, profileView: $profileView);
 
-        $key = 'profile-views:' . md5($request->input('username') . $request->input('repository'));
-        $maxAttempts = Config::get('cache.limiters.profile-views.max_attempts', 5);
+        // Use a consistent key format for rate limiting
+        $key = 'profile-views:' . $request->input('username');
+        $maxAttempts = Config::get('cache.limiters.profile-views.max_attempts', 12);
 
-        // For test compatibility, manually hit the rate limiter
+        // Hit the rate limiter for the request
         RateLimiter::hit($key);
 
         return $this->createBadgeResponse(
             badgeRender: $badgeRender,
             rateLimitKey: $key,
-            maxAttempts: config('cache.limiters.profile-views.max_attempts')
+            maxAttempts: $maxAttempts
         );
     }
 

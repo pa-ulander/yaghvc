@@ -83,13 +83,14 @@ it('handles rate limiting correctly', function () {
     $validator->validate();
     $request->setValidator($validator);
 
-    $key = "profile-views:" . md5($request->input('username') . $request->input('repository'));
+    // Make sure we're using the exact same key format as in the controller
+    $key = 'profile-views:' . $request->input('username');
     $ip = '192.168.1.1';
     $request->server->set('REMOTE_ADDR', $ip);
 
     RateLimiter::clear($key);
     for ($i = 0; $i < 5; $i++) {
-        RateLimiter::hit($key, 60);
+        RateLimiter::hit($key);
     }
 
     $response = $this->controller->index($request);
@@ -164,7 +165,8 @@ it('increments rate limiter on each request', function () {
     $validator->validate();
     $request->setValidator($validator);
 
-    $key = 'profile-views:127.0.0.1';
+    // Use the same key format as in the controller
+    $key = 'profile-views:' . $request->input('username');
     RateLimiter::clear($key);
 
     $response1 = $this->controller->index($request);
