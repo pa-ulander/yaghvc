@@ -12,7 +12,6 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ValidatedInput;
 
 class ProfileViewsController extends Controller
@@ -31,57 +30,34 @@ class ProfileViewsController extends Controller
         $profileView = $this->profileViewsRepository->findOrCreate(username: Arr::get(array: $safe, key: 'username'));
         $badgeRender = $this->renderBadge(safe: $safe, profileView: $profileView);
 
-        // Use a consistent key format for rate limiting
-        $key = 'profile-views:' . $request->input('username');
-        $maxAttempts = Config::get('cache.limiters.profile-views.max_attempts', 12);
-
-        // Hit the rate limiter for the request
-        RateLimiter::hit($key);
-
-        return $this->createBadgeResponse(
-            badgeRender: $badgeRender,
-            rateLimitKey: $key,
-            maxAttempts: $maxAttempts
-        );
+        return $this->createBadgeResponse($badgeRender);
     }
 
     private function renderBadge(ValidatedInput|array $safe, ProfileViews $profileView): string
     {
+        $count = $profileView->getCount(username: Arr::get(array: $safe, key: 'username')) ?? 0;
+
+        // Add base count if provided
+        if (isset($safe->base) && is_numeric($safe->base)) {
+            $count += (int)$safe->base;
+        }
+
         return $this->badgeRenderService->renderBadgeWithCount(
             label: $safe->label ?? config(key: 'badge.default_label'),
-            count: $profileView->getCount(username: Arr::get(array: $safe, key: 'username')) ?? 0,
+            count: $count,
             messageBackgroundFill: $safe->color ?? config(key: 'badge.default_color'),
             badgeStyle: $safe->style ?? config(key: 'badge.default_style'),
             abbreviated: $safe->abbreviated ?? config(key: 'badge.default_abbreviated'),
         );
     }
 
-    private function createBadgeResponse(
-        string $badgeRender,
-        ?string $rateLimitKey = null,
-        ?int $maxAttempts = null
-    ): Response {
-        $response = response(content: $badgeRender)
+    private function createBadgeResponse(string $badgeRender): Response
+    {
+        return response(content: $badgeRender)
             ->header(key: 'Status', values: '200')
             ->header(key: 'Content-Type', values: 'image/svg+xml')
             ->header(key: 'Cache-Control', values: 'max-age=0, no-cache, no-store, must-revalidate')
             ->header(key: 'Pragma', values: 'no-cache')
             ->header(key: 'Expires', values: '0');
-
-        // Add rate limiting headers for backward compatibility with tests
-        if ($rateLimitKey !== null && $maxAttempts !== null) {
-            $remainingAttempts = RateLimiter::remaining($rateLimitKey, $maxAttempts);
-
-            // If rate-limited, change response status code to 429 (too many requests)
-            if ($remainingAttempts <= 0) {
-                $response->setStatusCode(429);
-                $response->header('Retry-After', (string) RateLimiter::availableIn($rateLimitKey));
-            }
-
-            $response->header('X-RateLimit-Limit', (string) $maxAttempts);
-            $response->header('X-RateLimit-Remaining', (string) max(0, $remainingAttempts));
-        }
-
-        return $response;
     }
 }
