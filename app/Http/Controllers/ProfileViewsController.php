@@ -58,8 +58,8 @@ class ProfileViewsController extends Controller
 
     private function createBadgeResponse(
         string $badgeRender,
-        string $rateLimitKey = null,
-        int $maxAttempts = null
+        ?string $rateLimitKey = null,
+        ?int $maxAttempts = null
     ): Response {
         $response = response(content: $badgeRender)
             ->header(key: 'Status', values: '200')
