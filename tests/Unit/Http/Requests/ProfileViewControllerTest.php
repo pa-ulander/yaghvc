@@ -204,7 +204,7 @@ it('creates response with correct headers', function () {
     $createResponseMethod->setAccessible(true);
 
     $svgContent = '<svg>Test SVG</svg>';
-    $key = 'test-key';
+    $key = 'profile-views:127.0.0.1';
     $maxAttempts = 5;
 
     $response = $createResponseMethod->invoke(
