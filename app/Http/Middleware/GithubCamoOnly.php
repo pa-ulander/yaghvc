@@ -29,14 +29,12 @@ class GithubCamoOnly
             return $next($request);
         }
 
-        // Log unauthorized access attempts 
         Log::warning('Unauthorized access attempt', [
             'ip' => $request->ip(),
             'user_agent' => $userAgent,
             'path' => $request->path()
         ]);
 
-        // Return a simple and generic error message
         return response('Unauthorized', 403);
     }
 }
