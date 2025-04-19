@@ -49,13 +49,12 @@ class ProfileViewsRequest extends FormRequest
 
     public function failedValidation(Validator $validator): never
     {
-        Log::warning(message: 'Validation errors: ', context: $validator->errors()->toArray());
+        Log::warning(message: 'Validation errors: ' . print_r($this->all(), true), context: $validator->errors()->toArray());
 
         throw new HttpResponseException(response: response()->json(data: [
             'success' => false,
             'message' => 'Validation errors',
             'data' => $validator->errors(),
-            'input' => print_r($this->all(), true),
         ], status: 422));
     }
 
