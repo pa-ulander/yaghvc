@@ -55,17 +55,17 @@ The visitor counter badge can be customized with the following URL parameters:
 | `for-the-badge` | ![](./public_html/assets/style-for-the-badge.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&style=for-the-badge)` |
 | `flat`          | ![](./public_html/assets/style-flat.svg)          | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat)`          |
 | `flat-square`   | ![](./public_html/assets/style-flat-square.svg)   | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat-square)`   |
-| `plastic`       | ![](./public_html/assets/style-plastic.svg)      | `![](https://ghvc.kabelkultur.se?username=your-username&style=plastic)`       |
+| `plastic`       | ![](./public_html/assets/style-plastic.svg)       | `![](https://ghvc.kabelkultur.se?username=your-username&style=plastic)`       |
 
 
 ### Custom Colors
 
-| **Named Color** | Example                                     | Markdown                                                                    |
-| --------------- | ------------------------------------------- | --------------------------------------------------------------------------- |
-| `brightgreen`   | ![](./public_html/assets/color-green.svg)   | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
-| `red`           | ![](./public_html/assets/color-red.svg)     | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
+| **Named Color** | Example                                    | Markdown                                                                    |
+| --------------- | ------------------------------------------ | --------------------------------------------------------------------------- |
+| `brightgreen`   | ![](./public_html/assets/color-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
+| `red`           | ![](./public_html/assets/color-red.svg)    | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
 | `orange`        | ![](./public_html/assets/color-orange.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=orange)`      |
-| `yellow`        | ![](./public_html/assets/color-yellow.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)`      |
+| `yellow`        | ![](./public_html/assets/color-yellow.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)`      |
 
 
 
