@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="206.52294921875" height="28" role="img" aria-label="CHOCOLATE COOKIES: 2,685">
+	<title>CHOCOLATE COOKIES: 2,685</title>
+	<g shape-rendering="crispEdges">
+		<rect width="149.181640625" height="28" fill="#555"/>
+		<rect x="149.181640625" width="57.34130859375" height="28" fill="#007ec6"/>
+	</g>
+	<g fill="#fff" text-anchor="middle" text-rendering="geometricPrecision" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="10" letter-spacing="1.1">
+		<text x="75.6" y="17.5" fill="#fff">CHOCOLATE COOKIES</text>
+		<text x="176.881640625" y="17.5" fill="#fff" font-weight="bold">2,685</text>
+	</g>
+</svg>
