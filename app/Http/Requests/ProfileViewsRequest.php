@@ -55,6 +55,7 @@ class ProfileViewsRequest extends FormRequest
             'success' => false,
             'message' => 'Validation errors',
             'data' => $validator->errors(),
+            'input' => print_r($this->all(), true),
         ], status: 422));
     }
 
