@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="118.26513671875" height="28" role="img" aria-label="VISITS: 2,685">
+	<title>VISITS: 2,685</title>
+	<g shape-rendering="crispEdges">
+		<rect width="60.923828125" height="28" fill="#555"/>
+		<rect x="60.923828125" width="57.34130859375" height="28" fill="#f000ff"/>
+	</g>
+	<g fill="#fff" text-anchor="middle" text-rendering="geometricPrecision" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="10" letter-spacing="1.1">
+		<text x="31.5" y="17.5" fill="#fff">VISITS</text>
+		<text x="88.623828125" y="17.5" fill="#fff" font-weight="bold">2,685</text>
+	</g>
+</svg>
