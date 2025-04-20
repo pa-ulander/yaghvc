@@ -18,10 +18,18 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // $this->seed();
-        // $this->artisan('config:cache');
-        config(['app.env' => 'testing']);
+
+        // explicitly set the database connection
+        config(['database.default' => 'sqlite_testing']);
+        config(['cache.default' => 'array']);
+        config(['session.driver' => 'array']);
+        config(['queue.default' => 'sync']);
+
+        // now it's safe to clear cache
         Artisan::call('cache:clear');
+
+        // other configurations
+        config(['app.env' => 'testing']);
     }
 
     protected function tearDown(): void
