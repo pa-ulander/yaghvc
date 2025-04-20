@@ -3,39 +3,38 @@ FROM php:8.4-apache
 RUN apt update
 
 # 1. development packages
-RUN apt update && \
-apt install -y --no-install-recommends \
-apt-utils \
-g++ \
-git \
-zip \
-vim \
-curl \
-sudo \
-unzip \
-sqlite3 \
-openssl \
-ssl-cert \
-apt-utils \
-libzip-dev \
-libicu-dev \
-libbz2-dev \
-libpng-dev \
-libgmp-dev \
-libwebp-dev \
-libjpeg-dev \
-libonig-dev \
-libldap2-dev \
-libmcrypt-dev \
-libsqlite3-dev \    
-libreadline-dev \
-ca-certificates \
-libfreetype6-dev \
-libjpeg62-turbo-dev && \
-docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ && \
-apt-get autoremove -y && \
-apt-get clean && \
-rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y --no-install-recommends \
+    apt-utils \
+    g++ \
+    git \
+    zip \
+    vim \
+    curl \
+    sudo \
+    unzip \
+    sqlite3 \
+    openssl \
+    ssl-cert \
+    apt-utils \
+    libzip-dev \
+    libicu-dev \
+    libbz2-dev \
+    libpng-dev \
+    libgmp-dev \
+    libwebp-dev \
+    libjpeg-dev \
+    libonig-dev \
+    libldap2-dev \
+    libmcrypt-dev \
+    libsqlite3-dev \ 
+    libreadline-dev \
+    ca-certificates \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev &&
+    docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ &&
+    apt-get autoremove -y &&
+    apt-get clean &&
+    rm -rf /var/lib/apt/lists/*
 
 # RUN pecl install ast
 
@@ -60,20 +59,21 @@ EXPOSE 80
 EXPOSE 443
 
 RUN docker-php-ext-install \
-gd \    
-pdo \
-zip \
-exif \
-bcmath \
-opcache \
-calendar \
-pdo_mysql
+    gd \ 
+    pdo \
+    zip \
+    exif \
+    bcmath \
+    opcache \
+    calendar \
+    pdo_mysql \
+    pdo_sqlite
 
 # 5. composer
 COPY --from=composer:2.7.2 /usr/bin/composer /usr/bin/composer
 
-RUN pecl install xdebug-3.3.2 \
-    && docker-php-ext-enable xdebug
+RUN pecl install xdebug-3.3.2 &&
+    docker-php-ext-enable xdebug
 
 # 6. we need a user with the same UID/GID as the host user
 # so when we execute CLI commands, all the host file's permissions and ownership remains intact
@@ -83,5 +83,10 @@ ARG devuser
 RUN useradd -G www-data,root -u $uid -d /home/$devuser $devuser
 RUN mkdir -p /home/$devuser/.composer
 RUN chown -R $devuser:$devuser /home/$devuser
+
+# Create PHPStan cache directory with proper permissions
+RUN mkdir -p /tmp/phpstan/cache/PHPStan &&
+    chown $devuser:www-data /tmp/phpstan/cache/PHPStan &&
+    chmod 0775 /tmp/phpstan/cache/PHPStan
 
 RUN DEFAULT_IGNORE_HTTPS_ERRORS=true
