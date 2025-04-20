@@ -22,9 +22,8 @@ class GithubCamoOnly
         $userAgent = $request->header('User-Agent');
 
         // Allow GitHub's camo-client user agent or configure exceptions in .env
-        if (
-            $userAgent === 'camo-client' ||
-            (env('ALLOW_ALL_USER_AGENTS', false) && app()->environment(['local', 'testing']))
+        if ($userAgent === 'camo-client' ||
+            (config('auth.github_camo_only', true) && app()->environment(['local', 'testing']))
         ) {
             return $next($request);
         }
