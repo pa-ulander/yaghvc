@@ -112,4 +112,35 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+     |--------------------------------------------------------------------------
+     | Allowed Clients
+     |--------------------------------------------------------------------------
+     |
+     | This option defines the allowed clients for your application. You may
+     | change these values as required, but they're a perfect start for most
+     | applications. The default is to allow all user agents.
+     |
+     | If you want to restrict access to only GitHub's camo-client user agent,
+     | set the ALLOW_ALL_USER_AGENTS environment variable to false. This will
+     | only allow requests from GitHub's camo-client user agent.
+     |
+     | If you want to allow all user agents, set the ALLOW_ALL_USER_AGENTS
+     | environment variable to true. This will allow requests from all user
+     | agents, including GitHub's camo-client user agent.
+     |
+     | You can also configure exceptions in the GITHUB_CAMO_ONLY_EXCEPTIONS
+     | environment variable. This will allow requests from all user agents
+     | in the specified environments, even if ALLOW_ALL_USER_AGENTS is set
+     | to false.
+     |
+     | The default for peoduvtion use is to only allow Github's Camo Client agent.
+     */
+    'allow_all_user_agents' => env('ALLOW_ALL_USER_AGENTS', false),
+    'github_camo_only' => env('ALLOW_GITHUB_CAMO_ONLY', true),
+    'github_camo_only_exceptions' => [
+        'local',
+        'testing',
+    ],
+
 ];
