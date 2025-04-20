@@ -21,13 +21,28 @@ class GithubCamoOnly
     {
         $userAgent = $request->header('User-Agent');
 
-        // Allow GitHub's camo-client user agent or configure exceptions in .env
-        if ($userAgent === 'camo-client' ||
-            (config('auth.github_camo_only', true) && app()->environment(['local', 'testing']))
-        ) {
+        // Check if GitHub Camo restriction is disabled entirely
+        if (!config('auth.github_camo_only', true)) {
             return $next($request);
         }
 
+        // Allow GitHub's camo-client user agent
+        if ($userAgent === 'camo-client') {
+            return $next($request);
+        }
+
+        // Allow all user agents if explicitly configured
+        if (config('auth.allow_all_user_agents', false)) {
+            return $next($request);
+        }
+
+        // Check if current environment is in the exceptions list
+        $environmentExceptions = config('auth.environment_exceptions', ['local', 'testing']);
+        if (in_array(app()->environment(), $environmentExceptions, true)) {
+            return $next($request);
+        }
+
+        // Otherwise, block access
         Log::warning('Unauthorized access attempt', [
             'ip' => $request->ip(),
             'user_agent' => $userAgent,
