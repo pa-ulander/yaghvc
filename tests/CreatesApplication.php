@@ -14,11 +14,17 @@ trait CreatesApplication
      */
     public function createApplication(): Application
     {
-        $app = require __DIR__.'/../bootstrap/app.php';
+        $app = require __DIR__ . '/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
         Hash::setRounds(4);
+
+        // Set database configuration before any cache operations
+        $app['config']->set('database.default', 'sqlite_testing');
+        $app['config']->set('cache.default', 'array');
+        $app['config']->set('session.driver', 'array');
+        $app['config']->set('queue.default', 'sync');
 
         $this->clearCache();
 
