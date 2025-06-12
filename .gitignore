@@ -1,4 +1,5 @@
 docker/db/data
+docker/db_test/data
 docker/var
 vendor
 

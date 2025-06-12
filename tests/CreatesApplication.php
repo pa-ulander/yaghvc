@@ -21,7 +21,10 @@ trait CreatesApplication
         Hash::setRounds(4);
 
         // Set database configuration before any cache operations
-        $app['config']->set('database.default', 'sqlite_testing');
+        // Allow DB_CONNECTION to be set by environment instead of hardcoding
+        if (!env('DB_CONNECTION')) {
+            $app['config']->set('database.default', 'sqlite_testing');
+        }
         $app['config']->set('cache.default', 'array');
         $app['config']->set('session.driver', 'array');
         $app['config']->set('queue.default', 'sync');

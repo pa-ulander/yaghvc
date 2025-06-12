@@ -8,15 +8,15 @@ use Tests\TestCase;
 
 class DefaultDatabaseConnectionTest extends TestCase
 {
-    public function testEnvDatabaseConfigurationIsSqliteTesting(): void
+    public function testEnvDatabaseConfigurationIsRespected(): void
     {
-        $this->assertSame(expected: 'sqlite_testing', actual: getenv('DB_CONNECTION'));
+        $expectedConnection = env('DB_CONNECTION', 'sqlite_testing');
+        $this->assertSame(expected: $expectedConnection, actual: config(key: 'database.default'));
     }
 
-    public function testDefaultDatabaseIsSqliteTesting(): void
+    public function testDefaultDatabaseConnectionIsUsed(): void
     {
-        // dump(database_path('database.sqlite'));
-        // dump(database_path('database.sqlite_testing'));
-        $this->assertSame(expected: 'sqlite_testing', actual: config(key: 'database.default'));
+        $expectedConnection = env('DB_CONNECTION', 'sqlite_testing');
+        $this->assertSame(expected: $expectedConnection, actual: config(key: 'database.default'));
     }
 }

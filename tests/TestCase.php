@@ -19,8 +19,10 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        // explicitly set the database connection
-        config(['database.default' => 'sqlite_testing']);
+        // Allow DB_CONNECTION to be set by environment instead of hardcoding
+        if (!env('DB_CONNECTION')) {
+            config(['database.default' => 'sqlite_testing']);
+        }
         config(['cache.default' => 'array']);
         config(['session.driver' => 'array']);
         config(['queue.default' => 'sync']);

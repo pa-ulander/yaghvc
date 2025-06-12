@@ -1,0 +1,5 @@
+CREATE DATABASE IF NOT EXISTS db_test;
+DROP USER IF EXISTS 'db_test'@'%';
+CREATE USER 'db_test'@'%' IDENTIFIED BY 'db_test';
+GRANT ALL PRIVILEGES ON db_test.* TO 'db_test'@'%';
+FLUSH PRIVILEGES;

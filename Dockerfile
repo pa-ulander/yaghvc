@@ -11,29 +11,50 @@ RUN apt update && apt install -y --no-install-recommends \
     vim \
     curl \
     sudo \
+    wget \
     unzip \
     sqlite3 \
+    libnss3 \
     openssl \
+    libgbm1 \
+    libdrm2 \
     ssl-cert \
+    libcups2 \
     apt-utils \
     libzip-dev \
     libicu-dev \
     libbz2-dev \
     libpng-dev \
+    libxrandr2 \
+    libxfixes3 \
     libgmp-dev \
+    libasound2 \
     libwebp-dev \
+    libatk1.0-0 \
     libjpeg-dev \
     libonig-dev \
+    libxdamage1 \
     libldap2-dev \
+    libxshmfence1 \
     libmcrypt-dev \
+    libxkbcommon0 \
+    libxcomposite1 \
     libsqlite3-dev \ 
-    libreadline-dev \
+    libpango-1.0-0 \
     ca-certificates \
+    libreadline-dev \
     libfreetype6-dev \
-    libjpeg62-turbo-dev &&
-    docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ &&
-    apt-get autoremove -y &&
-    apt-get clean &&
+    fonts-liberation \
+    libatk-bridge2.0-0 \
+    libpangocairo-1.0-0 \
+    default-mysql-client \
+    libjpeg62-turbo-dev && \
+    docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ && \
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt install -y ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb && \
+    apt-get autoremove -y && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # RUN pecl install ast
@@ -70,10 +91,10 @@ RUN docker-php-ext-install \
     pdo_sqlite
 
 # 5. composer
-COPY --from=composer:2.7.2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8.8 /usr/bin/composer /usr/bin/composer
 
-RUN pecl install xdebug-3.3.2 &&
-    docker-php-ext-enable xdebug
+RUN pecl install xdebug-3.4.2 \
+    && docker-php-ext-enable xdebug
 
 # 6. we need a user with the same UID/GID as the host user
 # so when we execute CLI commands, all the host file's permissions and ownership remains intact
@@ -84,9 +105,13 @@ RUN useradd -G www-data,root -u $uid -d /home/$devuser $devuser
 RUN mkdir -p /home/$devuser/.composer
 RUN chown -R $devuser:$devuser /home/$devuser
 
-# Create PHPStan cache directory with proper permissions
-RUN mkdir -p /tmp/phpstan/cache/PHPStan &&
-    chown $devuser:www-data /tmp/phpstan/cache/PHPStan &&
+# create PHPStan cache directory with proper permissions
+RUN mkdir -p /tmp/phpstan/cache/PHPStan && \
+    chown $devuser:www-data /tmp/phpstan/cache/PHPStan && \
     chmod 0775 /tmp/phpstan/cache/PHPStan
 
 RUN DEFAULT_IGNORE_HTTPS_ERRORS=true
+
+# 7. chrome binary env vars for Dusk browser testing
+ENV CHROME_BIN=/usr/bin/chromium
+ENV DUSK_CHROME_BIN=/usr/bin/chromium

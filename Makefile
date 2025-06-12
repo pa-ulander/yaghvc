@@ -5,7 +5,7 @@ ENVIRONMENT_FILE=$(shell pwd)/.env
 PROJECT_DIRECTORY=$(shell pwd)
 
 # Available docker containers
-CONTAINERS=yagvc-app db 
+CONTAINERS=yagvc-app db db_test selenium
 
 #####################################################
 # RUNTIME TARGETS			 						#
@@ -15,6 +15,9 @@ default: up
 ##@ Start all containers
 up: post-build-actions prerequisite
 	- npx kill-port 3306
+	- npx kill-port 3307
+	- npx kill-port 4444
+	- npx kill-port 7900
 	- npx kill-port 443
 	- npx kill-port 80
 	- docker-compose -f docker-compose.yml up -d
@@ -138,15 +141,27 @@ bash-db: prerequisite
 	- docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` db bash
 	# - docker exec -it db bash -c "sudo -u $(DEVUSER) /bin/bash"
 
+##@ Opens a bash prompt to the testing db container
+bash-db_test: prerequisite
+	- docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` db_test bash
+	# - docker exec -it db bash -c "sudo -u $(DEVUSER) /bin/bash"
+
+
 #################################################
 # TEST TARGETS			 						#
 #################################################
 
 ##@ Launch unit tests
 test-php:
-	@echo "Start phpunit tests";
+	@echo "Start PEST testrunner";
 	docker-compose exec yagvc-app bash -c "cd /var/www/html && composer test"
 
+##@ Launch e2e tests
+test-dusk:
+	@echo "Start Dusk testrunner";
+	- docker-compose --profile test up -d db_test
+	- docker-compose exec yagvc-app php artisan dusk tests/Browser/ExampleTest.php
+	# - docker-compose exec yagvc-app bash -c "cd /var/www/html && composer test:e2e"
 
 #################################################
 # INTERNAL TARGETS			 					#
