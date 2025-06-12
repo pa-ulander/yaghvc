@@ -12,14 +12,14 @@
         "php": "^8.3",
         "badges/poser": "v3.1.0",
         "laravel/framework": "v11.43.2",
-        "laravel/sanctum": "v4.0.8",
+        "laravel/sanctum": "v4.1.1",
         "laravel/tinker": "v2.10.1",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
         "fakerphp/faker": "v1.24.1",
         "larastan/larastan": "v3.0.2",
-        "laravel/pint": "v1.22.0",
+        "laravel/pint": "v1.22.1",
         "laravel/sail": "v1.41.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "8.5.0",
