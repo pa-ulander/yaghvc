@@ -27,7 +27,7 @@ test(description: 'username should be added to the database', closure: function 
 
 
 test('fillable attributes are set correctly', function () {
-    $fillable = ['username', 'visit_count', 'last_visit'];
+    $fillable = ['username', 'repository', 'visit_count', 'last_visit'];
     expect($this->profileViews->getFillable())->toBe($fillable);
 });
 
