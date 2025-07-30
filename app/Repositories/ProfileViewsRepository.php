@@ -6,13 +6,20 @@ use App\Models\ProfileViews;
 
 class ProfileViewsRepository
 {
-    public function findOrCreate(string $username): ProfileViews
+    public function findOrCreate(string $username, ?string $repository = null): ProfileViews
     {
+        $attributes = ['username' => $username];
+        $values = ['visit_count' => 0, 'last_visit' => now()];
+
+        if ($repository !== null) {
+            $attributes['repository'] = $repository;
+        }
+
         $profileView = ProfileViews::firstOrCreate(
-            attributes: ['username' => $username],
-            values: ['visit_count' => 0, 'last_visit' => now()]
+            attributes: $attributes,
+            values: $values
         );
-        
+
         $profileView->incrementCount();
 
         return $profileView;
