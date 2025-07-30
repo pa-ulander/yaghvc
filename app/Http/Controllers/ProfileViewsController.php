@@ -27,7 +27,10 @@ class ProfileViewsController extends Controller
     public function index(ProfileViewsRequest $request): ResponseFactory|Response
     {
         $safe = $request->safe();
-        $profileView = $this->profileViewsRepository->findOrCreate(username: Arr::get(array: $safe, key: 'username'));
+        $username = Arr::get(array: $safe, key: 'username');
+        $repository = Arr::get(array: $safe, key: 'repository');
+
+        $profileView = $this->profileViewsRepository->findOrCreate(username: $username, repository: $repository);
         $badgeRender = $this->renderBadge(safe: $safe, profileView: $profileView);
 
         return $this->createBadgeResponse($badgeRender);
@@ -35,7 +38,10 @@ class ProfileViewsController extends Controller
 
     private function renderBadge(ValidatedInput|array $safe, ProfileViews $profileView): string
     {
-        $count = $profileView->getCount(username: Arr::get(array: $safe, key: 'username')) ?? 0;
+        $username = Arr::get(array: $safe, key: 'username');
+        $repository = Arr::get(array: $safe, key: 'repository');
+
+        $count = $profileView->getCount(username: $username, repository: $repository) ?? 0;
 
         // Add base count if provided
         if (isset($safe->base) && is_numeric($safe->base)) {
