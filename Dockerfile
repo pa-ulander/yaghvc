@@ -30,11 +30,13 @@ RUN apt update && apt install -y --no-install-recommends \
     libreadline-dev \
     ca-certificates \
     libfreetype6-dev \
-    libjpeg62-turbo-dev &&
-    docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/ &&
-    apt-get autoremove -y &&
-    apt-get clean &&
+    libjpeg62-turbo-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Configure GD extension
+RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/include/ --with-jpeg=/usr/include/
 
 # RUN pecl install ast
 
@@ -70,9 +72,9 @@ RUN docker-php-ext-install \
     pdo_sqlite
 
 # 5. composer
-COPY --from=composer:2.7.2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8.10 /usr/bin/composer /usr/bin/composer
 
-RUN pecl install xdebug-3.3.2 &&
+RUN pecl install xdebug-3.4.5 && \
     docker-php-ext-enable xdebug
 
 # 6. we need a user with the same UID/GID as the host user
@@ -85,8 +87,8 @@ RUN mkdir -p /home/$devuser/.composer
 RUN chown -R $devuser:$devuser /home/$devuser
 
 # Create PHPStan cache directory with proper permissions
-RUN mkdir -p /tmp/phpstan/cache/PHPStan &&
-    chown $devuser:www-data /tmp/phpstan/cache/PHPStan &&
+RUN mkdir -p /tmp/phpstan/cache/PHPStan && \
+    chown $devuser:www-data /tmp/phpstan/cache/PHPStan && \
     chmod 0775 /tmp/phpstan/cache/PHPStan
 
 RUN DEFAULT_IGNORE_HTTPS_ERRORS=true
