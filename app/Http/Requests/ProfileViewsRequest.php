@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
 class ProfileViewsRequest extends FormRequest
 {
     private const int MAX_USERNAME_LENGTH = 39;
+    private const int MAX_REPOSITORY_NAME_LENGTH = 100;
 
     private const array ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic'];
 
@@ -34,6 +35,7 @@ class ProfileViewsRequest extends FormRequest
             'color' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
             'style' => ['nullable', 'string', Rule::in(values: self::ALLOWED_STYLES)],
             'base' => ['nullable', 'integer', 'min:0', 'max:1000000'],
+            'repository' => ['nullable', 'string', 'max:' . self::MAX_REPOSITORY_NAME_LENGTH],
             'abbreviated' => ['nullable', 'boolean'],
             'user_agent' => ['required', 'string'],
         ];
@@ -67,7 +69,7 @@ class ProfileViewsRequest extends FormRequest
         if ($this->has('username') && !empty($this->input(key: 'username'))) {
             $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
 
-            $optionalFields = ['label', 'color', 'style', 'base'];
+            $optionalFields = ['label', 'color', 'style', 'base', 'repository'];
 
             foreach ($optionalFields as $field) {
                 if ($this->input(key: $field) === null) {
