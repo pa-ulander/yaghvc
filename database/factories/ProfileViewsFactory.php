@@ -31,6 +31,17 @@ class ProfileViewsFactory extends Factory
     {
         return [
             'username' => fake()->username(),
+            'repository' => null, // Default to profile view (no repository)
         ];
+    }
+
+    /**
+     * Create a repository-specific profile view
+     */
+    public function forRepository(string $repository): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'repository' => $repository,
+        ]);
     }
 }
