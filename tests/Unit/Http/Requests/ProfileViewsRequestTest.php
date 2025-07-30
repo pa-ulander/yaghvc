@@ -20,12 +20,13 @@ it('authorizes all requests', function () {
 it('has correct validation rules', function () {
     $rules = $this->request->rules();
 
-    expect($rules)->toHaveKeys(['username', 'label', 'color', 'style', 'base', 'abbreviated', 'user_agent']);
+    expect($rules)->toHaveKeys(['username', 'label', 'color', 'style', 'base', 'repository', 'abbreviated', 'user_agent']);
     expect($rules['username'])->toContain('required', 'max:39', 'regex:/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i');
     expect($rules['label'])->toContain('nullable', 'string', 'max:50');
     expect($rules['color'])->toContain('nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/');
     expect($rules['style'])->toContain('nullable', 'string');
     expect($rules['base'])->toContain('nullable', 'integer', 'min:0', 'max:1000000');
+    expect($rules['repository'])->toContain('nullable', 'string', 'max:100');
     expect($rules['abbreviated'])->toContain('nullable', 'boolean');
     expect($rules['user_agent'])->toContain('required', 'string');
 });
@@ -55,6 +56,7 @@ it('prepares data for validation', function () {
         'color' => ' FF5500 ',
         'style' => ' flat-square ',
         'base' => ' 100 ',
+        'repository' => ' <script>my-repo</script> ',
         'abbreviated' => 'true',
     ]);
 
@@ -69,6 +71,7 @@ it('prepares data for validation', function () {
         ->toHaveKey('color', 'FF5500')
         ->toHaveKey('style', 'flat-square')
         ->toHaveKey('base', '100')
+        ->toHaveKey('repository', 'my-repo')
         ->toHaveKey('abbreviated', true)
         ->toHaveKey('user_agent', 'TestAgent');
 });
@@ -133,4 +136,50 @@ it('validates allowed styles', function () {
     $data = ['style' => 'invalid-style'];
     $validator = Validator::make($data, ['style' => $rules['style']]);
     expect($validator->fails())->toBeTrue();
+});
+
+it('validates repository parameter', function () {
+    $request = new ProfileViewsRequest();
+    $rules = $request->rules();
+
+    // Valid repository names
+    $validRepositories = ['my-repo', 'test_project', 'my-awesome-project-123', 'a'];
+    foreach ($validRepositories as $repo) {
+        $data = ['repository' => $repo];
+        $validator = Validator::make($data, ['repository' => $rules['repository']]);
+        expect($validator->passes())->toBeTrue("Repository '$repo' should be valid");
+    }
+
+    // Repository too long (over 100 characters)
+    $longRepo = str_repeat('a', 101);
+    $data = ['repository' => $longRepo];
+    $validator = Validator::make($data, ['repository' => $rules['repository']]);
+    expect($validator->fails())->toBeTrue('Repository name over 100 characters should fail');
+
+    // Null repository should pass (nullable)
+    $data = ['repository' => null];
+    $validator = Validator::make($data, ['repository' => $rules['repository']]);
+    expect($validator->passes())->toBeTrue('Null repository should pass');
+});
+
+it('returns correct validated data with repository', function () {
+    $request = new ProfileViewsRequest();
+    $request->merge([
+        'username' => 'test-user',
+        'label' => 'Test Label',
+        'repository' => 'my-repo',
+        'user_agent' => 'TestAgent',
+    ]);
+
+    $validator = Validator::make($request->all(), $request->rules());
+    $request->setValidator($validator);
+
+    $validated = $request->validated();
+
+    expect($validated)
+        ->toHaveKeys(['username', 'label', 'repository', 'user_agent'])
+        ->toHaveKey('username', 'test-user')
+        ->toHaveKey('label', 'Test Label')
+        ->toHaveKey('repository', 'my-repo')
+        ->toHaveKey('user_agent', 'TestAgent');
 });
