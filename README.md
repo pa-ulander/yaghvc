@@ -3,6 +3,7 @@
 [![Tests](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/tests.yml)
 [![Test Coverage](./code_coverage_badge.svg)](https://github.com/pa-ulander/ghvc)
 [![Deploy](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml/badge.svg)](https://github.com/pa-ulander/ghvc/actions/workflows/deploy.yml)
+![](https://ghvc.kabelkultur.se?username=pa-ulander&label=Repository%20visits&color=brightgreen&style=flat&repository=yaghvc&base=624)
 
 A Laravel-based GitHub profile visitor counter and github repository visitor counter that generates customizable SVG badges to display on your GitHub profile or in a repository's README.<br> 
 Made only for fun and to try out new latest laravel and testing features. I just wanted to have a visitorcounter on my github profile.
