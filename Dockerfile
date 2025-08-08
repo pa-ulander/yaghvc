@@ -43,7 +43,7 @@ RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-webp=/usr/i
 # 2. apache configs
 RUN echo "ServerName yagvc" >>/etc/apache2/apache2.conf
 RUN mkdir "/etc/apache2/ssl"
-RUN openssl req -x509 -nodes -days 36500 -newkey rsa:4096 -keyout /etc/apache2/ssl/selfsigned.key -out /etc/apache2/ssl/selfsigned.crt -subj "/C=AA/ST=AA/L=Internet/O=Docker/OU=tapeter/CN=selfsigned"
+RUN openssl req -x509 -nodes -days 36500 -newkey rsa:4096 -keyout /etc/apache2/ssl/selfsigned.key -out /etc/apache2/ssl/selfsigned.crt -subj "/C=AA/ST=AA/L=Internet/O=Docker/OU=yagcv/CN=selfsigned"
 
 COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
