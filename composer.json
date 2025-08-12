@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.3",
         "badges/poser": "v3.1.0",
-        "laravel/framework": "v11.43.2",
+        "laravel/framework": "v11.44.1",
         "laravel/sanctum": "v4.2.0",
         "laravel/tinker": "v2.10.1",
         "webmozart/assert": "^1.11"
