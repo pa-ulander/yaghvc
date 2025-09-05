@@ -27,7 +27,7 @@
         "pestphp/pest-plugin-type-coverage": "v3.6.1",
         "phpunit/phpunit": "^11.5.1",
         "spatie/laravel-ignition": "^2.9.0",
-        "squizlabs/php_codesniffer": "3.13.2"
+        "squizlabs/php_codesniffer": "3.13.3"
     },
     "autoload": {
         "psr-4": {
