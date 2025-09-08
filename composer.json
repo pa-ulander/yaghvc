@@ -20,7 +20,7 @@
         "fakerphp/faker": "v1.24.1",
         "larastan/larastan": "v3.0.2",
         "laravel/pint": "v1.24.0",
-        "laravel/sail": "v1.44.0",
+        "laravel/sail": "v1.45.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "8.5.0",
         "pestphp/pest": "v3.7.1",
