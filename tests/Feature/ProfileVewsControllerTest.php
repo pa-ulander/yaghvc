@@ -15,7 +15,13 @@ it(description: 'handles base')
     ->get(uri: '/?username=testuser&color=blue&style=for-the-badge&base=123')->assertStatus(status: 200);
 
 it(description: 'handles label')
-->get(uri: '/?username=testuser&color=blue&label=hello')->assertStatus(status: 200);
+    ->get(uri: '/?username=testuser&color=blue&label=hello')->assertStatus(status: 200);
 
 it(description: 'handles abbreviated')
-->get(uri: '/?username=testuser&color=blue&label=hello&abbreviated=true')->assertStatus(status: 200);
+    ->get(uri: '/?username=testuser&color=blue&label=hello&abbreviated=true')->assertStatus(status: 200);
+
+it(description: 'handles labelColor')
+    ->get(uri: '/?username=testuser&color=blue&labelColor=red')->assertStatus(status: 200);
+
+it(description: 'handles logo')
+    ->get(uri: '/?username=testuser&color=blue&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')->assertStatus(status: 200);
