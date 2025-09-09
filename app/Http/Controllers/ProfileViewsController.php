@@ -54,6 +54,8 @@ class ProfileViewsController extends Controller
             messageBackgroundFill: $safe->color ?? config(key: 'badge.default_color'),
             badgeStyle: $safe->style ?? config(key: 'badge.default_style'),
             abbreviated: $safe->abbreviated ?? config(key: 'badge.default_abbreviated'),
+            labelColor: $safe->labelColor ?? null,
+            logo: $safe->logo ?? null,
         );
     }
 
