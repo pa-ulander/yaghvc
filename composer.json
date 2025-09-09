@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.3",
         "badges/poser": "v3.1.0",
+        "intervention/image": "^3.11",
         "laravel/framework": "v11.44.1",
         "laravel/sanctum": "v4.2.0",
         "laravel/tinker": "v2.10.1",
