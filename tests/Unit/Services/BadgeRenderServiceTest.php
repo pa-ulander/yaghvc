@@ -8,7 +8,7 @@ beforeEach(function () {
 });
 
 it('renders badge with count', function () {
-    $result = $this->badgeRenderService->renderBadgeWithCount('Views', 1000, 'blue', 'flat', false);
+    $result = $this->badgeRenderService->renderBadgeWithCount('Views', 1000, 'blue', 'flat', false, null, null);
 
     expect($result)->toBeString();
     expect($result)->toContain('<svg');
@@ -17,7 +17,7 @@ it('renders badge with count', function () {
 });
 
 it('renders badge with abbreviated count', function () {
-    $result = $this->badgeRenderService->renderBadgeWithCount('Views', 1500, 'green', 'flat-square', true);
+    $result = $this->badgeRenderService->renderBadgeWithCount('Views', 1500, 'green', 'flat-square', true, null, null);
 
     expect($result)->toBeString();
     expect($result)->toContain('<svg');
@@ -87,7 +87,29 @@ it('uses correct color', function () {
     $colors = ['#e05d44', '#97ca00', '#007ec6', '#dfb317'];
 
     foreach ($colors as $color) {
-        $result = $this->badgeRenderService->renderBadgeWithCount('Test', 100, $color, 'flat', false);
+        $result = $this->badgeRenderService->renderBadgeWithCount('Test', 100, $color, 'flat', false, null, null);
         expect($result)->toContain($color);
     }
+});
+
+it('applies label color correctly', function () {
+    $result = $this->badgeRenderService->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'red', null);
+    expect($result)->toContain('fill="#e05d44"'); // red color
+});
+
+it('handles named label colors', function () {
+    $result = $this->badgeRenderService->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'green', null);
+    expect($result)->toContain('fill="#97ca00"'); // green color
+});
+
+it('handles hex label colors', function () {
+    $result = $this->badgeRenderService->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'ff0000', null);
+    expect($result)->toContain('fill="#ff0000"'); // red color
+});
+
+it('handles logo parameter without errors', function () {
+    $base64Logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    $result = $this->badgeRenderService->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, $base64Logo);
+    expect($result)->toBeString();
+    expect($result)->toContain('<svg');
 });
