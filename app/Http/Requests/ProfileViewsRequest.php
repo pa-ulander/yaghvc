@@ -40,6 +40,7 @@ class ProfileViewsRequest extends FormRequest
             'abbreviated' => ['nullable', 'boolean'],
             'labelColor' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
             'logo' => ['nullable', new Base64DataUrl(), 'max:5000'],
+            'logoSize' => ['nullable', 'regex:/^(auto|[0-9]{1,2})$/'],
             'user_agent' => ['required', 'string'],
         ];
     }
@@ -72,7 +73,7 @@ class ProfileViewsRequest extends FormRequest
         if ($this->has('username') && !empty($this->input(key: 'username'))) {
             $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
 
-            $optionalFields = ['label', 'color', 'style', 'base', 'repository', 'labelColor'];
+            $optionalFields = ['label', 'color', 'style', 'base', 'repository', 'labelColor', 'logoSize'];
 
             foreach ($optionalFields as $field) {
                 if ($this->input(key: $field) === null) {
