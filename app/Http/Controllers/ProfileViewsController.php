@@ -48,6 +48,7 @@ class ProfileViewsController extends Controller
         }
 
         $logo = $safe->logo ?? null;
+        $logoSize = $safe->logoSize ?? config('badge.default_logo_size');
 
         return $this->badgeRenderService->renderBadgeWithCount(
             label: $safe->label ?? config(key: 'badge.default_label'),
@@ -57,6 +58,7 @@ class ProfileViewsController extends Controller
             abbreviated: $safe->abbreviated ?? config(key: 'badge.default_abbreviated'),
             labelColor: $safe->labelColor ?? null,
             logo: $logo,
+            logoSize: $logoSize,
         );
     }
 
