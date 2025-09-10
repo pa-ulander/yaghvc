@@ -12,6 +12,7 @@ use PUGX\Poser\Render\SvgFlatSquareRender;
 use PUGX\Poser\Render\SvgForTheBadgeRenderer;
 use PUGX\Poser\Render\SvgPlasticRender;
 
+/** @package App\Services */
 class BadgeRenderService
 {
     private Poser $poser;
@@ -44,6 +45,7 @@ class BadgeRenderService
         bool $abbreviated,
         ?string $labelColor = null,
         ?string $logo = null,
+        ?string $logoSize = null,
     ): string {
         $message = $this->formatNumber(number: $count, abbreviated: $abbreviated);
 
@@ -54,6 +56,7 @@ class BadgeRenderService
             badgeStyle: $badgeStyle,
             labelColor: $labelColor,
             logo: $logo,
+            logoSize: $logoSize,
         );
     }
 
@@ -84,6 +87,7 @@ class BadgeRenderService
         string $badgeStyle,
         ?string $labelColor = null,
         ?string $logo = null,
+        ?string $logoSize = null,
     ): string {
         $svg = (string) $this->poser->generate(
             subject: $label,
@@ -98,7 +102,7 @@ class BadgeRenderService
         }
 
         if ($logo) {
-            $svg = $this->applyLogo($svg, $logo);
+            $svg = $this->applyLogo($svg, $logo, $logoSize);
         }
 
         return $svg;
@@ -139,17 +143,25 @@ class BadgeRenderService
         return preg_replace($pattern, $replacement, $svg, 1);
     }
 
-    private function applyLogo(string $svg, string $logo): string
+    private function applyLogo(string $svg, string $logo, ?string $logoSize = null): string
     {
         try {
-            $imageData = $this->extractImageData($logo);
-            if (!$imageData) {
+            $processor = new LogoProcessor();
+            $prepared = $processor->prepare($logo, $logoSize);
+            if (!$prepared) {
                 return $svg;
             }
-
-            $resizedImage = $this->resizeImageForBadge($imageData['data'], $imageData['mime']);
-
-            return $this->embedLogoInSvg($svg, $resizedImage, $imageData['mime']);
+            // Basic limits (byte size + dimension) for raster; SVG intrinsic already constrained in processor
+            if (isset($prepared['binary'])) {
+                $maxBytes = (int) config('badge.logo_max_bytes', 10000);
+                if (strlen($prepared['binary']) > $maxBytes) {
+                    return $svg; // reject oversize
+                }
+            }
+            $dataUri = $prepared['dataUri'];
+            $width = $prepared['width'];
+            $height = $prepared['height'];
+            return $this->embedLogoInSvg($svg, $dataUri, $prepared['mime'], $width, $height);
         } catch (\Exception $e) {
             return $svg;
         }
@@ -187,52 +199,13 @@ class BadgeRenderService
         return $colorMap[strtolower($color)] ?? '007ec6'; // Default to blue
     }
 
-    private function extractImageData(string $logo): ?array
+
+    private function embedLogoInSvg(string $svg, string $logoDataUri, string $mime, int $width = 14, int $height = 14): string
     {
-        $decodedLogo = urldecode($logo);
-        $commaPos = strpos($decodedLogo, ',');
-        if ($commaPos === false) {
-            return null;
-        }
-        $prefix = substr($decodedLogo, 0, $commaPos);
-        $dataPart = substr($decodedLogo, $commaPos + 1);
-
-        if (!preg_match('/^data:image\/(png|jpeg|jpg|gif|svg\+xml);base64$/', $prefix)) {
-            return null;
-        }
-
-        $dataPart = str_replace(' ', '+', $dataPart);
-        $dataPart = preg_replace('/[\r\n\t]+/', '', $dataPart);
-        if ($dataPart === null) {
-            return null;
-        }
-
-        if (!preg_match('/^[A-Za-z0-9+\/=]+$/', $dataPart)) {
-            return null;
-        }
-
-        $decoded = base64_decode($dataPart, true);
-        if ($decoded === false || $decoded === '') {
-            return null;
-        }
-
-        $mime = substr($prefix, 11, strpos($prefix, ';') - 11);
-
-        return [
-            'mime' => $mime,
-            'data' => $decoded,
-        ];
-    }
-
-    private function resizeImageForBadge(string $imageData, string $mime): string
-    {
-        // TODO: Implement proper image resizing with Intervention\Image
-        return 'data:image/' . $mime . ';base64,' . base64_encode($imageData);
-    }
-
-    private function embedLogoInSvg(string $svg, string $logoDataUri, string $mime): string
-    {
-        $logoElement = '<image x="2" y="6" width="16" height="16" href="' . $logoDataUri . '" />';
+        // Adjust y so smaller heights remain vertically centered within typical 18px badge height
+        $badgeHeight = 18;
+        $y = (int) max(0, floor(($badgeHeight - $height) / 2));
+        $logoElement = '<image x="5" y="' . $y . '" width="' . $width . '" height="' . $height . '" href="' . $logoDataUri . '" />';
         return str_replace('</svg>', $logoElement . '</svg>', $svg);
     }
 }
