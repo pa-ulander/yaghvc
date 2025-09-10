@@ -11,7 +11,6 @@ use App\Services\BadgeRenderService;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ValidatedInput;
 
 class ProfileViewsController extends Controller
@@ -48,6 +47,8 @@ class ProfileViewsController extends Controller
             $count += (int)$safe->base;
         }
 
+        $logo = $safe->logo ?? null;
+
         return $this->badgeRenderService->renderBadgeWithCount(
             label: $safe->label ?? config(key: 'badge.default_label'),
             count: $count,
@@ -55,7 +56,7 @@ class ProfileViewsController extends Controller
             badgeStyle: $safe->style ?? config(key: 'badge.default_style'),
             abbreviated: $safe->abbreviated ?? config(key: 'badge.default_abbreviated'),
             labelColor: $safe->labelColor ?? null,
-            logo: $safe->logo ?? null,
+            logo: $logo,
         );
     }
 
