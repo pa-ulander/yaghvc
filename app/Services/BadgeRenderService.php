@@ -93,12 +93,10 @@ class BadgeRenderService
             format: Badge::DEFAULT_FORMAT,
         );
 
-        // Apply labelColor if provided
         if ($labelColor) {
             $svg = $this->applyLabelColor($svg, $labelColor);
         }
 
-        // Apply logo if provided
         if ($logo) {
             $svg = $this->applyLogo($svg, $logo);
         }
@@ -106,10 +104,6 @@ class BadgeRenderService
         return $svg;
     }
 
-    /**
-     * This method required because of native `number_format`
-     * method has big integer format limitation.
-     */
     private function formatNumber(
         int $number,
         bool $abbreviated,
@@ -136,58 +130,40 @@ class BadgeRenderService
         return round(num: $number, precision: 1) . self::$abbreviations[$abbreviationIndex];
     }
 
-    /**
-     * Apply custom label color to the SVG badge
-     */
     private function applyLabelColor(string $svg, string $labelColor): string
     {
-        // Convert named colors to hex if needed
         $hexColor = $this->getHexColor($labelColor);
-
-        // Replace the first rect fill (subject/label color) - more specific pattern
         $pattern = '/(<rect[^>]*)(fill="[^"]*")([^>]*>)/';
         $replacement = '$1fill="#' . $hexColor . '"$3';
 
         return preg_replace($pattern, $replacement, $svg, 1);
     }
 
-    /**
-     * Apply logo to the SVG badge
-     */
     private function applyLogo(string $svg, string $logo): string
     {
         try {
-            // Extract image data from base64 string
             $imageData = $this->extractImageData($logo);
             if (!$imageData) {
                 return $svg;
             }
 
-            // Resize image if needed (keep it small for badges)
             $resizedImage = $this->resizeImageForBadge($imageData['data'], $imageData['mime']);
 
-            // Embed logo in SVG
             return $this->embedLogoInSvg($svg, $resizedImage, $imageData['mime']);
         } catch (\Exception $e) {
-            // If logo processing fails, return original SVG
             return $svg;
         }
     }
 
-    /**
-     * Convert color name or hex to hex format
-     */
+
     private function getHexColor(string $color): string
     {
-        // Remove # if present
         $color = ltrim($color, '#');
 
-        // If it's already a hex color, return it
         if (preg_match('/^[0-9a-fA-F]{6}$/', $color)) {
             return $color;
         }
 
-        // Convert named colors to hex
         $colorMap = [
             'brightgreen' => '44cc11',
             'green' => '97ca00',
@@ -211,42 +187,52 @@ class BadgeRenderService
         return $colorMap[strtolower($color)] ?? '007ec6'; // Default to blue
     }
 
-    /**
-     * Extract image data from base64 string
-     */
     private function extractImageData(string $logo): ?array
     {
-        $pattern = '/^data:image\/(png|jpeg|gif|svg\+xml);base64,([A-Za-z0-9+\/]+={0,2})$/';
-        if (!preg_match($pattern, $logo, $matches)) {
+        $decodedLogo = urldecode($logo);
+        $commaPos = strpos($decodedLogo, ',');
+        if ($commaPos === false) {
+            return null;
+        }
+        $prefix = substr($decodedLogo, 0, $commaPos);
+        $dataPart = substr($decodedLogo, $commaPos + 1);
+
+        if (!preg_match('/^data:image\/(png|jpeg|jpg|gif|svg\+xml);base64$/', $prefix)) {
             return null;
         }
 
+        $dataPart = str_replace(' ', '+', $dataPart);
+        $dataPart = preg_replace('/[\r\n\t]+/', '', $dataPart);
+        if ($dataPart === null) {
+            return null;
+        }
+
+        if (!preg_match('/^[A-Za-z0-9+\/=]+$/', $dataPart)) {
+            return null;
+        }
+
+        $decoded = base64_decode($dataPart, true);
+        if ($decoded === false || $decoded === '') {
+            return null;
+        }
+
+        $mime = substr($prefix, 11, strpos($prefix, ';') - 11);
+
         return [
-            'mime' => $matches[1],
-            'data' => base64_decode($matches[2])
+            'mime' => $mime,
+            'data' => $decoded,
         ];
     }
 
-    /**
-     * Resize image for badge (keep it small)
-     */
     private function resizeImageForBadge(string $imageData, string $mime): string
     {
-        // For now, return the original image data without resizing
         // TODO: Implement proper image resizing with Intervention\Image
         return 'data:image/' . $mime . ';base64,' . base64_encode($imageData);
     }
 
-    /**
-     * Embed logo in SVG
-     */
     private function embedLogoInSvg(string $svg, string $logoDataUri, string $mime): string
     {
-        // Add logo as image element positioned in the subject area (left side)
-        // Position it at x=5, y=3 with 14x14 size to fit nicely in the badge
-        $logoElement = '<image x="5" y="3" width="14" height="14" href="' . $logoDataUri . '" />';
-
-        // Insert logo before the closing </svg> tag
+        $logoElement = '<image x="2" y="6" width="16" height="16" href="' . $logoDataUri . '" />';
         return str_replace('</svg>', $logoElement . '</svg>', $svg);
     }
 }
