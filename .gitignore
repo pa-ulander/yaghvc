@@ -14,3 +14,4 @@ auth.json
 yarn-error.log
 /.vscode
 clover.xml
+test_regex.php
