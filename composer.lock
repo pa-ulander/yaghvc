@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "557e4cfadb346ec5e08c05f61507e38d",
+    "content-hash": "51bb8849ad46a6781f4311ca4a6eccfa",
     "packages": [
         {
             "name": "badges/poser",
@@ -3741,6 +3741,47 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.0"
             },
             "time": "2025-06-25T14:20:11+00:00"
+        },
+        {
+            "name": "simple-icons/simple-icons",
+            "version": "15.14.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/simple-icons/simple-icons.git",
+                "reference": "b3462eb836aa9edbe197f11e8587875241f1b04c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/simple-icons/simple-icons/zipball/b3462eb836aa9edbe197f11e8587875241f1b04c",
+                "reference": "b3462eb836aa9edbe197f11e8587875241f1b04c",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CC0-1.0"
+            ],
+            "description": "SVG icons for popular brands",
+            "homepage": "https://simpleicons.org/",
+            "keywords": [
+                "icons",
+                "svg"
+            ],
+            "support": {
+                "chat": "https://discord.gg/vUXFa7t5xJ",
+                "docs": "https://github.com/simple-icons/simple-icons#php-usage-",
+                "forum": "https://github.com/simple-icons/simple-icons/discussions",
+                "issues": "https://github.com/simple-icons/simple-icons/issues",
+                "security": "https://github.com/simple-icons/simple-icons/security/policy",
+                "source": "https://github.com/simple-icons/simple-icons"
+            },
+            "funding": [
+                {
+                    "url": "https://opencollective.com/simple-icons",
+                    "type": "opencollective"
+                }
+            ],
+            "time": "2025-09-07T05:07:26+00:00"
         },
         {
             "name": "symfony/clock",

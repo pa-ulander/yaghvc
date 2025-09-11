@@ -15,6 +15,7 @@
         "laravel/framework": "v11.44.1",
         "laravel/sanctum": "v4.2.0",
         "laravel/tinker": "v2.10.1",
+        "simple-icons/simple-icons": "^15.14",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
