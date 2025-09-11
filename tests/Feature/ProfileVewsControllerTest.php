@@ -25,3 +25,15 @@ it(description: 'handles labelColor')
 
 it(description: 'handles logo')
     ->get(uri: '/?username=testuser&color=blue&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')->assertStatus(status: 200);
+
+it(description: 'handles simple-icons logo slug')
+    ->get(uri: '/?username=testuser&logo=github')->assertStatus(status: 200);
+
+it(description: 'handles svg auto logoSize')
+    ->get(uri: '/?username=testuser&logo=github&logoSize=auto')->assertStatus(status: 200);
+
+it(description: 'handles numeric logoSize clamped')
+    ->get(uri: '/?username=testuser&logo=github&logoSize=80')->assertStatus(status: 200);
+
+it(description: 'rejects oversize raster (still returns badge)')
+    ->get(uri: '/?username=testuser&logo=data:image/png;base64,' . str_repeat('iVBOR', 800))->assertStatus(status: 200);
