@@ -151,6 +151,6 @@ it('applies fixed numeric logoSize when provided', function () {
     preg_match('/<image[^>]*width="(\d+)"[^>]*height="(\d+)"/i', $result, $m);
     $width = (int)($m[1] ?? 0);
     $height = (int)($m[2] ?? 0);
-    expect($width)->toBe(14); // unchanged since numeric not yet implemented in LogoProcessor (future)
-    expect($height)->toBe(14);
+    expect($width)->toBe(10);
+    expect($height)->toBe(10);
 });
