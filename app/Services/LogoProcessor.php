@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
+
 /**
  * LogoProcessor inspired by shields.io logo handling.
  * Responsibilities:
@@ -36,13 +38,34 @@ class LogoProcessor
             return null;
         }
 
+        $cacheTtl = 0;
+        if (function_exists('config')) {
+            try {
+                $cacheTtl = (int) config('badge.logo_cache_ttl', 0);
+            } catch (\Throwable $e) {
+                $cacheTtl = 0; // container not ready
+            }
+        }
+        $cacheKey = null;
+        if ($cacheTtl > 0 && class_exists(Cache::class)) {
+            $cacheKey = 'logo:' . sha1($raw . '|' . ($logoSize ?? ''));
+            $cached = Cache::get($cacheKey);
+            if (is_array($cached)) {
+                return $cached;
+            }
+        }
+
         // Determine if named slug (no data: prefix)
         if (!str_starts_with($raw, 'data:')) {
             $named = $this->resolveNamedLogo($raw);
             if ($named === null) {
                 return null; // Unknown slug
             }
-            return $this->sizeSvgDataUri($named['dataUri'], $logoSize, $named['intrinsicWidth'] ?? $this->fixedSize, $named['intrinsicHeight'] ?? $this->fixedSize);
+            $result = $this->sizeSvgDataUri($named['dataUri'], $logoSize, $named['intrinsicWidth'] ?? $this->fixedSize, $named['intrinsicHeight'] ?? $this->fixedSize);
+            if ($cacheKey && isset($result['dataUri']) && $cacheTtl > 0) {
+                Cache::put($cacheKey, $result, $cacheTtl);
+            }
+            return $result;
         }
 
         $dataUri = $this->decodeDataUrlFromQueryParam($raw);
@@ -58,18 +81,69 @@ class LogoProcessor
         // For raster formats we cannot easily know intrinsic width/height without decoding binary
         // Leave sizing to outer code; return fixed by default.
         if ($parsed['mime'] !== 'svg+xml') {
-            return [
+            // Enforce byte size limit
+            $maxBytes = 10000;
+            if (function_exists('config')) {
+                try {
+                    $maxBytes = (int) config('badge.logo_max_bytes', 10000);
+                } catch (\Throwable $e) {
+                }
+            }
+            if (strlen($parsed['binary']) > $maxBytes) {
+                return null;
+            }
+            $width = $this->fixedSize;
+            $height = $this->fixedSize;
+            // Try to detect intrinsic size & enforce max dimensions
+            if (function_exists('getimagesizefromstring')) {
+                $info = @getimagesizefromstring($parsed['binary']);
+                if (is_array($info) && isset($info[0], $info[1])) {
+                    $intrinsicW = (int) $info[0];
+                    $intrinsicH = (int) $info[1];
+                    $maxDim = 64;
+                    if (function_exists('config')) {
+                        try {
+                            $maxDim = (int) config('badge.logo_max_dimension', 64);
+                        } catch (\Throwable $e) {
+                        }
+                    }
+                    if ($intrinsicW > $maxDim || $intrinsicH > $maxDim) {
+                        return null; // reject oversize raster
+                    }
+                }
+            }
+            if ($logoSize && $logoSize !== 'auto' && ctype_digit($logoSize)) {
+                $v = (int) $logoSize;
+                $maxDim = 64;
+                if (function_exists('config')) {
+                    try {
+                        $maxDim = (int) config('badge.logo_max_dimension', 64);
+                    } catch (\Throwable $e) {
+                    }
+                }
+                $v = max(8, min($maxDim, $v));
+                $width = $height = $v;
+            }
+            $result = [
                 'dataUri' => $dataUri,
-                'width' => $this->fixedSize,
-                'height' => $this->fixedSize,
+                'width' => $width,
+                'height' => $height,
                 'mime' => $parsed['mime'],
                 'binary' => $parsed['binary'],
             ];
+            if ($cacheKey && $cacheTtl > 0) {
+                Cache::put($cacheKey, $result, $cacheTtl);
+            }
+            return $result;
         }
 
         // SVG: attempt simple width/height extraction (optional)
         [$intrinsicWidth, $intrinsicHeight] = $this->extractSvgDimensions($parsed['binary']);
-        return $this->sizeSvgDataUri($dataUri, $logoSize, $intrinsicWidth, $intrinsicHeight, $parsed['binary']);
+        $result = $this->sizeSvgDataUri($dataUri, $logoSize, $intrinsicWidth, $intrinsicHeight, $parsed['binary']);
+        if ($cacheKey && $cacheTtl > 0) {
+            Cache::put($cacheKey, $result, $cacheTtl);
+        }
+        return $result;
     }
 
     /** Convert spaces to plus, strip whitespace, ensure prefix stays. */
@@ -131,6 +205,17 @@ class LogoProcessor
             $height = $this->targetHeight;
             $width = (int) round($height * $ratio);
             $width = max(1, min(2 * $this->targetHeight, $width)); // clamp
+        } elseif ($logoSize && ctype_digit($logoSize)) {
+            $v = (int) $logoSize;
+            $maxDim = 64;
+            if (function_exists('config')) {
+                try {
+                    $maxDim = (int) config('badge.logo_max_dimension', 64);
+                } catch (\Throwable $e) {
+                }
+            }
+            $v = max(8, min($maxDim, $v));
+            $width = $height = $v; // square sizing
         }
         return [
             'dataUri' => $dataUri,
@@ -141,27 +226,41 @@ class LogoProcessor
         ];
     }
 
-    /**
-     * Stub named logo resolver. Returns null if not recognised.
-     * Structure: [ dataUri, intrinsicWidth, intrinsicHeight ]
-     * You can extend by integrating a simple-icons provider.
-     */
     private function resolveNamedLogo(string $slug): ?array
     {
         $slug = strtolower(trim($slug));
-        $builtin = [
-            // Minimal example icon (GitHub mark simplified)
-            'github' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.53 15.6c.4.07.55-.18.55-.39v-1.34c-2.01.37-2.53-.5-2.69-.96-.09-.23-.48-.96-.82-1.15-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.2 1.87.86 2.33.65.07-.52.28-.86.51-1.06-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 2-.27 7.5 7.5 0 0 1 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.39A8 8 0 0 0 8 .2Z"/></svg>'
-        ];
-        if (!isset($builtin[$slug])) {
+        $basePathFn = function (string $path) {
+            if (function_exists('base_path')) {
+                try {
+                    return base_path($path);
+                } catch (\Throwable $e) {
+                }
+            }
+            $root = realpath(__DIR__ . '/../../'); // app/Services -> project/app -> project
+            if (!$root) {
+                $root = getcwd();
+            }
+            return $root . '/' . $path;
+        };
+        $basePath = $basePathFn('vendor/simple-icons/simple-icons/icons');
+        $file = $basePath . '/' . $slug . '.svg';
+        if (!is_readable($file)) {
+            return null; // debug path: $file
+        }
+        $svgContent = file_get_contents($file);
+        if ($svgContent === false) {
             return null;
         }
-        $svg = $builtin[$slug];
+        // Ensure width/height attributes for sizing (icons usually provide viewBox only)
+        if (!preg_match('/width="/i', $svgContent)) {
+            $svgContent = preg_replace('/<svg /i', '<svg width="24" height="24" ', $svgContent, 1);
+        }
+        $svg = $svgContent;
         $dataUri = 'data:image/svg+xml;base64,' . base64_encode($svg);
         return [
             'dataUri' => $dataUri,
-            'intrinsicWidth' => 16,
-            'intrinsicHeight' => 16,
+            'intrinsicWidth' => 24,
+            'intrinsicHeight' => 24,
         ];
     }
 }
