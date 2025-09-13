@@ -39,8 +39,9 @@ class ProfileViewsRequest extends FormRequest
             'repository' => ['nullable', 'string', 'max:' . self::MAX_REPOSITORY_NAME_LENGTH],
             'abbreviated' => ['nullable', 'boolean'],
             'labelColor' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
-            // Accept either a simple-icons slug (letters, digits, hyphen) OR a data URI
-            'logo' => ['nullable', 'regex:/^(data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,[A-Za-z0-9+\/=\s%]+|[a-z0-9-]{1,60})$/i', 'max:5000'],
+            // Accept either a simple-icons slug OR a fully percent-encoded data URI (no raw spaces or % remnants inside base64). Users must encode externally.
+            // Accept already percent-encoded data URI (starting with data%3Aimage%2F...) or plain form.
+            'logo' => ['nullable', 'regex:/^((data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,[A-Za-z0-9+\/=%]+)|(data%3Aimage%2F(png|jpeg|jpg|gif|svg%2Bxml)%3Bbase64%2C[A-Za-z0-9%]+)|[a-z0-9-]{1,60})$/i', 'max:5000'],
             'logoSize' => ['nullable', 'regex:/^(auto|[0-9]{1,2})$/'],
             'user_agent' => ['required', 'string'],
         ];
@@ -51,6 +52,7 @@ class ProfileViewsRequest extends FormRequest
         return [
             'username.required' => 'A GitHub account username is needed to count views',
             'username.regex' => 'The username must be a valid GitHub username',
+            'logo.regex' => 'Invalid logo parameter. If using a data URI you must percent-encode the entire value (e.g. encodeURIComponent or rawurlencode).',
         ];
     }
 
