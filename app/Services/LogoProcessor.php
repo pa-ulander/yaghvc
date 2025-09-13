@@ -101,8 +101,9 @@ class LogoProcessor
                     $b64 = preg_replace('/\s+/', '', $b64) ?? $b64;
                     $bin = base64_decode($b64, true);
                     if ($bin !== false && $bin !== '') {
+                        $parsedMime = preg_replace('/[^a-z0-9+]+/i', '', $mime);
                         $parsed = [
-                            'mime' => preg_replace('/[^a-z0-9+]+/i', '', $mime) === 'svg+xml' ? 'svg+xml' : ($mime ?? 'png'),
+                            'mime' => $parsedMime === 'svg+xml' ? 'svg+xml' : ($parsedMime !== '' ? $parsedMime : 'png'),
                             'binary' => $bin,
                         ];
                     }
