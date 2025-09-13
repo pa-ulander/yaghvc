@@ -9,12 +9,12 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use App\Rules\Base64DataUrl;
 use Illuminate\Validation\Rule;
 
 class ProfileViewsRequest extends FormRequest
 {
     private const int MAX_USERNAME_LENGTH = 39;
+
     private const int MAX_REPOSITORY_NAME_LENGTH = 100;
 
     private const array ALLOWED_STYLES = ['flat', 'flat-square', 'for-the-badge', 'plastic'];
@@ -30,7 +30,7 @@ class ProfileViewsRequest extends FormRequest
             'username' => [
                 'required',
                 'max:' . self::MAX_USERNAME_LENGTH,
-                'regex:/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i'
+                'regex:/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i',
             ],
             'label' => ['nullable', 'string', 'max:50'],
             'color' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
@@ -39,6 +39,7 @@ class ProfileViewsRequest extends FormRequest
             'repository' => ['nullable', 'string', 'max:' . self::MAX_REPOSITORY_NAME_LENGTH],
             'abbreviated' => ['nullable', 'boolean'],
             'labelColor' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
+            'logoColor' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
             // Accept either a simple-icons slug OR a fully percent-encoded data URI (no raw spaces or % remnants inside base64). Users must encode externally.
             // Accept already percent-encoded data URI (starting with data%3Aimage%2F...) or plain form.
             'logo' => ['nullable', 'regex:/^((data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,[A-Za-z0-9+\/=%]+)|(data%3Aimage%2F(png|jpeg|jpg|gif|svg%2Bxml)%3Bbase64%2C[A-Za-z0-9%]+)|[a-z0-9-]{1,60})$/i', 'max:5000'],
@@ -73,10 +74,10 @@ class ProfileViewsRequest extends FormRequest
             'user_agent' => $this->header(key: 'User-Agent', default: ''),
         ];
 
-        if ($this->has('username') && !empty($this->input(key: 'username'))) {
+        if ($this->has('username') && ! empty($this->input(key: 'username'))) {
             $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
 
-            $optionalFields = ['label', 'color', 'style', 'base', 'repository', 'labelColor', 'logoSize'];
+            $optionalFields = ['label', 'color', 'style', 'base', 'repository', 'labelColor', 'logoColor', 'logoSize'];
 
             foreach ($optionalFields as $field) {
                 if ($this->input(key: $field) === null) {
@@ -100,20 +101,20 @@ class ProfileViewsRequest extends FormRequest
     }
 
     /**
-     * @param array|mixed|null $keys
+     * @param  array|mixed|null  $keys
      */
     public function all(mixed $keys = null): array
     {
         $data = parent::all(keys: $keys);
-        if (!isset($data['user_agent'])) {
+        if (! isset($data['user_agent'])) {
             $data['user_agent'] = $this->header(key: 'User-Agent', default: '');
         }
+
         return $data;
     }
 
     /**
-     * @param array|int|string|null $key
-     * @param mixed $default
+     * @param  array|int|string|null  $key
      */
     public function validated(mixed $key = null, mixed $default = null): mixed
     {
