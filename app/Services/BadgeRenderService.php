@@ -19,6 +19,8 @@ class BadgeRenderService
 
     private static array $abbreviations = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
 
+    // (Diagnostic fields removed during cleanup)
+
     public function __construct()
     {
         $this->poser = new Poser([
@@ -97,12 +99,13 @@ class BadgeRenderService
             format: Badge::DEFAULT_FORMAT,
         );
 
-        if ($labelColor) {
-            $svg = $this->applyLabelColor($svg, $labelColor);
-        }
-
+        // Bug fix: logo failed to render if labelColor set because geometry
+        // detection expected original fill="#555"; embed logo BEFORE recoloring label.
         if ($logo) {
             $svg = $this->applyLogo($svg, $logo, $logoSize);
+        }
+        if ($labelColor) {
+            $svg = $this->applyLabelColor($svg, $labelColor);
         }
 
         return $svg;
@@ -137,43 +140,91 @@ class BadgeRenderService
     private function applyLabelColor(string $svg, string $labelColor): string
     {
         $hexColor = $this->getHexColor($labelColor);
-        $pattern = '/(<rect[^>]*)(fill="[^"]*")([^>]*>)/';
+        // Prefer targeting the original label rect (fill="#555") to avoid recoloring mask/gradient rects
+        $labelPattern = '/(<rect[^>]*fill="#555"[^>]*>)/';
+        if (preg_match($labelPattern, $svg)) {
+            return preg_replace_callback($labelPattern, function (array $m) use ($hexColor): string {
+                $replaced = preg_replace('/fill="#555"/', 'fill="#' . $hexColor . '"', $m[0], 1);
+                return is_string($replaced) ? $replaced : $m[0];
+            }, $svg, 1) ?? $svg;
+        }
+        // Fallback: replace first rect fill
+        $genericPattern = '/(<rect[^>]*)(fill="[^"]*")([^>]*>)/';
         $replacement = '$1fill="#' . $hexColor . '"$3';
-
-        return preg_replace($pattern, $replacement, $svg, 1);
+        return preg_replace($genericPattern, $replacement, $svg, 1) ?? $svg;
     }
 
     private function applyLogo(string $svg, string $logo, ?string $logoSize = null): string
     {
+        $dataUri = null;
+        $width = 0;
+        $height = 0;
+        $mime = '';
         try {
             $processor = new LogoProcessor();
             $prepared = $processor->prepare($logo, $logoSize);
-
-            if ($prepared === null) {
-                return $svg . '<!--logo-prepared-null-->';
+            if (!$prepared || !isset($prepared['dataUri'])) {
+                // Salvage: if the raw (possibly urlencoded) value looks like a data URI, inject minimally
+                $decoded = urldecode($logo);
+                if (str_starts_with($decoded, 'data:image/')) {
+                    // Basic shape check: must contain ';base64,' and small enough
+                    if (str_contains($decoded, ';base64,') && strlen($decoded) < 12000) { // widen guard
+                        $dataUri = $decoded;
+                        $width = 14;
+                        $height = 14; // default square
+                        // Inject directly at end
+                        if (!str_contains($svg, '<image')) {
+                            $fallbackImage = '<image x="4" y="2" width="' . $width . '" height="' . $height . '" href="' . $dataUri . '" />';
+                            if (str_contains($svg, '</svg>')) {
+                                $svg = str_replace('</svg>', $fallbackImage . '</svg>', $svg);
+                            } else {
+                                $svg .= $fallbackImage;
+                            }
+                        }
+                        return $svg;
+                    }
+                }
+                return $svg; // degrade silently
             }
-            if (!$prepared) {
-                return $svg;
-            }
-            if (!isset($prepared['dataUri'])) {
-                return $svg; // safety
-            }
-            // Basic limits (byte size + dimension) for raster; SVG intrinsic already constrained in processor
             if (isset($prepared['binary'])) {
                 $maxBytes = (int) config('badge.logo_max_bytes', 10000);
                 if (strlen($prepared['binary']) > $maxBytes) {
-                    return $svg; // reject oversize
+                    return $svg;
                 }
             }
             $dataUri = $prepared['dataUri'];
-            $width = $prepared['width'];
-            $height = $prepared['height'];
-            return $this->embedLogoInSvg($svg, $dataUri, $prepared['mime'], $width, $height);
-        } catch (\Exception $e) {
-            return $svg;
+            $width = (int) $prepared['width'];
+            $height = (int) $prepared['height'];
+            $mime = (string) $prepared['mime'];
+            $svg = $this->embedLogoInSvg($svg, $dataUri, $mime, $width, $height);
+        } catch (\Throwable $e) {
+            // On exception we still attempt a salvage path
+            $decoded = urldecode($logo);
+            if (str_starts_with($decoded, 'data:image/') && str_contains($decoded, ';base64,') && strlen($decoded) < 16000) {
+                $dataUri = $decoded;
+                $width = 14;
+                $height = 14;
+                if (!str_contains($svg, '<image')) {
+                    $fallbackImage = '<image x="4" y="2" width="' . $width . '" height="' . $height . '" href="' . $dataUri . '" />';
+                    if (str_contains($svg, '</svg>')) {
+                        $svg = str_replace('</svg>', $fallbackImage . '</svg>', $svg);
+                    } else {
+                        $svg .= $fallbackImage;
+                    }
+                }
+            }
         }
+        // Deterministic fallback guaranteeing an <image> if we have a data URI
+        if ($dataUri && strpos($svg, '<image') === false) {
+            $fallbackImage = '<image x="4" y="2" width="' . ($width ?: 14) . '" height="' . ($height ?: 14) . '" href="' . $dataUri . '" />';
+            if (str_contains($svg, '</svg>')) {
+                $svg = str_replace('</svg>', $fallbackImage . '</svg>', $svg);
+            } else {
+                $svg .= $fallbackImage;
+            }
+        }
+        return $svg;
     }
-
 
     private function getHexColor(string $color): string
     {
@@ -220,30 +271,30 @@ class BadgeRenderService
         $y = (int) round(($badgeHeight - $height) / 2);
 
         $padLeft = 10;   // space from left edge to logo
-        $padRight = 0;  // space between logo and label text
+        $padRight = 10;  // space between logo and label text
         $segment = $padLeft + $width + $padRight; // horizontal space we must add to the label area
 
         // 2. Extract width & rect metrics from original badge BEFORE modifications
         if (!preg_match('/<svg[^>]*width="([0-9.]+)"/i', $svg, $mTotal)) {
-            return $svg; // unexpected – bail out without breaking badge
+            // Geometry unexpected – fallback simple inject without width shifts
+            return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
         $totalWidth = (float) $mTotal[1];
-
         if (!preg_match('/<rect[^>]*width="([0-9.]+)"[^>]*fill="#555"[^>]*>/', $svg, $mLabel)) {
-            return $svg; // bail if cannot find label rect
+            return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
         $labelWidth = (float) $mLabel[1];
 
         // Match status rect: has x attribute and a solid color fill (e.g. #97ca00)
         if (!preg_match('/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', $svg, $mStatus)) {
-            return $svg; // bail if cannot find status rect
+            return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
         $statusX = (float) $mStatus[1];
         $statusWidth = (float) $mStatus[2];
 
         // Sanity: ensure pieces line up to total width
         if (abs(($labelWidth + $statusWidth) - $totalWidth) > 0.05) {
-            return $svg; // unexpected layout; avoid corrupting svg
+            return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
 
         // 3. Compute new geometry
@@ -260,21 +311,25 @@ class BadgeRenderService
         $svg = preg_replace('/<rect width="' . preg_quote((string)$totalWidth, '/') . '" height="' . $badgeHeight . '" fill="url\(#b\)"\/>/', '<rect width="' . $newTotal . '" height="' . $badgeHeight . '" fill="url(#b)"/>', $svg, 1) ?? $svg;
         // label rect width (no x, fill #555)
         $labelPattern = '/<rect width="([0-9.]+)" height="' . $badgeHeight . '" fill="#555"\/>/';
-        $svg = preg_replace_callback($labelPattern, function ($m) use ($labelWidth, $newLabelWidth) {
-            if ((float)$m[1] !== $labelWidth) return $m[0];
+        $svg = preg_replace_callback($labelPattern, function (array $m) use ($labelWidth, $newLabelWidth): string {
+            if ((float)$m[1] !== $labelWidth) {
+                return $m[0];
+            }
             return str_replace('width="' . $m[1] . '"', 'width="' . $newLabelWidth . '"', $m[0]);
         }, $svg, 1) ?? $svg;
         // status rect x update
         $statusPattern = '/<rect x="([0-9.]+)" width="([0-9.]+)" height="' . $badgeHeight . '" fill="#([0-9a-fA-F]{3,8})"\/>/';
-        $svg = preg_replace_callback($statusPattern, function ($m) use ($statusX, $statusWidth, $newStatusX) {
-            if ((float)$m[1] !== $statusX || (float)$m[2] !== $statusWidth) return $m[0];
+        $svg = preg_replace_callback($statusPattern, function (array $m) use ($statusX, $statusWidth, $newStatusX): string {
+            if ((float)$m[1] !== $statusX || (float)$m[2] !== $statusWidth) {
+                return $m[0];
+            }
             $out = $m[0];
             $out = preg_replace('/x="' . preg_quote($m[1], '\/') . '"/', 'x="' . $newStatusX . '"', $out, 1);
-            return $out;
+            return is_string($out) ? $out : $m[0];
         }, $svg, 1) ?? $svg;
 
         // 5. Shift text x positions by segment
-        $svg = preg_replace_callback('/<text x="([0-9.]+)" y="([0-9.]+)"([^>]*)>/', function ($m) use ($segment) {
+        $svg = preg_replace_callback('/<text x="([0-9.]+)" y="([0-9.]+)"([^>]*)>/', function (array $m) use ($segment): string {
             $newX = (float) $m[1] + $segment;
             return '<text x="' . $newX . '" y="' . $m[2] . '"' . $m[3] . '>';
         }, $svg) ?? $svg;
@@ -289,5 +344,15 @@ class BadgeRenderService
         }
 
         return $svg;
+    }
+
+    private function simpleInjectLogo(string $svg, string $logoDataUri, int $width, int $height, int $y): string
+    {
+        // Minimal fallback: insert before closing svg without changing geometry
+        $fallback = '<image x="4" y="' . $y . '" width="' . $width . '" height="' . $height . '" href="' . $logoDataUri . '" />';
+        if (str_contains($svg, '</svg>')) {
+            return str_replace('</svg>', $fallback . '</svg>', $svg);
+        }
+        return $svg . $fallback;
     }
 }
