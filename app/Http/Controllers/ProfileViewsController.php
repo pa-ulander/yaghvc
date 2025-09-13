@@ -31,7 +31,6 @@ class ProfileViewsController extends Controller
 
         $profileView = $this->profileViewsRepository->findOrCreate(username: $username, repository: $repository);
         $badgeRender = $this->renderBadge(safe: $safe, profileView: $profileView);
-
         return $this->createBadgeResponse($badgeRender);
     }
 
@@ -47,7 +46,7 @@ class ProfileViewsController extends Controller
             $count += (int)$safe->base;
         }
 
-        $logo = $safe->logo ?? null;
+        $logo = $safe->logo ?? request()->query('logo');
         $logoSize = $safe->logoSize ?? config('badge.default_logo_size');
 
         return $this->badgeRenderService->renderBadgeWithCount(
@@ -64,11 +63,20 @@ class ProfileViewsController extends Controller
 
     private function createBadgeResponse(string $badgeRender): Response
     {
-        return response(content: $badgeRender)
+        $etag = 'W/"' . sha1($badgeRender) . '"';
+        $response = response(content: $badgeRender)
             ->header(key: 'Status', values: '200')
             ->header(key: 'Content-Type', values: 'image/svg+xml')
-            ->header(key: 'Cache-Control', values: 'max-age=0, no-cache, no-store, must-revalidate')
-            ->header(key: 'Pragma', values: 'no-cache')
-            ->header(key: 'Expires', values: '0');
+            // Allow very short caching while requiring revalidation to keep counts fresh.
+            ->header(key: 'Cache-Control', values: 'public, max-age=1, s-maxage=1, stale-while-revalidate=5')
+            ->header(key: 'ETag', values: $etag);
+
+        // Conditional GET handling
+        if (request()->header('If-None-Match') === $etag) {
+            $response->setStatusCode(304);
+            $response->setContent(null);
+        }
+
+        return $response;
     }
 }
