@@ -1,0 +1,44 @@
+name: Encode Logo Smoke
+
+on:
+  #   push:
+  #     branches:
+  #       - '**'
+  #   pull_request:
+  workflow_dispatch:
+
+jobs:
+  encode-logo-smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create tiny test PNG (1x1)
+        run: |
+          # Generate a 1x1 transparent PNG via base64 (avoids ImageMagick dependency)
+          echo iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg== | base64 -d > test.png
+          ls -l test.png
+
+      - name: Encode logo (raw output)
+        id: raw
+        run: |
+          php scripts/encode-logo.php test.png > encoded.txt
+          echo "encoded=$(cat encoded.txt)" >> $GITHUB_OUTPUT
+          # Basic assertions: starts with data%3Aimage%2Fpng%3Bbase64%2C and no newline
+          if ! grep -q '^data%3Aimage%2Fpng%3Bbase64%2C' encoded.txt; then
+            echo 'Encoded output missing expected prefix' >&2; exit 1; fi
+          if [ $(wc -l < encoded.txt) -ne 1 ]; then echo 'Unexpected newline(s) in output' >&2; exit 1; fi
+
+      - name: Encode logo (inline markdown)
+        id: inline
+        run: |
+          php scripts/encode-logo.php test.png --inline > inline.txt
+          cat inline.txt
+          if ! grep -q '^!\[](' inline.txt; then echo 'Inline output not starting with Markdown image syntax' >&2; exit 1; fi
+          if ! grep -q '?username=<your-username>&logo=data%3Aimage%2Fpng%3Bbase64%2C' inline.txt; then echo 'Inline output missing expected query parameters' >&2; exit 1; fi
+
+      - name: Show truncated outputs
+        run: |
+          echo RAW: $(head -c 80 encoded.txt)...
+          echo INLINE: $(head -c 120 inline.txt)...
