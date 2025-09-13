@@ -38,6 +38,17 @@ class LogoProcessor
             return null;
         }
 
+        // If the logo appears to be a percent-encoded data URI, decode it once so later logic
+        // recognises it as a data: URL. Users are instructed to percent-encode the entire value,
+        // so handling the encoded prefix here improves robustness.
+        if (preg_match('/^data%3Aimage%2F/i', $raw) === 1) {
+            $decodedOnce = urldecode($raw);
+            // Only trust the decode if it now clearly starts with data:image/
+            if (str_starts_with($decodedOnce, 'data:image/')) {
+                $raw = $decodedOnce;
+            }
+        }
+
         $cacheTtl = 0;
         if (function_exists('config')) {
             try {
@@ -63,19 +74,43 @@ class LogoProcessor
             }
             $result = $this->sizeSvgDataUri($named['dataUri'], $logoSize, $named['intrinsicWidth'] ?? $this->fixedSize, $named['intrinsicHeight'] ?? $this->fixedSize);
             if ($cacheKey && isset($result['dataUri']) && $cacheTtl > 0) {
-                Cache::put($cacheKey, $result, $cacheTtl);
+                $cachePayload = $result;
+                unset($cachePayload['binary']);
+                Cache::put($cacheKey, $cachePayload, $cacheTtl);
             }
             return $result;
         }
 
         $dataUri = $this->decodeDataUrlFromQueryParam($raw);
+        // (debug removed)
         if ($dataUri === null) {
             return null;
         }
 
         $parsed = $this->parseDataUri($dataUri);
+        // (debug removed)
         if ($parsed === null) {
-            return null;
+            // Salvage attempt: tolerate uncommon base64 variants (e.g., urlencoded edge cases)
+            if (str_starts_with($dataUri, 'data:image/')) {
+                $semi = strpos($dataUri, ';base64,');
+                if ($semi !== false) {
+                    $prefix = substr($dataUri, 0, $semi);
+                    $mime = substr($prefix, strlen('data:image/'));
+                    $b64 = substr($dataUri, $semi + 8);
+                    // Remove any stray whitespace
+                    $b64 = preg_replace('/\s+/', '', $b64) ?? $b64;
+                    $bin = base64_decode($b64, true);
+                    if ($bin !== false && $bin !== '') {
+                        $parsed = [
+                            'mime' => preg_replace('/[^a-z0-9+]+/i', '', $mime) === 'svg+xml' ? 'svg+xml' : ($mime ?? 'png'),
+                            'binary' => $bin,
+                        ];
+                    }
+                }
+            }
+            if ($parsed === null) {
+                return null;
+            }
         }
 
         // For raster formats we cannot easily know intrinsic width/height without decoding binary
@@ -97,18 +132,21 @@ class LogoProcessor
             // Try to detect intrinsic size & enforce max dimensions
             if (function_exists('getimagesizefromstring')) {
                 $info = @getimagesizefromstring($parsed['binary']);
-                if (is_array($info) && isset($info[0], $info[1])) {
+                if (is_array($info)) {
+                    // indexes 0 and 1 always exist for valid image size arrays
                     $intrinsicW = (int) $info[0];
                     $intrinsicH = (int) $info[1];
-                    $maxDim = 64;
-                    if (function_exists('config')) {
-                        try {
-                            $maxDim = (int) config('badge.logo_max_dimension', 64);
-                        } catch (\Throwable $e) {
+                    if ($intrinsicW > 0 && $intrinsicH > 0) {
+                        $maxDim = 64;
+                        if (function_exists('config')) {
+                            try {
+                                $maxDim = (int) config('badge.logo_max_dimension', 64);
+                            } catch (\Throwable $e) {
+                            }
                         }
-                    }
-                    if ($intrinsicW > $maxDim || $intrinsicH > $maxDim) {
-                        return null; // reject oversize raster
+                        if ($intrinsicW > $maxDim || $intrinsicH > $maxDim) {
+                            return null; // reject oversize raster
+                        }
                     }
                 }
             }
@@ -132,7 +170,9 @@ class LogoProcessor
                 'binary' => $parsed['binary'],
             ];
             if ($cacheKey && $cacheTtl > 0) {
-                Cache::put($cacheKey, $result, $cacheTtl);
+                $cachePayload = $result;
+                unset($cachePayload['binary']);
+                Cache::put($cacheKey, $cachePayload, $cacheTtl);
             }
             return $result;
         }
@@ -141,7 +181,9 @@ class LogoProcessor
         [$intrinsicWidth, $intrinsicHeight] = $this->extractSvgDimensions($parsed['binary']);
         $result = $this->sizeSvgDataUri($dataUri, $logoSize, $intrinsicWidth, $intrinsicHeight, $parsed['binary']);
         if ($cacheKey && $cacheTtl > 0) {
-            Cache::put($cacheKey, $result, $cacheTtl);
+            $cachePayload = $result;
+            unset($cachePayload['binary']);
+            Cache::put($cacheKey, $cachePayload, $cacheTtl);
         }
         return $result;
     }
@@ -149,14 +191,16 @@ class LogoProcessor
     /** Convert spaces to plus, strip whitespace, ensure prefix stays. */
     private function decodeDataUrlFromQueryParam(string $value): ?string
     {
+        // Original logic: urldecode then convert spaces back to plus; compress whitespace
         $candidate = urldecode($value);
-        $candidate = str_replace(' ', '+', $candidate); // restore plus
+        $candidate = str_replace(' ', '+', $candidate);
         $candidate = preg_replace('/\s+/', '', $candidate) ?? '';
         if (!str_starts_with($candidate, 'data:')) {
             return null;
         }
         return $candidate;
     }
+
 
     /** Parse a data URI returning [mime,binary] or null */
     private function parseDataUri(string $dataUri): ?array
