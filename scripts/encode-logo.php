@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Usage:
  *   php scripts/encode-logo.php path/to/logo.png [--mime=image/png] [--inline]
  * If --mime not provided it will be inferred from extension.
- * Default output: single line (no newline) suitable for appending as &logo=<output>
+ * Default output: single line (terminated by a newline) suitable for piping or cat; contains no internal newlines.
  * With --inline: emits a full Markdown snippet including the encoded logo query parameter.
  */
 
@@ -62,9 +62,9 @@ if ($inline === true) {
     // Provide a ready-to-paste Markdown badge snippet. Username placeholder helps quick usage.
     // User can replace <your-username> and optionally add other params.
     $snippet = '![](https://ghvc.kabelkultur.se?username=<your-username>&logo=' . $encoded . ')';
-    echo $snippet; // no newline (consistent with original behavior)
+    echo $snippet . "\n"; // newline so wc -l reports 1
     exit(0);
 }
 
 // Default: output only the encoded string (no trailing newline to ease shell use)
-echo $encoded;
+echo $encoded . "\n"; // newline so CI wc -l == 1

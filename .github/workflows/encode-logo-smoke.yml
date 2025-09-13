@@ -6,6 +6,10 @@ on:
   #   branches:
   #     - '**'
   # pull_request:
+  push:
+    branches:
+      - "**"
+  pull_request:
 
 jobs:
   encode-logo-smoke:
