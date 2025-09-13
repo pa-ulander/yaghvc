@@ -31,6 +31,7 @@ class ProfileViewsController extends Controller
 
         $profileView = $this->profileViewsRepository->findOrCreate(username: $username, repository: $repository);
         $badgeRender = $this->renderBadge(safe: $safe, profileView: $profileView);
+
         return $this->createBadgeResponse($badgeRender);
     }
 
@@ -43,7 +44,7 @@ class ProfileViewsController extends Controller
 
         // Add base count if provided
         if (isset($safe->base) && is_numeric($safe->base)) {
-            $count += (int)$safe->base;
+            $count += (int) $safe->base;
         }
 
         $logo = $safe->logo ?? request()->query('logo');
@@ -56,6 +57,7 @@ class ProfileViewsController extends Controller
             badgeStyle: $safe->style ?? config(key: 'badge.default_style'),
             abbreviated: $safe->abbreviated ?? config(key: 'badge.default_abbreviated'),
             labelColor: $safe->labelColor ?? null,
+            logoColor: $safe->logoColor ?? null,
             logo: $logo,
             logoSize: $logoSize,
         );
