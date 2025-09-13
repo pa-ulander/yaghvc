@@ -12,7 +12,7 @@ use Tests\TestCase;
  */
 class BadgeRenderingTest extends TestCase
 {
-    public function testRendersBasicBadgeWithDefaultLabel(): void
+    public function test_renders_basic_badge_with_default_label(): void
     {
         $this->get('/?username=badgeuser')
             ->assertStatus(200)
@@ -20,7 +20,7 @@ class BadgeRenderingTest extends TestCase
             ->assertSee('VISITS');
     }
 
-    public function testAppliesLabelColorOverride(): void
+    public function test_applies_label_color_override(): void
     {
         $this->get('/?username=badgeuser&labelColor=red')
             ->assertStatus(200)
@@ -28,7 +28,7 @@ class BadgeRenderingTest extends TestCase
             ->assertSee('#e05d44');
     }
 
-    public function testLogoRendersWhenLabelColorAlsoSet(): void
+    public function test_logo_renders_when_label_color_also_set(): void
     {
         $response = $this->get('/?username=badgeuser&logo=github&labelColor=red');
         $response->assertStatus(200)
@@ -36,7 +36,7 @@ class BadgeRenderingTest extends TestCase
             ->assertSee('<image', false); // logo embedded
     }
 
-    public function testEmbedsSimpleIconsLogoSlug(): void
+    public function test_embeds_simple_icons_logo_slug(): void
     {
         $response = $this->get('/?username=badgeuser&logo=github');
         // Uncomment for debugging: fwrite(STDERR, $response->getContent());
@@ -73,21 +73,21 @@ class BadgeRenderingTest extends TestCase
             ->assertJsonPath('data.logo.0', fn($msg) => str_contains($msg, 'percent-encode'));
     }
 
-    public function testInvalidLogoSlugTriggersValidation422(): void
+    public function test_invalid_logo_slug_triggers_validation422(): void
     {
         $this->get('/?username=badgeuser&logo=__not_a_real_icon__')
             ->assertStatus(422)
             ->assertJsonStructure(['success', 'message', 'data']);
     }
 
-    public function testRejectsBadLogoSizeValue(): void
+    public function test_rejects_bad_logo_size_value(): void
     {
         $this->get('/?username=badgeuser&logo=github&logoSize=huge')
             ->assertStatus(422)
             ->assertJsonStructure(['success', 'message', 'data']);
     }
 
-    public function testAbbreviatesLargeNumbers(): void
+    public function test_abbreviates_large_numbers(): void
     {
         ProfileViews::factory()->create([
             'username' => 'abbrseed',
@@ -99,7 +99,7 @@ class BadgeRenderingTest extends TestCase
             ->assertSee('1.2K');
     }
 
-    public function testAddsBaseCountToStoredValue(): void
+    public function test_adds_base_count_to_stored_value(): void
     {
         $this->get('/?username=baseuser'); // count = 1
         $this->get('/?username=baseuser&base=100')
@@ -107,13 +107,13 @@ class BadgeRenderingTest extends TestCase
             ->assertSee('102');
     }
 
-    public function testInvalidCharactersInUsernameSanitized(): void
+    public function test_invalid_characters_in_username_sanitized(): void
     {
         $this->get('/?username=Bad*Chars!')
             ->assertStatus(200);
     }
 
-    public function testOversizeRasterLogoRejected(): void
+    public function test_oversize_raster_logo_rejected(): void
     {
         $oversize = 'data:image/png;base64,' . str_repeat('A', 6000);
         $this->get('/?username=badgelogo&logo=' . urlencode($oversize))
@@ -121,7 +121,7 @@ class BadgeRenderingTest extends TestCase
             ->assertJsonStructure(['success', 'message', 'data']);
     }
 
-    public function testEmbedsUserReportedPngLogo(): void
+    public function test_embeds_user_reported_png_logo(): void
     {
         // Base64 extracted from user curl (percent-decoding applied).
         $b64 = 'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABcVBMVEUAAAAAgM0Af8wolNQAa7YAbbkAQIcAQIYAVJ0AgM0AgM0AgM0AgM0AgM0AgM0AgM0AgM0AgM0AgM0Af8wAfswAfswAf8wAgM0AgM0AgM0Af80AgM0AgM0AgM0AgM0Af8wAgM0Af80djtIIg84Af8wAfsxYrN4Fg84Gg85RqNwej9MLhM8LhM8AfcsAgM0Hg88AfsshkNNTqd1/v+UXi9AHdsAAYKoAY64ih8kAf81YkcEFV54GV55Sj8EnlNULhc8AecYdebwKcrsAe8gAb7oAXacAXqgAcLwAImUAUpoAVJ0AUpwAUZoAIWMAVJ0AVJ0AUpwAUZwAVJ0AVJ0AVJ0AVJ0AgM0cjtJqteGczetqtOEAf807ndjL5fT9/v7///M5fQ9ntnu9vu12vCi0Oz///6Hw+ebzeufz+x+v+W12e+gz+xqteLu9fmRx+jL3Ovu8/i1zeKrzeUAUpw7e7M8fLQAU50cZ6hqm8WcvNgAVJ3xWY3ZAAAAVnRSTlMAAAAAAAAAAAAREApTvrxRCQQ9rfX0qwErleyUKjncOFv+/v5b/f7+/v7+/v1b/f7+/v7W/7+/v79/v7+/v7+/v7+/jfa2jcBKJHqKAEEO6r0CVC8EFaOox4AAAABYktHRF9z0VEtAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH5QYKDQws/BWF6QAAAONJREFUGNNjYAABRkZOLkZGBhhgZOTm4eXjF4AJMQoKCYuEhYmKCQmCRBjFJSSlwiMiI6PCpaRlxBkZGGXlomNi4+Lj4xISo+XkgQIKikqx8UnJyUnxKcqKKiAB1ajUJDV1Dc00LW0dXSaggF56fLK+gYFhhlGmsQkzRCDL1MzcIhsmYJkTn2tlbWObZ2cP0sKk4OCYH19QWFgQX+TkrMLEwOLiWlySD7I2v7TMzZ2Vgc3D08u7vKKysqLc28vHlx3oVg4//4DAqqrAAH8/DohnODiCgkNCgoM4OOD+5eAIDYVyAZ9mMF8DmkLwAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTA2LTEwVDE4OjEyOjQ0LTA1OjAwkjvGQgAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wNi0xMFQxODoxMjo0NC0wNTowMONmfv4AAAAASUVORK5CYII=';
@@ -131,7 +131,7 @@ class BadgeRenderingTest extends TestCase
         $this->assertStringContainsString('<image', $response->getContent(), 'Expected user-reported base64 PNG logo to embed');
     }
 
-    public function testEmbedsPercentEncodedLogoDirectly(): void
+    public function test_embeds_percent_encoded_logo_directly(): void
     {
         $b64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
         $raw = 'data:image/png;base64,' . $b64;
@@ -141,7 +141,36 @@ class BadgeRenderingTest extends TestCase
         $this->assertStringContainsString('<image', $response->getContent());
     }
 
-    public function testEmbedsLargePercentEncodedLogoProvidedByUser(): void
+    public function test_applies_logo_color_to_simple_icon(): void
+    {
+        $response = $this->get('/?username=logocoloruser&logo=github&logoColor=red');
+        $response->assertStatus(200)->assertSee('<image', false);
+    }
+
+    public function test_logo_color_validation_failure(): void
+    {
+        // Include an invalid character '!' to break the color/name regex
+        $this->get('/?username=logocolorbad&logo=github&logoColor=red!')
+            ->assertStatus(422)
+            ->assertJsonStructure(['success', 'message', 'data']);
+    }
+
+    public function test_logo_color_ignored_for_raster(): void
+    {
+        $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PvSxNwAAAABJRU5ErkJggg==';
+        $dataUri = 'data:image/png;base64,' . $pngBase64;
+        $response = $this->get('/?username=logocolorraster&logo=' . urlencode($dataUri) . '&logoColor=blue');
+        $response->assertSuccessful();
+        $this->assertStringContainsString('<image', $response->getContent());
+    }
+
+    public function test_logo_color_auto_simple_icon(): void
+    {
+        $response = $this->get('/?username=autocolor&logo=github&logoColor=auto');
+        $response->assertStatus(200)->assertSee('<image', false);
+    }
+
+    public function test_embeds_large_percent_encoded_logo_provided_by_user(): void
     {
         $encoded = 'data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC%2FxhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABcVBMVEUAAAAAgM0Af8wolNQAa7YAbbkAQIcAQIYAVJ0AgM0AgM0AgM0AgM0AgM0AgM0AgM0AgM0AgM0AgM0Af8wAfswAfswAf8wAgM0AgM0AgM0Af80AgM0AgM0AgM0AgM0Af8wAgM0Af80djtIIg84Af8wAfsxYrN4Fg84Gg85RqNwej9MLhM8LhM8AfcsAgM0Hg88AfsshkNNTqd1%2Fv%2BUXi9AHdsAAYKoAY64ih8kAf81YkcEFV54GV55Sj8EnlNULhc8AecYdebwKcrsAe8gAb7oAXacAXqgAcLwAImUAUpoAVJ0AUpwAUZoAIWMAVJ0AVJ0AUpwAUZwAVJ0AVJ0AVJ0AVJ0AgM0cjtJqteGczetqtOEAf807ndjL5fT9%2Fv7%2F%2F%2F%2FM5fQ9ntnu9vu12vCi0Oz%2F%2F%2F6Hw%2Bebzeufz%2Bx%2Bv%2BW12e%2Bgz%2BxqteLu9fmRx%2BjL3Ovu8%2Fi1zeKrzeUAUpw7e7M8fLQAU50cZ6hqm8WcvNgAVJ3xWY3ZAAAAVnRSTlMAAAAAAAAAAAAREApTvrxRCQQ9rfX0qwErleyUKjncOFv%2B%2Fv5b%2Ff7%2B%2Fv7%2B%2Fv1b%2Ff7%2B%2Fv7%2BW%2F7%2B%2Fv79%2Fv7%2B%2Fv7%2B%2Fv7%2B%2Fjfa2jcBKJHqKAEEO6r0CVC8EFaOox4AAAABYktHRF9z0VEtAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH5QYKDQws%2FBWF6QAAAONJREFUGNNjYAABRkZOLkZGBhhgZOTm4eXjF4AJMQoKCYuEhYmKCQmCRBjFJSSlwiMiI6PCpaRlxBkZGGXlomNi4%2BLj4xISo%2BXkgQIKikqx8UnJyUnxKcqKKiAB1ajUJDV1Dc00LW0dXSaggF56fLK%2BgYFhhlGmsQkzRCDL1MzcIhsmYJkTn2tlbWObZ2cP0sKk4OCYH19QWFgQX%2BTkrMLEwOLiWlySD7I2v7TMzZ2Vgc3D08u7vKKysqLc28vHlx3oVg4%2F%2F4DAqqrAAH8%2FDohnODiCgkNCgoM4OOD%2B5eAIDYVyAZ9mMF8DmkLwAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTA2LTEwVDE4OjEyOjQ0LTA1OjAwkjvGQgAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wNi0xMFQxODoxMjo0NC0wNTowMONmfv4AAAAASUVORK5CYII%3D';
         $response = $this->get('/?username=bigencpng&label=Visitors%20for%20me&color=orange&style=for-the-badge&abbreviated=true&logo=' . $encoded);
