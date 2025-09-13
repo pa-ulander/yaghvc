@@ -14,13 +14,11 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 
 beforeEach(function () {
-    $this->badgeRenderService = app(BadgeRenderService::class);
-    $this->repository = app(ProfileViewsRepository::class);
-
-    $this->controller = new ProfileViewsController(
-        $this->badgeRenderService,
-        $this->repository
-    );
+    $badgeRenderService = app(BadgeRenderService::class);
+    $repository = app(ProfileViewsRepository::class);
+    $controller = new ProfileViewsController($badgeRenderService, $repository);
+    // store in container for retrieval in individual tests
+    app()->instance('test.controller', $controller);
 
     Config::set('badge.default_label', 'Profile Views');
     Config::set('badge.default_color', 'blue');
@@ -37,14 +35,17 @@ it('returns badge with correct headers', function () {
     $validator->validate();
     $request->setValidator($validator);
 
-    $response = $this->controller->index($request);
+    /** @var ProfileViewsController $controller */
+    $controller = app('test.controller');
+    $response = $controller->index($request);
 
+    $cacheControl = $response->headers->get('Cache-Control');
     expect($response)
         ->toBeInstanceOf(Response::class)
         ->and($response->headers->get('Content-Type'))->toBe('image/svg+xml')
-        ->and($response->headers->has('Cache-Control'))->toBeTrue() // Just check for existence, not exact format
-        ->and($response->headers->get('Pragma'))->toBe('no-cache')
-        ->and($response->headers->get('Expires'))->toBe('0');
+        ->and($cacheControl)->toContain('max-age=1')
+        ->and($cacheControl)->toContain('stale-while-revalidate')
+        ->and($response->headers->has('ETag'))->toBeTrue();
 });
 
 it('processes request parameters correctly', function () {
@@ -64,7 +65,8 @@ it('processes request parameters correctly', function () {
     $validator->validate();
     $request->setValidator($validator);
 
-    $response = $this->controller->index($request);
+    $controller = app('test.controller');
+    $response = $controller->index($request);
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getContent())->toContain('Custom Label');
@@ -85,7 +87,8 @@ it('applies base value correctly when provided', function () {
     $validator->validate();
     $request->setValidator($validator);
 
-    $response = $this->controller->index($request);
+    $controller = app('test.controller');
+    $response = $controller->index($request);
 
     expect($response->getStatusCode())->toBe(200);
 });
@@ -99,7 +102,8 @@ it('uses default values for optional parameters', function () {
     $validator->validate();
     $request->setValidator($validator);
 
-    $response = $this->controller->index($request);
+    $controller = app('test.controller');
+    $response = $controller->index($request);
 
     expect($response->getStatusCode())->toBe(200);
 });
@@ -119,14 +123,16 @@ it('can use each allowed style parameter', function () {
         $validator->validate();
         $request->setValidator($validator);
 
-        $response = $this->controller->index($request);
+        $controller = app('test.controller');
+        $response = $controller->index($request);
 
         expect($response->getStatusCode())->toBe(200);
     }
 });
 
 it('renders badge with correct parameters', function () {
-    $reflectionClass = new \ReflectionClass($this->controller);
+    $controller = app('test.controller');
+    $reflectionClass = new \ReflectionClass($controller);
     $renderBadgeMethod = $reflectionClass->getMethod('renderBadge');
     $renderBadgeMethod->setAccessible(true);
 
@@ -140,7 +146,7 @@ it('renders badge with correct parameters', function () {
 
     $profileViews = app(ProfileViewsRepository::class)->findOrCreate('test-user');
 
-    $svgContent = $renderBadgeMethod->invoke($this->controller, $safe, $profileViews);
+    $svgContent = $renderBadgeMethod->invoke($controller, $safe, $profileViews);
 
     expect($svgContent)->toBeString()
         ->and($svgContent)->toContain('<svg')
@@ -149,14 +155,15 @@ it('renders badge with correct parameters', function () {
 });
 
 it('creates response with correct headers', function () {
-    $reflectionClass = new \ReflectionClass($this->controller);
+    $controller = app('test.controller');
+    $reflectionClass = new \ReflectionClass($controller);
     $createResponseMethod = $reflectionClass->getMethod('createBadgeResponse');
     $createResponseMethod->setAccessible(true);
 
     $svgContent = '<svg>Test SVG</svg>';
 
     $response = $createResponseMethod->invoke(
-        $this->controller,
+        $controller,
         $svgContent
     );
 
@@ -177,7 +184,8 @@ it('handles repository parameter correctly', function () {
     $validator->validate();
     $request->setValidator($validator);
 
-    $response = $this->controller->index($request);
+    $controller = app('test.controller');
+    $response = $controller->index($request);
 
     expect($response->getStatusCode())->toBe(200);
 });
@@ -194,7 +202,8 @@ it('creates separate counts for profile and repository views', function () {
     $validator->validate();
     $profileRequest->setValidator($validator);
 
-    $this->controller->index($profileRequest); // Count: 1
+    $controller = app('test.controller');
+    $controller->index($profileRequest); // Count: 1
 
     // Create repository view
     $repoRequest = new ProfileViewsRequest();
@@ -205,10 +214,10 @@ it('creates separate counts for profile and repository views', function () {
     $validator->validate();
     $repoRequest->setValidator($validator);
 
-    $this->controller->index($repoRequest); // Count: 1 (separate from profile)
+    $controller->index($repoRequest); // Count: 1 (separate from profile)
 
     // Increment profile view again
-    $this->controller->index($profileRequest); // Count: 2
+    $controller->index($profileRequest); // Count: 2
 
     // Check that counts are separate
     $profileView = ProfileViews::where('username', $username)->whereNull('repository')->first();
@@ -233,7 +242,8 @@ it('handles multiple repositories for same user', function () {
         $validator->validate();
         $request->setValidator($validator);
 
-        $this->controller->index($request);
+        $controller = app('test.controller');
+        $controller->index($request);
     }
 
     // Check that each repository has its own count

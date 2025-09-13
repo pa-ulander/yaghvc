@@ -36,15 +36,18 @@ Add this to your repository README.md to show a visitor counter badge for a spec
 
 The visitor counter badge can be customized with the following URL parameters:
 
-| Parameter     | Description                       | Default       | Example Values                                     |
-| ------------- | --------------------------------- | ------------- | -------------------------------------------------- |
-| `username`    | GitHub username (required)        | -             | `username=your-username`                           |
-| `label`       | Text label displayed on the badge | Visits        | `label=Profile Views`                              |
-| `color`       | Badge color                       | blue          | `color=green`, `color=red`, `color=ff5500`         |
-| `style`       | Badge style                       | for-the-badge | `style=flat`, `style=flat-square`, `style=plastic` |
-| `base`        | Starting count value              | 0             | `base=100`                                         |
-| `abbreviated` | Abbreviate large numbers          | false         | `abbreviated=true`                                 |
-| `repository`  | Count visits in a repository      | false         | `repository=your-repositorys-name`                 |
+| Parameter     | Description                                             | Default       | Example Values                                                       |
+| ------------- | ------------------------------------------------------- | ------------- | -------------------------------------------------------------------- |
+| `username`    | GitHub username (required)                              | -             | `username=your-username`                                             |
+| `label`       | Text label displayed on the badge                       | Visits        | `label=Profile Views`                                                |
+| `color`       | Badge right-side (value) color                          | blue          | `color=green`, `color=red`, `color=ff5500`                           |
+| `labelColor`  | Left-side label background color (named or hex w/out #) | blue          | `labelColor=red`, `labelColor=ffd700`                                |
+| `style`       | Badge style                                             | for-the-badge | `style=flat`, `style=flat-square`, `style=plastic`                   |
+| `base`        | Starting count value added to stored counter            | 0             | `base=100`                                                           |
+| `abbreviated` | Abbreviate large numbers (1.2K, 3.4M)                   | false         | `abbreviated=true`                                                   |
+| `repository`  | Count visits in a repository (scopes counter)           | (none)        | `repository=my-repo`                                                 |
+| `logo`        | Data URI image (png,jpg,gif,svg) OR simple-icons slug   | (none)        | `logo=github`, `logo=laravel`, `logo=data:image/png;base64,iVBOR...` |
+| `logoSize`    | Logo sizing: 'auto' (SVG adapt) or fixed px (8-64)      | 14            | `logoSize=auto`, `logoSize=32`                                       |
 
 
 ## Examples
@@ -103,6 +106,57 @@ Display large numbers in abbreviated format (1K, 1.5M, etc.):
 ![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&abbreviated=true)
 ```
 ![](./public_html/assets/full.svg) 
+
+### Label Background Color (labelColor)
+
+You can style the left label segment independently from the value segment using `labelColor`:
+
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)
+````
+
+### Adding a Logo
+
+Provide either a simple-icons slug (thousands available) or a full base64 data URI:
+
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github)
+
+Another icon (Laravel framework):
+
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&logo=laravel)
+````
+````
+
+Using a (short) data URI PNG:
+
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
+````
+
+SVG logos can adapt width when `logoSize=auto` is specified, preserving aspect ratio while targeting a standard badge height:
+
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&logo=<your-encoded-svg-data-uri>&logoSize=auto)
+````
+
+Security / Limits: Logos over ~10KB or with suspicious formatting may be ignored. Only image MIME types (png,jpeg,jpg,gif,svg+xml) are accepted.
+
+Logo Size Control:
+````markdown
+?logo=github&logoSize=32      # Force 32x32 square (clamped 8..64)
+?logo=github&logoSize=auto    # Height ~14px, width scaled to aspect
+````
+
+Icon Slugs: Browse https://simpleicons.org or see `vendor/simple-icons/simple-icons/slugs.md` for valid slugs.
+
+Caching: Processed logos are cached (default TTL 3600s) keyed by slug/data URI + size for performance.
+
+Limits & Rejection:
+ - Max decoded bytes: `config('badge.logo_max_bytes')` (default 10KB)
+ - Max raster dimension: `config('badge.logo_max_dimension')` (default 64px each side)
+ - Oversized or invalid logos are silently skipped (badge still renders).
 
 ## Self-hosting
 

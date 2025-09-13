@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use App\Rules\Base64DataUrl;
 use Illuminate\Validation\Rule;
 
 class ProfileViewsRequest extends FormRequest
@@ -37,6 +38,11 @@ class ProfileViewsRequest extends FormRequest
             'base' => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'repository' => ['nullable', 'string', 'max:' . self::MAX_REPOSITORY_NAME_LENGTH],
             'abbreviated' => ['nullable', 'boolean'],
+            'labelColor' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
+            // Accept either a simple-icons slug OR a fully percent-encoded data URI (no raw spaces or % remnants inside base64). Users must encode externally.
+            // Accept already percent-encoded data URI (starting with data%3Aimage%2F...) or plain form.
+            'logo' => ['nullable', 'regex:/^((data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,[A-Za-z0-9+\/=%]+)|(data%3Aimage%2F(png|jpeg|jpg|gif|svg%2Bxml)%3Bbase64%2C[A-Za-z0-9%]+)|[a-z0-9-]{1,60})$/i', 'max:5000'],
+            'logoSize' => ['nullable', 'regex:/^(auto|[0-9]{1,2})$/'],
             'user_agent' => ['required', 'string'],
         ];
     }
@@ -46,6 +52,7 @@ class ProfileViewsRequest extends FormRequest
         return [
             'username.required' => 'A GitHub account username is needed to count views',
             'username.regex' => 'The username must be a valid GitHub username',
+            'logo.regex' => 'Invalid logo parameter. If using a data URI you must percent-encode the entire value (e.g. encodeURIComponent or rawurlencode).',
         ];
     }
 
@@ -69,7 +76,7 @@ class ProfileViewsRequest extends FormRequest
         if ($this->has('username') && !empty($this->input(key: 'username'))) {
             $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
 
-            $optionalFields = ['label', 'color', 'style', 'base', 'repository'];
+            $optionalFields = ['label', 'color', 'style', 'base', 'repository', 'labelColor', 'logoSize'];
 
             foreach ($optionalFields as $field) {
                 if ($this->input(key: $field) === null) {
@@ -78,6 +85,10 @@ class ProfileViewsRequest extends FormRequest
                 if ($this->has($field)) {
                     $mergeData[$field] = trim(string: strip_tags(string: $this->input(key: $field)));
                 }
+            }
+
+            if ($this->has('logo') && $this->input(key: 'logo') !== null) {
+                $mergeData['logo'] = trim(string: $this->input(key: 'logo'));
             }
 
             if ($this->has(key: 'abbreviated')) {
@@ -90,7 +101,6 @@ class ProfileViewsRequest extends FormRequest
 
     /**
      * @param array|mixed|null $keys
-     * @return array
      */
     public function all(mixed $keys = null): array
     {
@@ -101,16 +111,9 @@ class ProfileViewsRequest extends FormRequest
         return $data;
     }
 
-    // protected function passedValidation(): void
-    // {
-    //     dump('passedValidation method called');
-    // }
-
-
     /**
      * @param array|int|string|null $key
      * @param mixed $default
-     * @return mixed
      */
     public function validated(mixed $key = null, mixed $default = null): mixed
     {
