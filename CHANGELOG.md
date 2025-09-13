@@ -2,11 +2,9 @@
 
 All notable changes to this project are documented in this file.
 
-The format follows Keep a Changelog and the project aims to follow [Semantic Versioning](https://semver.org/).
-
 ### [Unreleased]
 
-### [1.0.0] - 2025-09-08
+### [1.0.0] - 2025-09-14
 
 Initial stable release derived from the accumulated work on `main` up to this date.
 
