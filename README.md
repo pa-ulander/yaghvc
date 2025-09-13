@@ -48,6 +48,7 @@ The visitor counter badge can be customized with the following URL parameters:
 | `repository`  | Count visits in a repository (scopes counter)           | (none)        | `repository=my-repo`                                                 |
 | `logo`        | Data URI image (png,jpg,gif,svg) OR simple-icons slug   | (none)        | `logo=github`, `logo=laravel`, `logo=data:image/png;base64,iVBOR...` |
 | `logoSize`    | Logo sizing: 'auto' (SVG adapt) or fixed px (8-64)      | 14            | `logoSize=auto`, `logoSize=32`                                       |
+| `logoColor`   | Recolor SVG/simple-icon logo (named or hex, no #)       | (none)        | `logoColor=red`, `logoColor=ff8800`, `logoColor=brightgreen`         |
 
 
 ## Examples
@@ -115,48 +116,228 @@ You can style the left label segment independently from the value segment using 
 ![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)
 ````
 
-### Adding a Logo
+### Logo Usage (Slug vs Base64 Data URI)
 
-Provide either a simple-icons slug (thousands available) or a full base64 data URI:
+The `logo` parameter supports either a simple-icons slug (preferred for brevity) or a full base64 data URI.
 
+Slug examples:
 ````markdown
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=github)
-
-Another icon (Laravel framework):
-
-````markdown
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=laravel)
 ````
-````
 
-Using a (short) data URI PNG:
-
+Small PNG via data URI:
 ````markdown
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
 ````
 
-SVG logos can adapt width when `logoSize=auto` is specified, preserving aspect ratio while targeting a standard badge height:
+![](https://ghvc.kabelkultur.se?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
 
+
+SVG with automatic aspect scaling:
 ````markdown
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=<your-encoded-svg-data-uri>&logoSize=auto)
 ````
 
-Security / Limits: Logos over ~10KB or with suspicious formatting may be ignored. Only image MIME types (png,jpeg,jpg,gif,svg+xml) are accepted.
-
-Logo Size Control:
-````markdown
-?logo=github&logoSize=32      # Force 32x32 square (clamped 8..64)
-?logo=github&logoSize=auto    # Height ~14px, width scaled to aspect
+Sizing:
+````
+logoSize=auto   # scale width to maintain intrinsic aspect ratio at target height
+logoSize=32     # fixed square size (clamped to configured max)
 ````
 
-Icon Slugs: Browse https://simpleicons.org or see `vendor/simple-icons/simple-icons/slugs.md` for valid slugs.
+Security & Limits:
+- MIME types accepted: png, jpeg, jpg, gif, svg+xml
+- Max decoded bytes: `config('badge.logo_max_bytes')` (default 10000)
+- Max raster dimension: `config('badge.logo_max_dimension')`
+- Invalid / oversize input: silently ignored (badge still renders)
 
-Caching: Processed logos are cached (default TTL 3600s) keyed by slug/data URI + size for performance.
+### Logo Color (logoColor)
 
-Limits & Rejection:
- - Max decoded bytes: `config('badge.logo_max_bytes')` (default 10KB)
- - Max raster dimension: `config('badge.logo_max_dimension')` (default 64px each side)
- - Oversized or invalid logos are silently skipped (badge still renders).
+`logoColor` lets you recolor supported SVG logos (simple-icons slugs or inline SVG data URIs). It is ignored for raster images (png/jpg/gif) and for SVGs where a safe unified replacement cannot be determined. If you omit `logoColor` for a simple-icons slug, a subtle neutral default `f5f5f5` is applied automatically.
+
+Accepted formats mirror `color` / `labelColor`:
+
+```
+logoColor=red
+logoColor=ff8800
+logoColor=brightgreen
+```
+
+Behavior:
+* If the SVG uses `currentColor`, a `fill` is added to the root `<svg>` and `currentColor` tokens are replaced.
+* Otherwise existing solid `fill="#XXXXXX"` values (not `none` / gradients) are replaced uniformly.
+* If no fills are found, a `fill` is injected into the first `<path>` element.
+* Fails safely (returns original logo) on parse anomalies — never breaks the badge.
+
+Notes:
+* Does NOT attempt to recolor gradients, masks, or more complex paint servers.
+* Raster logos (PNG/JPG/GIF) are unaffected (silently ignored).
+* Default for simple-icons when omitted: `f5f5f5`.
+* Works well with monochrome simple-icons whose original paths are single-color.
+
+Example:
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoColor=orange)
+````
+
+`logoColor=auto`
+
+Use `auto` to automatically select a contrasting monochrome color for the logo relative to the label background:
+
+Algorithm:
+1. Determine base background: explicit `labelColor` if provided; otherwise the existing label segment color (initially `#555`), else the message segment color.
+2. Convert to RGB and compute perceived brightness: `0.299*R + 0.587*G + 0.114*B`.
+3. Brightness < 128 → light logo `f5f5f5`; otherwise dark logo `333333`.
+
+Happens before applying the simple-icons default so `auto` always overrides the neutral fallback.
+
+Additional examples:
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoColor=auto)
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&labelColor=yellow&logoColor=auto)
+````
+
+Chaining with size:
+````markdown
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoSize=auto&logoColor=ff0000)
+````
+
+#### Encoding Requirements (Important)
+
+When supplying a base64 data URI as the `logo` parameter you MUST percent‑encode (URL encode) the entire value before adding it to the query string. Raw (unencoded) data URIs can be corrupted by shells, markdown renderers, or HTTP clients (notably `+` may be turned into a space) causing the logo to be rejected.
+
+Incorrect (raw, may break):
+````markdown
+![](https://ghvc.kabelkultur.se?username=you&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...)
+````
+
+Correct (percent‑encoded):
+````markdown
+![](https://ghvc.kabelkultur.se?username=you&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...)
+````
+
+How to encode:
+* JavaScript: `encodeURIComponent('data:image/png;base64,' + b64)`
+* Bash (GNU coreutils): `python - <<'PY'\nimport urllib.parse,sys;print(urllib.parse.quote(sys.stdin.read().strip(), safe=''))\nPY`
+* PHP: `rawurlencode($dataUri)`
+
+If you supply an unencoded data URI, validation will now return HTTP 422 with a message indicating encoding is required.
+
+Caching: Prepared logos may be cached (TTL in `config/badge.php`) by content hash + size.
+
+Icon catalog: https://simpleicons.org (files located in `vendor/simple-icons/simple-icons/icons`).
+
+### FAQ
+
+#### Why did my logo disappear?
+Common causes:
+| Cause                          | Symptom                           | Fix                                                            |
+| ------------------------------ | --------------------------------- | -------------------------------------------------------------- |
+| Not percent-encoded data URI   | Badge renders but no `<image>`    | URL‑encode entire `logo` value (see Encoding Requirements)     |
+| Invalid simple-icons slug      | 422 validation or silent fallback | Use a valid slug from simpleicons.org                          |
+| Payload too large (bytes)      | Logo missing                      | Reduce image size or compress (limit: `logo_max_bytes`)        |
+| Raster dimensions exceed limit | Logo missing                      | Resize to within `logo_max_dimension`                          |
+| MIME not allowed               | 422 or silent drop                | Use png, jpg, jpeg, gif, or svg+xml                            |
+| Spaces turned plus signs       | Base64 rejected                   | Ensure tool didn’t convert `+` to space; always percent‑encode |
+
+If validation fails you’ll get HTTP 422 with a JSON body. If validation succeeds but the logo is invalid at processing time it degrades silently to avoid breaking the badge.
+
+### Helper: Encoding a Logo Locally
+
+You can generate a percent‑encoded data URI using the provided helper script:
+
+```bash
+php scripts/encode-logo.php path/to/logo.png > encoded.txt
+cat encoded.txt  # paste after &logo=
+```
+
+Want a ready-to-paste Markdown snippet (with a username placeholder) in one step? Use `--inline`:
+
+```bash
+php scripts/encode-logo.php path/to/logo.png --inline
+# Outputs: ![](https://ghvc.kabelkultur.se?username=<your-username>&logo=data%3Aimage%2F...)
+```
+
+Specify MIME manually if the extension is non-standard:
+
+```bash
+php scripts/encode-logo.php path/to/custom-image.bin --mime=image/png
+```
+
+For SVG:
+```bash
+php scripts/encode-logo.php path/to/icon.svg > encoded.txt
+```
+
+The script outputs ONLY the encoded string (no newline) so you can inline it:
+
+```bash
+ENC=$(php scripts/encode-logo.php assets/icon.svg); curl "https://ghvc.kabelkultur.se?username=you&logo=$ENC"
+
+Or directly with `--inline`:
+
+```bash
+php scripts/encode-logo.php assets/icon.svg --inline
+```
+
+### Quick Local Fetch & Verification
+
+For rapid local experimentation (ensuring an `<image>` actually embeds) use the helper fetch script:
+
+```bash
+scripts/fetch-badge.sh -u your-username --logo-slug github --style flat
+scripts/fetch-badge.sh -u your-username --logo-file path/to/logo.png --label "Profile Views" --style for-the-badge
+```
+
+It writes `badge.svg` (override with `--out`) and reports whether an `<image>` tag was found. The script will percent‑encode a file‑derived data URI automatically.
+
+### Logo Troubleshooting (Condensed)
+
+1. Always percent‑encode full data URIs (or let the helper scripts do it).
+2. Verify locally: open the resulting `badge.svg` and search for `<image`.
+3. Keep size under configured byte & dimension limits (see `config/badge.php`).
+4. If a slug fails, confirm it exists in `vendor/simple-icons/simple-icons/icons`.
+5. Raster looks blurry? Supply a higher resolution and rely on downscaling.
+
+Still stuck? Reduce to a 1x1 PNG data URI (shown above) to confirm the pipeline, then substitute your real asset.
+```
+
+### Rate Limiting & Caching Strategy
+
+To remain robust under high traffic:
+- Per-IP rate limit (default 60 req/min) via Laravel `RateLimiter` (`routes/web.php`).
+- Short-lived caching semantics: response includes `Cache-Control: public, max-age=1, s-maxage=1, stale-while-revalidate=5` and an `ETag` for conditional requests.
+- Clients can revalidate quickly; counts remain fresh while repeated identical badge views avoid recomputing within a one‑second window.
+
+You may tune these by editing the limiter definition or exposing env-driven limits (e.g. `BADGE_RATE_LIMIT`).
+
+#### Potential Caching Header Tuning (With vs Without Logos)
+
+Possible future optimization differentiates cache lifetimes:
+
+* **No logo provided** – badge is purely text/geometry; identical requests are common. Use a slightly longer `max-age` (e.g. 5–10s) plus generous `stale-while-revalidate` to reduce backend load.
+* **Logo provided** – especially data URI logos (unique per user) have low re-use. Keep conservative 1s freshness to reflect counts quickly.
+
+Illustrative example:
+```
+# No logo
+Cache-Control: public, max-age=10, s-maxage=10, stale-while-revalidate=30
+
+# With logo
+Cache-Control: public, max-age=1, s-maxage=1, stale-while-revalidate=5
+```
+
+Benefits:
+1. Improves CDN edge hit ratio for high-volume plain badges.
+2. Avoids over-caching many near-unique logo variants.
+3. Preserves fast count visibility for logo variants.
+
+Implementation outline:
+1. After rendering, check if `<image` exists (or if `logo` query absent) and choose header profile.
+2. Optionally allow `cache=off` query for debugging zero-cache responses.
+3. Measure baseline QPS and hit ratios before enabling to validate improvement.
+
+Current policy is intentionally conservative; only pursue tuning if traffic profile shows backend strain.
 
 ## Self-hosting
 
