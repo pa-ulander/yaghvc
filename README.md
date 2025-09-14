@@ -8,6 +8,8 @@
 A Laravel-based GitHub profile visitor counter and github repository visitor counter that generates customizable SVG badges to display on your GitHub profile or in a repository's README.<br> 
 Made only for fun and to try out new latest laravel and testing features. I just wanted to have a visitorcounter on my github profile.
 
+> Developers: See the new `DEVELOPMENT.md` guide for local setup, contributing, testing and architecture details.
+
 ## Usage
 
 Add this to your profile page README.md to show a visitor counter badge:
@@ -131,7 +133,7 @@ Small PNG via data URI:
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
 ````
 
-![](https://ghvc.kabelkultur.se?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
+![](http://localhost/?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
 
 
 SVG with automatic aspect scaling:
@@ -216,132 +218,11 @@ Correct (percent‑encoded):
 ![](https://ghvc.kabelkultur.se?username=you&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...)
 ````
 
-How to encode:
-* JavaScript: `encodeURIComponent('data:image/png;base64,' + b64)`
-* Bash (GNU coreutils): `python - <<'PY'\nimport urllib.parse,sys;print(urllib.parse.quote(sys.stdin.read().strip(), safe=''))\nPY`
-* PHP: `rawurlencode($dataUri)`
-
-If you supply an unencoded data URI, validation will now return HTTP 422 with a message indicating encoding is required.
-
-Caching: Prepared logos may be cached (TTL in `config/badge.php`) by content hash + size.
-
-Icon catalog: https://simpleicons.org (files located in `vendor/simple-icons/simple-icons/icons`).
-
-### FAQ
-
-#### Why did my logo disappear?
-Common causes:
-| Cause                          | Symptom                           | Fix                                                            |
-| ------------------------------ | --------------------------------- | -------------------------------------------------------------- |
-| Not percent-encoded data URI   | Badge renders but no `<image>`    | URL‑encode entire `logo` value (see Encoding Requirements)     |
-| Invalid simple-icons slug      | 422 validation or silent fallback | Use a valid slug from simpleicons.org                          |
-| Payload too large (bytes)      | Logo missing                      | Reduce image size or compress (limit: `logo_max_bytes`)        |
-| Raster dimensions exceed limit | Logo missing                      | Resize to within `logo_max_dimension`                          |
-| MIME not allowed               | 422 or silent drop                | Use png, jpg, jpeg, gif, or svg+xml                            |
-| Spaces turned plus signs       | Base64 rejected                   | Ensure tool didn’t convert `+` to space; always percent‑encode |
-
-If validation fails you’ll get HTTP 422 with a JSON body. If validation succeeds but the logo is invalid at processing time it degrades silently to avoid breaking the badge.
-
-### Helper: Encoding a Logo Locally
-
-You can generate a percent‑encoded data URI using the provided helper script:
-
-```bash
-php scripts/encode-logo.php path/to/logo.png > encoded.txt
-cat encoded.txt  # paste after &logo=
-```
-
-Want a ready-to-paste Markdown snippet (with a username placeholder) in one step? Use `--inline`:
-
-```bash
-php scripts/encode-logo.php path/to/logo.png --inline
-# Outputs: ![](https://ghvc.kabelkultur.se?username=<your-username>&logo=data%3Aimage%2F...)
-```
-
-Specify MIME manually if the extension is non-standard:
-
-```bash
-php scripts/encode-logo.php path/to/custom-image.bin --mime=image/png
-```
-
-For SVG:
-```bash
-php scripts/encode-logo.php path/to/icon.svg > encoded.txt
-```
-
-The script outputs ONLY the encoded string (no newline) so you can inline it:
-
-```bash
-ENC=$(php scripts/encode-logo.php assets/icon.svg); curl "https://ghvc.kabelkultur.se?username=you&logo=$ENC"
-
-Or directly with `--inline`:
-
-```bash
-php scripts/encode-logo.php assets/icon.svg --inline
-```
-
-### Quick Local Fetch & Verification
-
-For rapid local experimentation (ensuring an `<image>` actually embeds) use the helper fetch script:
-
-```bash
-scripts/fetch-badge.sh -u your-username --logo-slug github --style flat
-scripts/fetch-badge.sh -u your-username --logo-file path/to/logo.png --label "Profile Views" --style for-the-badge
-```
-
-It writes `badge.svg` (override with `--out`) and reports whether an `<image>` tag was found. The script will percent‑encode a file‑derived data URI automatically.
-
-### Logo Troubleshooting (Condensed)
-
-1. Always percent‑encode full data URIs (or let the helper scripts do it).
-2. Verify locally: open the resulting `badge.svg` and search for `<image`.
-3. Keep size under configured byte & dimension limits (see `config/badge.php`).
-4. If a slug fails, confirm it exists in `vendor/simple-icons/simple-icons/icons`.
-5. Raster looks blurry? Supply a higher resolution and rely on downscaling.
-
-Still stuck? Reduce to a 1x1 PNG data URI (shown above) to confirm the pipeline, then substitute your real asset.
-```
-
-### Rate Limiting & Caching Strategy
-
-To remain robust under high traffic:
-- Per-IP rate limit (default 60 req/min) via Laravel `RateLimiter` (`routes/web.php`).
-- Short-lived caching semantics: response includes `Cache-Control: public, max-age=1, s-maxage=1, stale-while-revalidate=5` and an `ETag` for conditional requests.
-- Clients can revalidate quickly; counts remain fresh while repeated identical badge views avoid recomputing within a one‑second window.
-
-You may tune these by editing the limiter definition or exposing env-driven limits (e.g. `BADGE_RATE_LIMIT`).
-
-#### Potential Caching Header Tuning (With vs Without Logos)
-
-Possible future optimization differentiates cache lifetimes:
-
-* **No logo provided** – badge is purely text/geometry; identical requests are common. Use a slightly longer `max-age` (e.g. 5–10s) plus generous `stale-while-revalidate` to reduce backend load.
-* **Logo provided** – especially data URI logos (unique per user) have low re-use. Keep conservative 1s freshness to reflect counts quickly.
-
-Illustrative example:
-```
-# No logo
-Cache-Control: public, max-age=10, s-maxage=10, stale-while-revalidate=30
-
-# With logo
-Cache-Control: public, max-age=1, s-maxage=1, stale-while-revalidate=5
-```
-
-Benefits:
-1. Improves CDN edge hit ratio for high-volume plain badges.
-2. Avoids over-caching many near-unique logo variants.
-3. Preserves fast count visibility for logo variants.
-
-Implementation outline:
-1. After rendering, check if `<image` exists (or if `logo` query absent) and choose header profile.
-2. Optionally allow `cache=off` query for debugging zero-cache responses.
-3. Measure baseline QPS and hit ratios before enabling to validate improvement.
-
-Current policy is intentionally conservative; only pursue tuning if traffic profile shows backend strain.
-
 ## Self-hosting
 
 This is a Laravel-based application that can be self-hosted. See the project structure and Docker configuration for details on how to set up your own instance.
+
+For detailed development and operations instructions consult: [DEVELOPMENT.md](./DEVELOPMENT.md)
 
 ## Acknowledgments
 - [Badges](https://github.com/badges) for the cool [Poser](https://github.com/badges/poser) library. A php library that creates badges.
