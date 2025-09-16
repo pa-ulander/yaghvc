@@ -77,11 +77,34 @@ The visitor counter badge can be customized with the following URL parameters:
 
 > **Note:** You must specify hex colors without the `#` prefix (e.g., `f000ff` instead of `#f000ff`).
 
+### Custom Labels
+
 | **Custom Label** | Example | Markdown |
 | --- | --- | --- |
 | `Profile%20Visitors` | ![](./public_html/assets/label-pfv.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)` |
 | `Chocolate%20Cookies` | ![](./public_html/assets/label-cho.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)` |
 | `Horsepowers` | ![](./public_html/assets/label-hp.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)` |
+
+
+### Custom Label Color
+
+| **Label Color** | Example | Markdown |
+| --- | --- | --- |
+| `red` | ![](./public_html/assets/labelColor-pfv.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)` |
+| `green` | ![](./public_html/assets/labelColor-cho.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&&=Chocolate%20Cookies&labelColor=green)` |
+| `brown` | ![](./public_html/assets/labelColor-hp.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers&labelColor=brown)` |
+
+
+
+### Label Background Color (labelColor)
+
+You can style the left label segment independently from the value segment using `labelColor`:
+
+```
+![](https://ghvc.kabelkultur.se?username=your-username&labelColor=0000ff)
+```
+![](http://localhost?username=your-username&labelColor=00aaff)
+
 
 ### Number Abbreviation
 
@@ -101,26 +124,48 @@ Display large numbers in abbreviated format (1K, 1.5M, etc.):
 
 ![](./public_html/assets/full.svg)
 
-### Label Background Color (labelColor)
 
-You can style the left label segment independently from the value segment using `labelColor`:
 
-```
-![](https://ghvc.kabelkultur.se?username=your-username&labelColor=0000ff)
-```
-![](http://localhost?username=your-username&labelColor=00aaff)
+# Logo or icon usage
 
-### Logo Usage (Slug vs Base64 Data URI)
+The `logo` parameter supports either a simple-icons slug or a full base64 data URI.  
+The data URI may or may not be urlencoded.  
+It's good practise to use a urlencoded base64 data URI.  
+But you don't have to. 
+You **can** just use a full svg or png data URI.
 
-The `logo` parameter supports either a simple-icons slug (preferred for brevity) or a full base64 data URI.
+---
 
-Slug examples:
+### Simple icon slug example:
 
 ```
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=github)
 ```
-
 ![](http://localhost/?username=your-username&logo=github)  
+
+If you are use a simpleicon slug you can also set logoColor.  
+Default logoColor when simple icon slugs is f5f5f5 (as seen above with the github icon). Which is what you get if you don't set a logoColor.
+
+#### Example with logoColor set to orange:
+
+```
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoColor=orange)
+```
+![](http://localhost/?username=your-username&logo=github&logoColor=orange)
+
+
+
+Examples:
+
+```
+```
+
+### Logo Size
+
+When using logo, you can also set logoSize 
+
+
+
  
 
 Small PNG via data URI:
@@ -144,12 +189,6 @@ logoSize=auto   # scale width to maintain intrinsic aspect ratio at target heigh
 logoSize=32     # fixed square size (clamped to configured max)
 ```
 
-Security & Limits:
-
-*   MIME types accepted: png, jpeg, jpg, gif, svg+xml
-*   Max decoded bytes: `config('badge.logo_max_bytes')` (default 10000)
-*   Max raster dimension: `config('badge.logo_max_dimension')`
-*   Invalid / oversize input: silently ignored (badge still renders)
 
 ### Logo Color (logoColor)
 
@@ -157,75 +196,7 @@ Security & Limits:
 
 Accepted formats mirror `color` / `labelColor`:
 
-```
-logoColor=red
-logoColor=ff8800
-logoColor=brightgreen
-```
 
-Behavior:
-
-*   If the SVG uses `currentColor`, a `fill` is added to the root `<svg>` and `currentColor` tokens are replaced.
-*   Otherwise existing solid `fill="#XXXXXX"` values (not `none` / gradients) are replaced uniformly.
-*   If no fills are found, a `fill` is injected into the first `<path>` element.
-*   Fails safely (returns original logo) on parse anomalies — never breaks the badge.
-
-Notes:
-
-*   Does NOT attempt to recolor gradients, masks, or more complex paint servers.
-*   Raster logos (PNG/JPG/GIF) are unaffected (silently ignored).
-*   Default for simple-icons when omitted: `f5f5f5`.
-*   Works well with monochrome simple-icons whose original paths are single-color.
-
-Example:
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoColor=orange)
-```
-![](http://localhost/?username=your-username&logo=github&logoColor=orange)
-
-#### Automatic Logo Color Selection
-
-`logoColor=auto`
-
-Use `auto` to automatically select a contrasting monochrome color for the logo relative to the label background:
-
-Algorithm:
-
-1.  Determine base background: explicit `labelColor` if provided; otherwise the existing label segment color (initially `#555`), else the message segment color.
-2.  Convert to RGB and compute perceived brightness: `0.299*R + 0.587*G + 0.114*B`.
-3.  Brightness \< 128 → light logo `f5f5f5`; otherwise dark logo `333333`.
-
-Happens before applying the simple-icons default so `auto` always overrides the neutral fallback.
-
-Additional examples:
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoColor=auto)
-![](https://ghvc.kabelkultur.se?username=your-username&logo=github&labelColor=yellow&logoColor=auto)
-```
-
-Chaining with size:
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoSize=auto&logoColor=ff0000)
-```
-
-#### Encoding Requirements (Important)
-
-When supplying a base64 data URI as the `logo` parameter you MUST percent‑encode (URL encode) the entire value before adding it to the query string. Raw (unencoded) data URIs can be corrupted by shells, markdown renderers, or HTTP clients (notably `+` may be turned into a space) causing the logo to be rejected.
-
-Incorrect (raw, may break):
-
-```
-![](https://ghvc.kabelkultur.se?username=you&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...)
-```
-
-Correct (percent‑encoded):
-
-```
-![](https://ghvc.kabelkultur.se?username=you&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...)
-```
 
 ## Self-hosting
 
