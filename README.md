@@ -197,16 +197,6 @@ logoSize=32     # fixed square size (clamped to configured max)
 Accepted formats mirror `color` / `labelColor`:
 
 
-
-## Self-hosting
-
-This is a Laravel-based application that can be self-hosted.  
-Consult [DEVELOPMENT.md](./DEVELOPMENT.md) for some technical documentation. 
-
-## Contributing
-
-Feature suggestions, code reviews and contributions are welcome!
-
 ## Acknowledgments
 
 - [Badges](https://github.com/badges) for the cool [Poser](https://github.com/badges/poser) library. A php library that creates badges.
