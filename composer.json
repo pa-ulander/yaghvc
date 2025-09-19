@@ -22,7 +22,7 @@
         "fakerphp/faker": "v1.24.1",
         "larastan/larastan": "v3.0.2",
         "laravel/boost": "^1.1",
-        "laravel/pint": "v1.24.0",
+        "laravel/pint": "v1.25.1",
         "laravel/sail": "v1.45.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "8.5.0",
@@ -30,7 +30,7 @@
         "pestphp/pest-plugin-type-coverage": "v3.6.1",
         "phpunit/phpunit": "^11.5.1",
         "spatie/laravel-ignition": "^2.9.0",
-        "squizlabs/php_codesniffer": "3.13.4"
+        "squizlabs/php_codesniffer": "4.0.0"
     },
     "autoload": {
         "psr-4": {
