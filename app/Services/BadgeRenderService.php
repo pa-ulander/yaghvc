@@ -168,6 +168,7 @@ class BadgeRenderService
             $processor = new LogoProcessor;
             $prepared = $processor->prepare($logo, $logoSize);
             if (! $prepared || ! isset($prepared['dataUri'])) {
+                // Fallback 1: treat as data URI if it already looks like one (existing logic below)
                 // Salvage: if the raw (possibly urlencoded) value looks like a data URI, inject minimally
                 $decoded = urldecode($logo);
                 if (str_starts_with($decoded, 'data:image/')) {
@@ -190,10 +191,40 @@ class BadgeRenderService
                     }
                 }
 
+                // Fallback 2: raw base64 blob (no data: prefix) – attempt on-the-fly wrap
+                // Use helper normalization (handles spaces vs '+') instead of brittle regex on urldecoded value.
+                if (!str_starts_with($logo, 'data:')) {
+                    $rawNorm = \App\Services\LogoDataHelper::normalizeRawBase64($logo);
+                    if ($rawNorm !== null) {
+                        $bin = base64_decode($rawNorm, true);
+                        if ($bin !== false && $bin !== '') {
+                            $mime = \App\Services\LogoDataHelper::inferMime($bin);
+                            if ($mime !== null) {
+                                $maxBytes = $this->safeConfig('badge.logo_max_bytes', 10000);
+                                if (\App\Services\LogoDataHelper::withinSize($bin, $maxBytes)) {
+                                    if ($mime === 'svg+xml') {
+                                        $san = \App\Services\LogoDataHelper::sanitizeSvg($bin);
+                                        if ($san === null) {
+                                            return $svg; // unsafe
+                                        }
+                                        $bin = $san;
+                                    }
+                                    $dataUri = 'data:image/' . $mime . ';base64,' . base64_encode($bin);
+                                    $width = 14;
+                                    $height = 14;
+                                    $svg = $this->embedLogoInSvg($svg, $dataUri, $mime, $width, $height);
+                                    return $svg;
+                                }
+                            }
+                        }
+                    } else {
+                    }
+                }
+
                 return $svg; // degrade silently
             }
             if (isset($prepared['binary'])) {
-                $maxBytes = (int) config('badge.logo_max_bytes', 10000);
+                $maxBytes = $this->safeConfig('badge.logo_max_bytes', 10000);
                 if (strlen($prepared['binary']) > $maxBytes) {
                     return $svg;
                 }
@@ -260,6 +291,24 @@ class BadgeRenderService
         }
 
         return $svg;
+    }
+
+    /**
+     * Retrieve configuration value safely outside the full Laravel app context.
+     * Falls back to default if helper or repository unavailable.
+     * @param mixed $default
+     * @return mixed
+     */
+    private function safeConfig(string $key, $default)
+    {
+        if (function_exists('config')) {
+            try {
+                return config($key, $default);
+            } catch (\Throwable $e) {
+                // swallow – CLI/debug context without container
+            }
+        }
+        return $default;
     }
 
     /**
@@ -423,7 +472,7 @@ class BadgeRenderService
         $y = (int) round(($badgeHeight - $height) / 2);
 
         $padLeft = 10;   // space from left edge to logo
-        $padRight = 10;  // space between logo and label text
+        $padRight = 0;  // space between logo and label text
         $segment = $padLeft + $width + $padRight; // horizontal space we must add to the label area
 
         // 2. Extract width & rect metrics from original badge BEFORE modifications
