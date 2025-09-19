@@ -35,7 +35,16 @@ class LogoProcessor
     public function prepare(?string $raw, ?string $logoSize = null): ?array
     {
         if ($raw === null || $raw === '') {
+            @file_put_contents('/tmp/yagvc_debug.log', "[prepare] early return null: empty input\n", FILE_APPEND);
             return null;
+        }
+        // Step 1: Attempt to interpret any non data: string as raw base64 BEFORE slug resolution.
+        // This prevents misclassification when a base64 payload accidentally matches future slug patterns.
+        if (!str_starts_with($raw, 'data:')) {
+            $maybe = $this->normaliseLooseBase64($raw);
+            if ($maybe !== null) {
+                $raw = $maybe; // Promote to data URI path.
+            }
         }
 
         // If the logo appears to be a percent-encoded data URI, decode it once so later logic
@@ -43,7 +52,6 @@ class LogoProcessor
         // so handling the encoded prefix here improves robustness.
         if (preg_match('/^data%3Aimage%2F/i', $raw) === 1) {
             $decodedOnce = urldecode($raw);
-            // Only trust the decode if it now clearly starts with data:image/
             if (str_starts_with($decodedOnce, 'data:image/')) {
                 $raw = $decodedOnce;
             }
@@ -66,10 +74,12 @@ class LogoProcessor
             }
         }
 
-        // Determine if named slug (no data: prefix)
-        if (!str_starts_with($raw, 'data:')) {
+        // Determine if named slug (only when clearly slug-shaped: letters/digits hyphen only)
+        if (!str_starts_with($raw, 'data:') && preg_match('/^[a-z0-9-]{1,60}$/i', $raw)) {
+            @file_put_contents('/tmp/yagvc_debug.log', "[prepare] treating as named slug: $raw\n", FILE_APPEND);
             $named = $this->resolveNamedLogo($raw);
             if ($named === null) {
+                @file_put_contents('/tmp/yagvc_debug.log', "[prepare] unknown slug -> returning null\n", FILE_APPEND);
                 return null; // Unknown slug
             }
             $result = $this->sizeSvgDataUri($named['dataUri'], $logoSize, $named['intrinsicWidth'] ?? $this->fixedSize, $named['intrinsicHeight'] ?? $this->fixedSize);
@@ -90,6 +100,7 @@ class LogoProcessor
         $parsed = $this->parseDataUri($dataUri);
         // (debug removed)
         if ($parsed === null) {
+            @file_put_contents('/tmp/yagvc_debug.log', "[prepare] parseDataUri primary failed, attempting salvage\n", FILE_APPEND);
             // Salvage attempt: tolerate uncommon base64 variants (e.g., urlencoded edge cases)
             if (str_starts_with($dataUri, 'data:image/')) {
                 $semi = strpos($dataUri, ';base64,');
@@ -106,6 +117,7 @@ class LogoProcessor
                             'mime' => $parsedMime === 'svg+xml' ? 'svg+xml' : ($parsedMime !== '' ? $parsedMime : 'png'),
                             'binary' => $bin,
                         ];
+                        @file_put_contents('/tmp/yagvc_debug.log', "[prepare] salvage succeeded with mime={$parsed['mime']} size=" . strlen($bin) . "\n", FILE_APPEND);
                     }
                 }
             }
@@ -200,6 +212,44 @@ class LogoProcessor
             return null;
         }
         return $candidate;
+    }
+
+    /**
+     * Attempt to interpret a raw (maybe URL-encoded) base64 blob as an image and wrap in a data URI.
+     * Returns normalised data URI string or null if not base64 or undecidable.
+     */
+    private function normaliseLooseBase64(string $input): ?string
+    {
+        $candidate = LogoDataHelper::normalizeRawBase64($input);
+        if ($candidate === null) {
+            return null;
+        }
+        $binary = base64_decode($candidate, true);
+        if ($binary === false || $binary === '') {
+            return null;
+        }
+        $mime = LogoDataHelper::inferMime($binary);
+        if ($mime === null) {
+            return null;
+        }
+        if ($mime === 'svg+xml') {
+            $sanitized = LogoDataHelper::sanitizeSvg($binary);
+            if ($sanitized === null) {
+                return null;
+            }
+            $binary = $sanitized;
+        }
+        $maxBytes = 10000;
+        if (function_exists('config')) {
+            try {
+                $maxBytes = (int) config('badge.logo_max_bytes', 10000);
+            } catch (\Throwable $e) {
+            }
+        }
+        if (!LogoDataHelper::withinSize($binary, $maxBytes)) {
+            return null;
+        }
+        return 'data:image/' . $mime . ';base64,' . base64_encode($binary);
     }
 
 
