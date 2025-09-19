@@ -11,14 +11,17 @@
     "require": {
         "php": "^8.3",
         "badges/poser": "v3.1.0",
+        "intervention/image": "^3.11",
         "laravel/framework": "v11.44.1",
         "laravel/sanctum": "v4.2.0",
         "laravel/tinker": "v2.10.1",
+        "simple-icons/simple-icons": "^15.14",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
         "fakerphp/faker": "v1.24.1",
         "larastan/larastan": "v3.0.2",
+        "laravel/boost": "^1.1",
         "laravel/pint": "v1.25.1",
         "laravel/sail": "v1.45.0",
         "mockery/mockery": "^1.6.12",
