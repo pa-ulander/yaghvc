@@ -135,6 +135,68 @@ scripts/fetch-badge.sh -u your-username --logo-slug github --style flat
 scripts/fetch-badge.sh -u your-username --logo-file path/to/logo.png --label "Profile Views" --style for-the-badge
 ```
 
+
+### Logo / image Behavior:
+
+*   If the SVG uses `currentColor`, a `fill` is added to the root `<svg>` and `currentColor` tokens are replaced.
+*   Otherwise existing solid `fill="#XXXXXX"` values (not `none` / gradients) are replaced uniformly.
+*   If no fills are found, a `fill` is injected into the first `<path>` element.
+*   Fails safely (returns original logo) on parse anomalies — never breaks the badge.
+
+Notes:
+
+*   Does NOT attempt to recolor gradients, masks, or more complex paint servers.
+*   Raster logos (PNG/JPG/GIF) are unaffected (silently ignored).
+*   Default for simple-icons when omitted: `f5f5f5`.
+*   Works well with monochrome simple-icons whose original paths are single-color.
+
+#### Automatic Logo Color Selection
+
+`logoColor=auto`
+
+Use `auto` to automatically select a contrasting monochrome color for the logo relative to the label background:
+
+Algorithm:
+
+1.  Determine base background: explicit `labelColor` if provided; otherwise the existing label segment color (initially `#555`), else the message segment color.
+2.  Convert to RGB and compute perceived brightness: `0.299*R + 0.587*G + 0.114*B`.
+3.  Brightness \< 128 → light logo `f5f5f5`; otherwise dark logo `333333`.
+
+Happens before applying the simple-icons default so `auto` always overrides the neutral fallback.
+
+Additional examples:
+
+```
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoColor=auto)
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&labelColor=yellow&logoColor=auto)
+```
+
+Chaining with size:
+
+```
+![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoSize=auto&logoColor=ff0000)
+```
+
+#### Encoding Requirements (Important)
+
+When supplying a base64 data URI as the `logo` parameter you MUST percent‑encode (URL encode) the entire value before adding it to the query string. Raw (unencoded) data URIs can be corrupted by shells, markdown renderers, or HTTP clients (notably `+` may be turned into a space) causing the logo to be rejected.
+
+Incorrect (raw, may break):
+
+```
+![](https://ghvc.kabelkultur.se?username=you&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...)
+```
+
+Correct (percent‑encoded):
+
+```
+![](https://ghvc.kabelkultur.se?username=you&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ...)
+```
+
+
+
+
+
 ### Logo Troubleshooting Quick Reference
 
 1. Always percent‑encode full data URIs (or let helper encode script do it).
