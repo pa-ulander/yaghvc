@@ -92,7 +92,7 @@ You can set the left label background color using `labelColor`:
 | --------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `00aaff`        | ![](./public_html/assets/labelColor_00aaff.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)`                                                   |
 | `green`         | ![](./public_html/assets/labelColor_green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&labelColor=green)` |
-| `brown`         | ![](./public_html/assets/labelColor-hp.svg)     | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers&labelColor=brown)`                               |
+| `yellow`         | ![](./public_html/assets/labelColor-hp.svg)     | `![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)`                               |
 
 ### Label Background Color (labelColor)
 
@@ -100,7 +100,7 @@ You can set the left label background color using `labelColor`:
 ![](https://ghvc.kabelkultur.se?username=your-username&labelColor=0000ff)
 ```
 
-![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=orange&style=for-the-badge&labelColor=green)
+![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)
 
 # Logo or icon usage
 
