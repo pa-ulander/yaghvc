@@ -100,7 +100,7 @@ You can set the left label background color using `labelColor`:
 ![](https://ghvc.kabelkultur.se?username=your-username&labelColor=0000ff)
 ```
 
-![](https://c21572a0a33b.ngrok-free.app?username=your-username&labelColor=00aaff)
+![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=orange&style=for-the-badge&labelColor=green)
 
 # Logo or icon usage
 
