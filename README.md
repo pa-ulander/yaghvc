@@ -60,7 +60,7 @@ The visitor counter badge can be customized with the following URL parameters:
 
 ### Custom Colors `color`
 
-| <div width="120px">Named Color</div> | <div style="width:120px">Example</div>     | Markdown                                                                    |
+| <div width="120px">Named Color</div> | <div width="120px">Example</div>     | Markdown                                                                    |
 | ------------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------- |
 | `brightgreen`                        | ![](./public_html/assets/color-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
 | `red`                                | ![](./public_html/assets/color-red.svg)    | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
