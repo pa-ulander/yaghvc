@@ -50,62 +50,58 @@ The visitor counter badge can be customized with the following URL parameters:
 
 ### Different Styles `style`
 
-| Style           | Example                                           | Markdown                                                                      |
-| --------------- | ------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `for-the-badge` | ![](./public_html/assets/style-for-the-badge.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&style=for-the-badge)` |
-| `flat`          | ![](./public_html/assets/style-flat.svg)          | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat)`          |
-| `flat-square`   | ![](./public_html/assets/style-flat-square.svg)   | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat-square)`   |
-| `plastic`       | ![](./public_html/assets/style-plastic.svg)       | `![](https://ghvc.kabelkultur.se?username=your-username&style=plastic)`       |
+| <div style="width:120px">Style</div> | <div style="width:120px">Example</div>            | Markdown                                                                      |
+| ------------------------------------ | ------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `for-the-badge`                      | ![](./public_html/assets/style-for-the-badge.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&style=for-the-badge)` |
+| `flat`                               | ![](./public_html/assets/style-flat.svg)          | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat)`          |
+| `flat-square`                        | ![](./public_html/assets/style-flat-square.svg)   | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat-square)`   |
+| `plastic`                            | ![](./public_html/assets/style-plastic.svg)       | `![](https://ghvc.kabelkultur.se?username=your-username&style=plastic)`       |
 
 ### Custom Colors `color`
 
-| Named Color   | Example                                    | Markdown                                                                    |
-| ------------- | ------------------------------------------ | --------------------------------------------------------------------------- |
-| `brightgreen` | ![](./public_html/assets/color-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
-| `red`         | ![](./public_html/assets/color-red.svg)    | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
-| `orange`      | ![](./public_html/assets/color-orange.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=orange)`      |
-| `yellow`      | ![](./public_html/assets/color-yellow.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)`      |
+| <div style="width:120px">Named Color</div> | <div style="width:120px">Example</div>     | Markdown                                                                    |
+| ------------------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------- |
+| `brightgreen`                              | ![](./public_html/assets/color-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
+| `red`                                      | ![](./public_html/assets/color-red.svg)    | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
+| `orange`                                   | ![](./public_html/assets/color-orange.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=orange)`      |
+| `yellow`                                   | ![](./public_html/assets/color-yellow.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)`      |
 
-| Hex Color | Example                                  | Markdown                                                               |
-| --------- | ---------------------------------------- | ---------------------------------------------------------------------- |
-| `ffd700`  | ![](./public_html/assets/hex-ffd700.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=ffd700)` |
-| `e34234`  | ![](./public_html/assets/hex-e34234.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=e34234)` |
-| `6a0dad`  | ![](./public_html/assets/hex-6a0dad.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=6a0dad)` |
-| `00b7eb`  | ![](./public_html/assets/hex-00b7eb.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=00b7eb)` |
+| <div style="width:120px">Hex Color</div> | <div style="width:120px">Example</div>   | Markdown                                                               |
+| ---------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
+| `ffd700`                                 | ![](./public_html/assets/hex-ffd700.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=ffd700)` |
+| `e34234`                                 | ![](./public_html/assets/hex-e34234.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=e34234)` |
+| `6a0dad`                                 | ![](./public_html/assets/hex-6a0dad.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=6a0dad)` |
+| `00b7eb`                                 | ![](./public_html/assets/hex-00b7eb.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=00b7eb)` |
 
 > **Note:** You must specify hex colors without the `#` prefix (e.g., `f000ff` instead of `#f000ff`).
 
 ### Custom Label `label`
 
-| Custom Label          | Example                                 | Markdown                                                                            |
-| --------------------- | --------------------------------------- | ----------------------------------------------------------------------------------- |
-| `Profile%20Visitors`  | ![](./public_html/assets/label-pfv.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)`  |
-| `Chocolate%20Cookies` | ![](./public_html/assets/label-cho.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)` |
-| `Horsepowers`         | ![](./public_html/assets/label-hp.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)`         |
+| <div style="width:120px">Custom Label</div> | <div style="width:160px">Example</div>  | <div style="width:400px">Markdown</div>                                             |
+| ------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------- |
+| `Profile%20Visitors`                        | ![](./public_html/assets/label-pfv.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)`  |
+| `Chocolate%20Cookies`                       | ![](./public_html/assets/label-cho.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)` |
+| `Horsepowers`                               | ![](./public_html/assets/label-hp.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)`         |
 
 ### Custom Label Color `labelColor`:
 
-| Label Color | Example                                         | Markdown                                                                                                                   |
-| ----------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `00aaff`    | ![](./public_html/assets/labelColor-00aaff.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)`                                                   |
-| `green`     | ![](./public_html/assets/labelColor-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&labelColor=green)` |
-| `yellow`    | ![](./public_html/assets/labelColor-yellow.svg) | `![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)`        |
+| <div style="width:120px">Label Color</div> | <div style="width:120px">Example</div>          | Markdown                                                                                                                   |
+| ------------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `00aaff`                                   | ![](./public_html/assets/labelColor-00aaff.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)`                                                   |
+| `green`                                    | ![](./public_html/assets/labelColor-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&labelColor=green)` |
+| `yellow`                                   | ![](./public_html/assets/labelColor-yellow.svg) | `![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)`        |
 
 ## Logo or icon usage
 
-The `logo` parameter supports:
+The `logo` parameter supports the following formats:
 
 1. Simple‑icons slug (`logo=github`, `logo=laravel`)
 
 2. Full data URI (raw or URL‑encoded): `logo=data:image/png;base64,iVBOR...`  
-   or percent‑encoded variant. urlencoded or rawurlencoded.
 
-3. Raw base64 image blob (PNG/JPEG/GIF/SVG) without a `data:` prefix.  
-   The service infers MIME and wraps it: `logo=iVBORw0KGgoAAAANSUhEUgAA...`.
+3. Raw base64 image blob (PNG/JPEG/GIF/SVG) without a `data:` prefix: `logo=iVBORw0KGgoAAAANSUhEUgAA...`.
 
-4. URL‑encoded raw base64 (will be decoded automatically).
-
-## Supported Formats
+4. URL‑encoded raw base64: `logo=iVBORw0KGgoAAAANSUhEUgAA...` (aka percent-encoded).
 
 ### Simple icon slug example:
 
@@ -115,8 +111,9 @@ The `logo` parameter supports:
 
 ![](https://c21572a0a33b.ngrok-free.app/?username=tuut0&logo=github)
 
-If you are use a simpleicon slug you can also set logoColor.  
-Default logoColor when simple icon slugs is f5f5f5 (as seen above with the github icon). Which is what you get if you don't set a logoColor.
+If you use a simpleicon slug or other fillable format, ie svg, you can also set the logoColor.   
+Default logoColor when using simple icon slugs or other svg is f5f5f5 (as seen above with the github icon).
+
 
 ### Base 64 encoded SVG PNG & JPG examples:
 
@@ -126,7 +123,7 @@ Small PNG via data URI:
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
 ```
 
-![](https://c21572a0a33b.ngrok-free.app/?username=tuut&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
+![](https://81307b99fe4c.ngrok-free.app/?username=tuut&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
 
 Raw base64 (no data URI) – same image:
 
