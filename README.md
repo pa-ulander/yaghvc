@@ -50,46 +50,47 @@ The visitor counter badge can be customized with the following URL parameters:
 
 ### Different Styles `style`
 
-| <div style="width:120px">Style</div> | <div style="width:120px">Example</div>            | Markdown                                                                      |
-| ------------------------------------ | ------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `for-the-badge`                      | ![](./public_html/assets/style-for-the-badge.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&style=for-the-badge)` |
-| `flat`                               | ![](./public_html/assets/style-flat.svg)          | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat)`          |
-| `flat-square`                        | ![](./public_html/assets/style-flat-square.svg)   | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat-square)`   |
-| `plastic`                            | ![](./public_html/assets/style-plastic.svg)       | `![](https://ghvc.kabelkultur.se?username=your-username&style=plastic)`       |
+
+| <div width="120px">Style</div> | <div width="120px">Example</div>                  | Markdown                                                                      |
+| ------------------------------ | ------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `for-the-badge`                | ![](./public_html/assets/style-for-the-badge.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&style=for-the-badge)` |
+| `flat`                         | ![](./public_html/assets/style-flat.svg)          | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat)`          |
+| `flat-square`                  | ![](./public_html/assets/style-flat-square.svg)   | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat-square)`   |
+| `plastic`                      | ![](./public_html/assets/style-plastic.svg)       | `![](https://ghvc.kabelkultur.se?username=your-username&style=plastic)`       |
 
 ### Custom Colors `color`
 
-| <div style="width:120px">Named Color</div> | <div style="width:120px">Example</div>     | Markdown                                                                    |
-| ------------------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------- |
-| `brightgreen`                              | ![](./public_html/assets/color-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
-| `red`                                      | ![](./public_html/assets/color-red.svg)    | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
-| `orange`                                   | ![](./public_html/assets/color-orange.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=orange)`      |
-| `yellow`                                   | ![](./public_html/assets/color-yellow.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)`      |
+| <div width="120px">Named Color</div> | <div style="width:120px">Example</div>     | Markdown                                                                    |
+| ------------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------- |
+| `brightgreen`                        | ![](./public_html/assets/color-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
+| `red`                                | ![](./public_html/assets/color-red.svg)    | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
+| `orange`                             | ![](./public_html/assets/color-orange.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=orange)`      |
+| `yellow`                             | ![](./public_html/assets/color-yellow.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)`      |
 
-| <div style="width:120px">Hex Color</div> | <div style="width:120px">Example</div>   | Markdown                                                               |
-| ---------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
-| `ffd700`                                 | ![](./public_html/assets/hex-ffd700.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=ffd700)` |
-| `e34234`                                 | ![](./public_html/assets/hex-e34234.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=e34234)` |
-| `6a0dad`                                 | ![](./public_html/assets/hex-6a0dad.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=6a0dad)` |
-| `00b7eb`                                 | ![](./public_html/assets/hex-00b7eb.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=00b7eb)` |
+| <div width="120px">Hex Color</div> | <div width="120px">Example</div>         | Markdown                                                               |
+| ---------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
+| `ffd700`                           | ![](./public_html/assets/hex-ffd700.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=ffd700)` |
+| `e34234`                           | ![](./public_html/assets/hex-e34234.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=e34234)` |
+| `6a0dad`                           | ![](./public_html/assets/hex-6a0dad.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=6a0dad)` |
+| `00b7eb`                           | ![](./public_html/assets/hex-00b7eb.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=00b7eb)` |
 
 > **Note:** You must specify hex colors without the `#` prefix (e.g., `f000ff` instead of `#f000ff`).
 
 ### Custom Label `label`
 
-| <div style="width:120px">Custom Label</div> | <div style="width:160px">Example</div>  | <div style="width:400px">Markdown</div>                                             |
-| ------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------- |
-| `Profile%20Visitors`                        | ![](./public_html/assets/label-pfv.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)`  |
-| `Chocolate%20Cookies`                       | ![](./public_html/assets/label-cho.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)` |
-| `Horsepowers`                               | ![](./public_html/assets/label-hp.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)`         |
+| <div width="120px">Custom Label</div> | <div width="160px">Example</div>        | Markdown                                                                            |
+| ------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------- |
+| `Profile%20Visitors`                  | ![](./public_html/assets/label-pfv.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)`  |
+| `Chocolate%20Cookies`                 | ![](./public_html/assets/label-cho.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)` |
+| `Horsepowers`                         | ![](./public_html/assets/label-hp.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)`         |
 
 ### Custom Label Color `labelColor`:
 
-| <div style="width:120px">Label Color</div> | <div style="width:120px">Example</div>          | Markdown                                                                                                                   |
-| ------------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `00aaff`                                   | ![](./public_html/assets/labelColor-00aaff.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)`                                                   |
-| `green`                                    | ![](./public_html/assets/labelColor-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&labelColor=green)` |
-| `yellow`                                   | ![](./public_html/assets/labelColor-yellow.svg) | `![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)`        |
+| <div width="120px">Label Color</div> | <div width="120px">Example</div>                | Markdown                                                                                                                   |
+| ------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `00aaff`                             | ![](./public_html/assets/labelColor-00aaff.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)`                                                   |
+| `green`                              | ![](./public_html/assets/labelColor-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&labelColor=green)` |
+| `yellow`                             | ![](./public_html/assets/labelColor-yellow.svg) | `![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)`        |
 
 ## Logo or icon usage
 
