@@ -272,11 +272,11 @@ The visitor counter badge can be customized with the following URL parameters:
 
 ## Logo or icon usage
 
-Supported types: <code>png | jpg | gif | svg</code>
+Supported image types: <code>png | jpg | gif | svg</code>
 
-The `logo` parameter supports the following inputformats:
+The `logo` parameter supports the following input;
 
-#### Simple Icons
+### Simple Icons
 Any simple‑icons slug. Like `logo=github`, `logo=laravel` ...etc.  
 <table>
 	<thead>
@@ -304,16 +304,54 @@ Any simple‑icons slug. Like `logo=github`, `logo=laravel` ...etc.
 
 When using a simpleicon slug, or logo/icon with a fillable format, ie `svg`, you can also set the logoColor.   
 
-This setting only affects color on simple icon slugs or `svg` logos.  
-If you try to use it on a `png` or `jpg` logo it will have no effect.
+> [!NOTE]
+> `logoColor` only affects the fill color on simple icon slugs or `svg` logos.  
+> If you try to use it on a `png` or `jpg` logo it will have no effect.
 
-2. Full data URI (raw or URL‑encoded): `logo=data:image/png;base64,iVBOR...` 
+<table>
+	<thead>
+		<tr>
+			<th width="120px">Slug</th>
+			<th width="160px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>refinedgithub</code></td>
+			<td><img src="./public_html/assets/logo-slug-refinedgithub.svg" alt="label yellow" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Visits&style=for-the-badge&logo=refinedgithub&logoColor=ffff00)</code></td>
+		</tr>
+        <tr>
+			<td><code>laravel</code></td>
+			<td><img src="./public_html/assets/logo-slug-laravel-red.svg" alt="label yellow" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se/?username=your-username&label=Visits&style=for-the-badge&logo=laravel&logoColor=red)</code></td>
+		</tr>
+	</tbody>
+</table>
 
 
-3. Raw base64 image blob (PNG/JPEG/GIF/SVG) without a `data:` prefix: `logo=iVBORw0KGgoAAAANSUhEUgAA...`.
+### Logo from a data URI (raw or URL‑encoded): 
+You can use your own custom logo by embedding it as a data URI.  
+* Full data URI - Example: `logo=data:image/png;base64,iVBOR...`  
+* Raw base64 blob without the `data:` prefix - Example: `logo=iVBORw0KGgoAAAANSUhEUgAA...`  
+ 
+Both works, but the first is preferred as it needs less processing and therefore gets rendered a little bit quicker.
+<table>
+	<thead>
+		<tr>
+			<th width="160px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><img src="./public_html/assets/logo-slug-refinedgithub.svg" alt="label yellow" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Visits&style=for-the-badge&logo=refinedgithub&logoColor=ffff00)</code></td>
+		</tr>
+	</tbody>
+</table>
 
-
-4. URL‑encoded raw base64: `logo=iVBORw0KGgoAAAANSUhEUgAA...` (aka percent-encoded).
 
 ### Limitations
 
