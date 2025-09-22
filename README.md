@@ -32,65 +32,242 @@ Add this to your repository README.md to show a visitor counter badge for a spec
 
 The visitor counter badge can be customized with the following URL parameters:
 
-| Parameter     | Description                                             | Default       | Example Values                                                       |
-| ------------- | ------------------------------------------------------- | ------------- | -------------------------------------------------------------------- |
-| `username`    | GitHub username (required)                              | \-            | `username=your-username`                                             |
-| `label`       | Text label displayed on the badge                       | Visits        | `label=Profile Views`                                                |
-| `color`       | Badge right-side (value) color                          | blue          | `color=green`, `color=red`, `color=ff5500`                           |
-| `labelColor`  | Left-side label background color (named or hex w/out #) | blue          | `labelColor=red`, `labelColor=ffd700`                                |
-| `style`       | Badge style                                             | for-the-badge | `style=flat`, `style=flat-square`, `style=plastic`                   |
-| `base`        | Starting count value added to stored counter            | 0             | `base=100`                                                           |
-| `abbreviated` | Abbreviate large numbers (1.2K, 3.4M)                   | false         | `abbreviated=true`                                                   |
-| `repository`  | Count visits in a repository (scopes counter)           | (none)        | `repository=my-repo`                                                 |
-| `logo`        | Data URI image (png,jpg,gif,svg) OR simple-icons slug   | (none)        | `logo=github`, `logo=laravel`, `logo=data:image/png;base64,iVBOR...` |
-| `logoSize`    | Logo sizing: 'auto' (SVG adapt) or fixed px (8-64)      | 14            | `logoSize=auto`, `logoSize=32`                                       |
-| `logoColor`   | Recolor SVG/simple-icon logo (named or hex, no #)       | (none)        | `logoColor=red`, `logoColor=ff8800`, `logoColor=brightgreen`         |
+<table>
+	<thead>
+		<tr>
+			<th width="140px">Parameter</th>
+			<th width="340px">Description</th>
+			<th width="90px">Default</th>
+			<th>Example Values</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>username</code></td>
+			<td>GitHub username (required)</td>
+			<td>—</td>
+			<td><code>?username=your-username</code></td>
+		</tr>
+		<tr>
+			<td><code>label</code></td>
+			<td>Text label displayed on the badge</td>
+			<td>Visits</td>
+			<td><code>label=Profile%20Views</code></td>
+		</tr>
+		<tr>
+			<td><code>color</code></td>
+			<td>Badge right-side (value) color</td>
+			<td>blue</td>
+			<td><code>color=green</code>, <code>color=ff5500</code>, <code>color=red</code></td>
+		</tr>
+		<tr>
+			<td><code>labelColor</code></td>
+			<td>Left-side label background (named or hex no #)</td>
+			<td>blue</td>
+			<td><code>labelColor=red</code>, <code>labelColor=ffd700</code></td>
+		</tr>
+		<tr>
+			<td><code>style</code></td>
+			<td>Badge style</td>
+			<td>for-the-badge</td>
+			<td><code>style=flat</code>, <code>style=flat-square</code>, <code>style=plastic</code></td>
+		</tr>
+		<tr>
+			<td><code>base</code></td>
+			<td>Starting count added to stored counter</td>
+			<td>0</td>
+			<td><code>base=100</code></td>
+		</tr>
+		<tr>
+			<td><code>abbreviated</code></td>
+			<td>Abbreviate large numbers (1.2K, 3.4M)</td>
+			<td>false</td>
+			<td><code>abbreviated=true</code></td>
+		</tr>
+		<tr>
+			<td><code>repository</code></td>
+			<td>Repository scope (per‑repo counter)</td>
+			<td>(none)</td>
+			<td><code>repository=my-repo</code></td>
+		</tr>
+		<tr>
+			<td><code>logo</code></td>
+			<td>Data URI image (png,jpg,gif,svg) OR simple-icons slug</td>
+			<td>(none)</td>
+			<td><code>logo=github</code>, <code>logo=laravel</code>, <code>logo=data:image/png;base64,iVBOR...</code></td>
+		</tr>
+		<tr>
+			<td><code>logoSize</code></td>
+			<td>Logo sizing: <code>auto</code> (SVG adapt) or fixed px (8–64)</td>
+			<td>14</td>
+			<td><code>logoSize=auto</code>, <code>logoSize=32</code></td>
+		</tr>
+		<tr>
+			<td><code>logoColor</code></td>
+			<td>Recolor SVG/simple-icon logo (named or hex, no #)</td>
+			<td>(none)</td>
+			<td><code>logoColor=red</code>, <code>logoColor=ff8800</code>, <code>logoColor=brightgreen</code></td>
+		</tr>
+	</tbody>
+</table>
 
 ## Examples
 
 ### Different Styles `style`
 
+<table>
+<thead><th width="120px">Style</th><th width="120px">Example</th><th>Markdown</th></thead>
+<tr>
+<td><code>for-the-badge</code></td>
+<td><img src="./public_html/assets/style-for-the-badge.svg"></td>
+<td><code>![](https://ghvc.kabelkultur.se?username=your-username&style=for-the-badge)</code></td>
+</tr>
 
-| <div width="120px">Style</div> | <div width="120px">Example</div>                  | Markdown                                                                      |
-| ------------------------------ | ------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `for-the-badge`                | ![](./public_html/assets/style-for-the-badge.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&style=for-the-badge)` |
-| `flat`                         | ![](./public_html/assets/style-flat.svg)          | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat)`          |
-| `flat-square`                  | ![](./public_html/assets/style-flat-square.svg)   | `![](https://ghvc.kabelkultur.se?username=your-username&style=flat-square)`   |
-| `plastic`                      | ![](./public_html/assets/style-plastic.svg)       | `![](https://ghvc.kabelkultur.se?username=your-username&style=plastic)`       |
+<tr>
+<td><code>flat</code></td>
+<td><img src="./public_html/assets/style-flat.svg"></td>
+<td><code>![](https://ghvc.kabelkultur.se?username=your-username&style=flat)</code></td>
+</tr>
+
+<tr>
+<td><code>flat-square</code></td>
+<td><img src="./public_html/assets/style-flat-square.svg"></td>
+<td><code>![](https://ghvc.kabelkultur.se?username=your-username&style=flat-square)</code></td>
+</tr>
+
+<tr>
+<td><code>plastic</code></td>
+<td><img src="./public_html/assets/style-plastic.svg"></td>
+<td><code>![](https://ghvc.kabelkultur.se?username=your-username&style=plastic</code></td>
+</tr>
+</table>
 
 ### Custom Colors `color`
 
-| <div width="120px">Named Color</div> | <div width="120px">Example</div>     | Markdown                                                                    |
-| ------------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------- |
-| `brightgreen`                        | ![](./public_html/assets/color-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)` |
-| `red`                                | ![](./public_html/assets/color-red.svg)    | `![](https://ghvc.kabelkultur.se?username=your-username&color=red)`         |
-| `orange`                             | ![](./public_html/assets/color-orange.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=orange)`      |
-| `yellow`                             | ![](./public_html/assets/color-yellow.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)`      |
+<table>
+	<thead>
+		<tr>
+			<th width="140px">Named Color</th>
+			<th width="160px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>brightgreen</code></td>
+			<td><img src="./public_html/assets/color-green.svg" alt="brightgreen" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=brightgreen)</code></td>
+		</tr>
+		<tr>
+			<td><code>red</code></td>
+			<td><img src="./public_html/assets/color-red.svg" alt="red" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=red)</code></td>
+		</tr>
+		<tr>
+			<td><code>orange</code></td>
+			<td><img src="./public_html/assets/color-orange.svg" alt="orange" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=orange)</code></td>
+		</tr>
+		<tr>
+			<td><code>yellow</code></td>
+			<td><img src="./public_html/assets/color-yellow.svg" alt="yellow" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=yellow)</code></td>
+		</tr>
+	</tbody>
+</table>
 
-| <div width="120px">Hex Color</div> | <div width="120px">Example</div>         | Markdown                                                               |
-| ---------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
-| `ffd700`                           | ![](./public_html/assets/hex-ffd700.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=ffd700)` |
-| `e34234`                           | ![](./public_html/assets/hex-e34234.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=e34234)` |
-| `6a0dad`                           | ![](./public_html/assets/hex-6a0dad.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=6a0dad)` |
-| `00b7eb`                           | ![](./public_html/assets/hex-00b7eb.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&color=00b7eb)` |
+<table>
+	<thead>
+		<tr>
+			<th width="140px">Hex Color</th>
+			<th width="160px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>ffd700</code></td>
+			<td><img src="./public_html/assets/hex-ffd700.svg" alt="ffd700" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=ffd700)</code></td>
+		</tr>
+		<tr>
+			<td><code>e34234</code></td>
+			<td><img src="./public_html/assets/hex-e34234.svg" alt="e34234" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=e34234)</code></td>
+		</tr>
+		<tr>
+			<td><code>6a0dad</code></td>
+			<td><img src="./public_html/assets/hex-6a0dad.svg" alt="6a0dad" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=6a0dad)</code></td>
+		</tr>
+		<tr>
+			<td><code>00b7eb</code></td>
+			<td><img src="./public_html/assets/hex-00b7eb.svg" alt="00b7eb" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&color=00b7eb)</code></td>
+		</tr>
+	</tbody>
+</table>
 
-> **Note:** You must specify hex colors without the `#` prefix (e.g., `f000ff` instead of `#f000ff`).
+> [!NOTE]
+> You must specify hex colors without the `#` prefix (e.g., `f000ff` instead of `#f000ff`).
 
 ### Custom Label `label`
 
-| <div width="120px">Custom Label</div> | <div width="160px">Example</div>        | Markdown                                                                            |
-| ------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------- |
-| `Profile%20Visitors`                  | ![](./public_html/assets/label-pfv.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)`  |
-| `Chocolate%20Cookies`                 | ![](./public_html/assets/label-cho.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)` |
-| `Horsepowers`                         | ![](./public_html/assets/label-hp.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)`         |
+<table>
+	<thead>
+		<tr>
+			<th width="160px">Custom Label</th>
+			<th width="180px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>Profile%20Visitors</code></td>
+			<td><img src="./public_html/assets/label-pfv.svg" alt="Profile Visitors" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)</code></td>
+		</tr>
+		<tr>
+			<td><code>Chocolate%20Cookies</code></td>
+			<td><img src="./public_html/assets/label-cho.svg" alt="Chocolate Cookies" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)</code></td>
+		</tr>
+		<tr>
+			<td><code>Horsepowers</code></td>
+			<td><img src="./public_html/assets/label-hp.svg" alt="Horsepowers" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)</code></td>
+		</tr>
+	</tbody>
+</table>
 
 ### Custom Label Color `labelColor`:
 
-| <div width="120px">Label Color</div> | <div width="120px">Example</div>                | Markdown                                                                                                                   |
-| ------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `00aaff`                             | ![](./public_html/assets/labelColor-00aaff.svg) | `![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)`                                                   |
-| `green`                              | ![](./public_html/assets/labelColor-green.svg)  | `![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&labelColor=green)` |
-| `yellow`                             | ![](./public_html/assets/labelColor-yellow.svg) | `![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)`        |
+<table>
+	<thead>
+		<tr>
+			<th width="140px">Label Color</th>
+			<th width="160px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>00aaff</code></td>
+			<td><img src="./public_html/assets/labelColor-00aaff.svg" alt="label 00aaff" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&labelColor=red)</code></td>
+		</tr>
+		<tr>
+			<td><code>green</code></td>
+			<td><img src="./public_html/assets/labelColor-green.svg" alt="label green" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&labelColor=green)</code></td>
+		</tr>
+		<tr>
+			<td><code>yellow</code></td>
+			<td><img src="./public_html/assets/labelColor-yellow.svg" alt="label yellow" /></td>
+			<td><code>![](https://c21572a0a33b.ngrok-free.app?username=your-username&&color=blue&style=for-the-badge&labelColor=yellow)</code></td>
+		</tr>
+	</tbody>
+</table>
 
 ## Logo or icon usage
 
