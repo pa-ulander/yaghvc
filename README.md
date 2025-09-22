@@ -105,11 +105,12 @@ The visitor counter badge can be customized with the following URL parameters:
 		<tr>
 			<td><code>logoColor</code></td>
 			<td>Recolor SVG/simple-icon logo (named or hex, no #)</td>
-			<td>(none)</td>
+			<td>f5f5f5</td>
 			<td><code>logoColor=red</code>, <code>logoColor=ff8800</code>, <code>logoColor=brightgreen</code></td>
 		</tr>
 	</tbody>
 </table>
+
 
 ## Examples
 
@@ -271,26 +272,61 @@ The visitor counter badge can be customized with the following URL parameters:
 
 ## Logo or icon usage
 
-The `logo` parameter supports the following formats:
+Supported types: <code>png | jpg | gif | svg</code>
 
-1. Simple‑icons slug (`logo=github`, `logo=laravel`)
+The `logo` parameter supports the following inputformats:
 
-2. Full data URI (raw or URL‑encoded): `logo=data:image/png;base64,iVBOR...`  
+#### Simple Icons
+Any simple‑icons slug. Like `logo=github`, `logo=laravel` ...etc.  
+<table>
+	<thead>
+		<tr>
+			<th width="80px">Slug</th>
+			<th width="160px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>github</code></td>
+			<td><img src="./public_html/assets/logo-slug-github.svg" alt="label yellow" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&logo=github)</code></td>
+		</tr>
+        <tr>
+			<td><code>laravel</code></td>
+			<td><img src="./public_html/assets/logo-slug-laravel.svg" alt="label yellow" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se??username=your-username&label=Visits&color=orange&style=for-the-badge&logo=laravel)</code></td>
+		</tr>
+	</tbody>
+</table>
+
+#### Simple Icons or svg's with color `logoColor`
+
+When using a simpleicon slug, or logo/icon with a fillable format, ie `svg`, you can also set the logoColor.   
+
+This setting only affects color on simple icon slugs or `svg` logos.  
+If you try to use it on a `png` or `jpg` logo it will have no effect.
+
+2. Full data URI (raw or URL‑encoded): `logo=data:image/png;base64,iVBOR...` 
+
 
 3. Raw base64 image blob (PNG/JPEG/GIF/SVG) without a `data:` prefix: `logo=iVBORw0KGgoAAAANSUhEUgAA...`.
 
+
 4. URL‑encoded raw base64: `logo=iVBORw0KGgoAAAANSUhEUgAA...` (aka percent-encoded).
 
-### Simple icon slug example:
+### Limitations
 
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=github)
-```
+Some limtiations are applied:
 
-![](https://c21572a0a33b.ngrok-free.app/?username=tuut0&logo=github)
+* Maximum allowed logo bytes. Oversize images are ignored.
+* Maximum dimensions for raster formats. Oversized images are rejected.  
+  Use a logo no larger than 64x64 pixels and it should be fine.  
+* Unsupported / unrecognized formats are silently ignored.
+* If a logo is rejected the badge still renders without `logo` so your README does not break.
 
-If you use a simpleicon slug or other fillable format, ie svg, you can also set the logoColor.   
-Default logoColor when using simple icon slugs or other svg is f5f5f5 (as seen above with the github icon).
+
+
 
 
 ### Base 64 encoded SVG PNG & JPG examples:
@@ -313,31 +349,9 @@ URL‑encoded raw base64 also works (decoded automatically):
 
 ```
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg%3D%3D)
-
-### Safety Notes
-
-Small safety guards are applied:
-
-* Maximum logo bytes (see `config/badge.php`) – oversize images are ignored.
-* Maximum dimensions for raster formats (oversize rejected).
-* Raw base64 SVGs are sanitized: scripts, foreignObject, event handler attributes and external links are stripped or cause rejection.
-* Unsupported / unrecognized formats are silently ignored (badge still renders without a logo).
-
-If a logo is rejected the badge still renders without `<image>` so your README does not break.
 ```
 
-#### Example with logoColor set to orange:
 
-This setting only affects color on simple icon slugs or SVG logos.  
-If you try to use it on a PNG or JPG logo it will have no effect.
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=github&logoColor=orange)
-```
-
-![](https://c21572a0a33b.ngrok-free.app/?username=tuut2&logo=github&logoColor=orange)
-
-Examples:
 
 ### Logo Size
 
