@@ -116,7 +116,7 @@ The visitor counter badge can be customized with the following URL parameters:
 ### Different Styles `style`
 
 <table>
-<thead><th width="120px">Style</th><th width="120px">Example</th><th>Markdown</th></thead>
+<thead><th width="140px">Style</th><th width="140px">Example</th><th>Markdown</th></thead>
 <tr>
 <td><code>for-the-badge</code></td>
 <td><img src="./public_html/assets/style-for-the-badge.svg"></td>
@@ -217,7 +217,7 @@ The visitor counter badge can be customized with the following URL parameters:
 	<thead>
 		<tr>
 			<th width="160px">Custom Label</th>
-			<th width="180px">Example</th>
+			<th width="200px">Example</th>
 			<th>Markdown</th>
 		</tr>
 	</thead>
