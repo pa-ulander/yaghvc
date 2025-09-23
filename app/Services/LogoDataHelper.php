@@ -16,16 +16,16 @@ namespace App\Services;
  */
 final class LogoDataHelper
 {
-    /** 
-     * Normalize a potential raw (optionally urlencoded) base64 string; 
+    /**
+     * Normalize a potential raw (optionally urlencoded) base64 string;
      * returns cleaned base64 or null.
-     * 
-     * @param string $input Raw or urlencoded base64 input 
+     *
+     * @param string $input Raw or urlencoded base64 input
      */
     public static function normalizeRawBase64(string $input): ?string
     {
         $decodedOnce = urldecode($input);
-        if (str_contains($decodedOnce, ' ') && !str_contains($decodedOnce, '+')) {
+        if (str_contains($decodedOnce, ' ')) {
             $decodedOnce = str_replace(' ', '+', $decodedOnce);
         }
         $candidate = preg_replace('/\s+/', '', $decodedOnce) ?? '';
@@ -54,11 +54,11 @@ final class LogoDataHelper
         return null;
     }
 
-    /** 
-     * Return sanitized SVG binary or null if unsafe. 
+    /**
+     * Return sanitized SVG binary or null if unsafe.
      * Rejects <script>, <foreignObject>, event handlers, non-data xlink:href,
      * and ensures it contains an <svg> element.
-     * 
+     *
      * @param string $svg Raw SVG input
      */
     public static function sanitizeSvg(string $svg): ?string
@@ -78,11 +78,10 @@ final class LogoDataHelper
         return $svg;
     }
 
-    /** 
+    /**
      * Ensure size within limit (decoded bytes).
      *
      * @param string $binary Raw binary bytes of the logo image (not base64; direct image data).
-     * @return mixed Processed logo representation, image object, or an error/result structure.
      */
     public static function withinSize(string $binary, int $maxBytes): bool
     {
