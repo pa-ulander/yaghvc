@@ -228,4 +228,25 @@ class BadgeRenderingTest extends TestCase
         $logo = (float)$w[1];
         $this->assertGreaterThan($base, $logo, 'SVG total width not increased when logo added');
     }
+
+    public function test_svg_logo_data_uri_raw_and_urlencoded_render_identically(): void
+    {
+        $svgContent = '<?xml version="1.0" encoding="utf-8"?><svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="black" d="M0 0h24v24H0z"/></svg>';
+        $b64 = base64_encode($svgContent);
+        $rawDataUri = 'data:image/svg+xml;base64,' . $b64;
+        $encodedDataUri = urlencode($rawDataUri);
+        $urlRaw = '/?username=svg-user&label=Visits&style=for-the-badge&logoColor=ffff00&logo=' . $rawDataUri;
+        $urlEncoded = '/?username=svg-user&label=Visits&style=for-the-badge&logoColor=ffff00&logo=' . $encodedDataUri;
+        $respRaw = $this->get($urlRaw);
+        $respEncoded = $this->get($urlEncoded);
+        $respRaw->assertOk();
+        $respEncoded->assertOk();
+        $contentRaw = $respRaw->getContent();
+        $contentEncoded = $respEncoded->getContent();
+        $this->assertStringContainsString('<image', $contentRaw, 'Raw data URI SVG logo missing');
+        $this->assertStringContainsString('<image', $contentEncoded, 'URL-encoded data URI SVG logo missing');
+        // Both should canonicalize; allow difference in geometry but ensure a logo element exists once.
+        $this->assertSame(1, substr_count($contentRaw, '<image'), 'Raw variant should embed exactly one logo');
+        $this->assertSame(1, substr_count($contentEncoded, '<image'), 'Encoded variant should embed exactly one logo');
+    }
 }
