@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Webmozart\Assert\Assert;
 
 /**
@@ -13,11 +13,12 @@ use Webmozart\Assert\Assert;
  */
 class Count extends Model
 {
+    /** @use HasFactory<\Database\Factories\CountFactory> */
     use HasFactory;
 
     private int|float $count;
 
-    public function __construct(int|float $count)
+    public function __construct(int|float $count = 1)
     {
         if ($count >= PHP_INT_MAX) {
             throw new \InvalidArgumentException(message: 'Max number of views reached');
@@ -30,9 +31,8 @@ class Count extends Model
         $this->count = $count;
     }
 
-    public static function ofString(
-        string $value
-    ): self {
+    public static function ofString(string $value): self
+    {
         Assert::digits(
             value: $value,
             message: 'Base count can only be a number',
@@ -52,8 +52,16 @@ class Count extends Model
         if ($this->count > PHP_INT_MAX - $that->count) {
             throw new \InvalidArgumentException('Max number of views reached');
         }
-        
+
         $sum = $this->count + $that->count;
         return new self($sum);
+    }
+
+    /**
+     * @return \Database\Factories\CountFactory
+     */
+    protected static function newFactory(): \Database\Factories\CountFactory
+    {
+        return \Database\Factories\CountFactory::new();
     }
 }
