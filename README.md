@@ -272,7 +272,7 @@ The visitor counter badge can be customized with the following URL parameters:
 
 ## Logo or icon usage
 
-Supported image types: <code>png | jpg | gif | svg</code>
+Supported image types: <code>png | svg</code>
 
 The `logo` parameter supports the following input;
 
@@ -335,8 +335,11 @@ When using a simpleicon slug, or logo/icon with a fillable format, ie `svg`, you
 You can use your own custom logo by embedding it as a data URI.  
 * Full data URI - Example: `logo=data:image/png;base64,iVBOR...`  
 * Raw base64 blob without the `data:` prefix - Example: `logo=iVBORw0KGgoAAAANSUhEUgAA...`  
+* Urlencoded base64 blob with `data:` prefix - Example: `logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc...`  
  
 Both works, but the first is preferred as it needs less processing and therefore gets rendered a little bit quicker.
+
+### Urlencoded svg
 <table>
 	<thead>
 		<tr>
@@ -347,23 +350,10 @@ Both works, but the first is preferred as it needs less processing and therefore
 	<tbody>
 		<tr>
 			<td><img src="./public_html/assets/logo-slug-refinedgithub.svg" alt="label yellow" /></td>
-			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Visits&style=for-the-badge&logo=refinedgithub&logoColor=ffff00)</code></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Visits&style=for-the-badge&logoColor=ffff00&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMjAuOTk5MiA1Ljk1ODQ2QzIxLjAwODcgNi41NjUgMjAuOTMzMyA3LjMyNjQ5IDIwLjg2NTggNy44ODA3QzIwLjgzOTUgOC4wOTY4NiAyMC44MDM3IDguMjc2NzYgMjAuNzY1MyA4LjQyNDUzQzIxLjYyMjcgMTAuMDEgMjIgMTEuOTE3NCAyMiAxNEMyMiAxNi40Njg0IDIwLjgxMjcgMTguNTAxIDE4Ljk2MzggMTkuODg3MUMxNy4xMzE5IDIxLjI2MDUgMTQuNjYwNiAyMiAxMiAyMkM5LjMzOTM5IDIyIDYuODY4MDkgMjEuMjYwNSA1LjAzNjIgMTkuODg3MUMzLjE4NzI3IDE4LjUwMSAyIDE2LjQ2ODQgMiAxNEMyIDExLjkxNzQgMi4zNzczMiAxMC4wMSAzLjIzNDcyIDguNDI0NTJDMy4xOTYzMSA4LjI3Njc2IDMuMTYwNTUgOC4wOTY4NSAzLjEzNDIyIDcuODgwN0MzLjA2NjczIDcuMzI2NDkgMi45OTEzMyA2LjU2NSAzLjAwMDgxIDUuOTU4NDZDMy4wMTE0OSA1LjI3NTA2IDMuMTAwODIgNC41OTE3IDMuMTk5ODggMy45MTM3OUMzLjI0NTY5IDMuNjAwMjggMy4zMTg0MyAzLjMwNTQ3IDMuNjU4ODMgMy4xMTkxN0M0LjAwNjU1IDIuOTI4ODYgNC4zNzI3NCAyLjk5OTgxIDQuNzMzOTggMy4xMDIxQzUuOTUyNDcgMy40NDcxMyA3LjA5NDg3IDMuOTMxMDggOC4xNjgwMyA0LjUxMjg3QzkuMjk5NSA0LjE3Mjg3IDEwLjU3ODMgNCAxMiA0QzEzLjQyMTcgNCAxNC43MDA1IDQuMTcyODcgMTUuODMyIDQuNTEyODdDMTYuOTA1MSAzLjkzMTA4IDE4LjA0NzUgMy40NDcxMyAxOS4yNjYgMy4xMDIxQzE5LjYyNzMgMi45OTk4MSAxOS45OTM1IDIuOTI4ODYgMjAuMzQxMiAzLjExOTE3QzIwLjY4MTYgMy4zMDU0NyAyMC43NTQzIDMuNjAwMjggMjAuODAwMSAzLjkxMzc5QzIwLjg5OTIgNC41OTE3IDIwLjk4ODUgNS4yNzUwNiAyMC45OTkyIDUuOTU4NDZaTTIwIDE0QzIwIDEyLjMxMjggMTkuNjEyMiAxMCAxNy41IDEwQzE2LjU0NzggMTAgMTUuNjQ3NCAxMC4yNTAyIDE0Ljc0NzQgMTAuNTAwNEMxMy44NDgyIDEwLjc1MDIgMTIuOTQ5NSAxMSAxMiAxMUMxMS4wNTA1IDExIDEwLjE1MTggMTAuNzUwMiA5LjI1MjYzIDEwLjUwMDRDOC4zNTI2MSAxMC4yNTAyIDcuNDUyMTYgMTAgNi41IDEwQzQuMzkzNzkgMTAgNCAxMi4zMTk3IDQgMTRDNCAxNS43NjM2IDQuODI3NDUgMTcuMjMxIDYuMjM1ODggMTguMjg2OUM3LjY2MTM1IDE5LjM1NTYgOS42OTAwNSAyMCAxMiAyMEMxNC4zMDk5IDIwIDE2LjMzODYgMTkuMzU1NSAxNy43NjQxIDE4LjI4NjlDMTkuMTcyNiAxNy4yMzEgMjAgMTUuNzYzNiAyMCAxNFpNMTAgMTQuNUMxMCAxNS44ODA3IDkuMzI4NDMgMTcgOC41IDE3QzcuNjcxNTcgMTcgNyAxNS44ODA3IDcgMTQuNUM3IDEzLjExOTMgNy42NzE1NyAxMiA4LjUgMTJDOS4zMjg0MyAxMiAxMCAxMy4xMTkzIDEwIDE0LjVaTTE1LjUgMTdDMTYuMzI4NCAxNyAxNyAxNS44ODA3IDE3IDE0LjVDMTcgMTMuMTE5MyAxNi4zMjg0IDEyIDE1LjUgMTJDMTQuNjcxNiAxMiAxNCAxMy4xMTkzIDE0IDE0LjVDMTQgMTUuODgwNyAxNC42NzE2IDE3IDE1LjUgMTdaIiBmaWxsPSIjMDAwMDAwIi8%2BDQo8L3N2Zz4%3D)</code></td>
 		</tr>
 	</tbody>
 </table>
-
-
-### Limitations
-
-Some limtiations are applied:
-
-* Maximum allowed logo bytes. Oversize images are ignored.
-* Maximum dimensions for raster formats. Oversized images are rejected.  
-  Use a logo no larger than 64x64 pixels and it should be fine.  
-* Unsupported / unrecognized formats are silently ignored.
-* If a logo is rejected the badge still renders without `logo` so your README does not break.
-
-
 
 
 
@@ -425,6 +415,21 @@ Display large numbers in abbreviated format (1K, 1.5M, etc.):
 ```
 
 ![](./public_html/assets/full.svg)
+
+
+
+### Limitations
+
+Some limtiations are applied:
+
+* Maximum allowed logo bytes. Oversize images are ignored.
+* Maximum dimensions for raster formats. Oversized images are rejected.  
+  Use a logo no larger than 64x64 pixels and it should be fine.  
+* Unsupported / unrecognized formats are silently ignored.
+* If a logo is rejected the badge still renders without `logo` so your README does not break.
+
+
+
 
 ---
 
