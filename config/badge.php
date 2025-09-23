@@ -16,4 +16,6 @@ return [
     'logo_max_bytes' => 10000, // ~10KB decoded payload cap
     'logo_max_dimension' => 32, // max width/height for raster; svg intrinsic clamp
     'logo_cache_ttl' => 3600, // seconds
+    // Enable verbose geometry / logo debug logging (disabled by default for perf)
+    'debug_logging' => env('BADGE_DEBUG_LOG', false),
 ];
