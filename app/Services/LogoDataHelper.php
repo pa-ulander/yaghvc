@@ -48,8 +48,16 @@ final class LogoDataHelper
             return 'gif';
         }
         $trim = ltrim($binary, "\xEF\xBB\xBF\r\n\t \0");
+        // Common SVG starts directly with <svg ...>
         if (str_starts_with($trim, '<svg')) {
             return 'svg+xml';
+        }
+        // Allow optional XML declaration before the <svg> element
+        if (str_starts_with($trim, '<?xml')) {
+            // Find first <svg tag after declaration (robust against whitespace/comments)
+            if (preg_match('/<svg\b/i', $trim)) {
+                return 'svg+xml';
+            }
         }
         return null;
     }
