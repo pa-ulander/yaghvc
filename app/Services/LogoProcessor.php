@@ -29,13 +29,13 @@ class LogoProcessor
     }
 
     /**
-     * Prepare logo returning associative array or null if invalid.
-     * Returns: [ 'dataUri' => string, 'width' => int, 'height' => int, 'mime' => string ]
+     * Prepare logo returning structured array or null if invalid.
+     * Shape differs for svg vs raster (binary always present for parsed forms).
+     * @return array{dataUri:string,width:int,height:int,mime:string,binary?:string}|null
      */
     public function prepare(?string $raw, ?string $logoSize = null): ?array
     {
         if ($raw === null || $raw === '') {
-            @file_put_contents('/tmp/yagvc_debug.log', "[prepare] early return null: empty input\n", FILE_APPEND);
             return null;
         }
         // Step 1: Attempt to interpret any non data: string as raw base64 BEFORE slug resolution.
@@ -76,14 +76,12 @@ class LogoProcessor
 
         // Determine if named slug (only when clearly slug-shaped: letters/digits hyphen only)
         if (!str_starts_with($raw, 'data:') && preg_match('/^[a-z0-9-]{1,60}$/i', $raw)) {
-            @file_put_contents('/tmp/yagvc_debug.log', "[prepare] treating as named slug: $raw\n", FILE_APPEND);
             $named = $this->resolveNamedLogo($raw);
             if ($named === null) {
-                @file_put_contents('/tmp/yagvc_debug.log', "[prepare] unknown slug -> returning null\n", FILE_APPEND);
                 return null; // Unknown slug
             }
-            $result = $this->sizeSvgDataUri($named['dataUri'], $logoSize, $named['intrinsicWidth'] ?? $this->fixedSize, $named['intrinsicHeight'] ?? $this->fixedSize);
-            if ($cacheKey && isset($result['dataUri']) && $cacheTtl > 0) {
+            $result = $this->sizeSvgDataUri($named['dataUri'], $logoSize, $named['intrinsicWidth'], $named['intrinsicHeight']);
+            if ($cacheKey && $cacheTtl > 0) {
                 $cachePayload = $result;
                 unset($cachePayload['binary']);
                 Cache::put($cacheKey, $cachePayload, $cacheTtl);
@@ -100,7 +98,6 @@ class LogoProcessor
         $parsed = $this->parseDataUri($dataUri);
         // (debug removed)
         if ($parsed === null) {
-            @file_put_contents('/tmp/yagvc_debug.log', "[prepare] parseDataUri primary failed, attempting salvage\n", FILE_APPEND);
             // Salvage attempt: tolerate uncommon base64 variants (e.g., urlencoded edge cases)
             if (str_starts_with($dataUri, 'data:image/')) {
                 $semi = strpos($dataUri, ';base64,');
@@ -117,7 +114,6 @@ class LogoProcessor
                             'mime' => $parsedMime === 'svg+xml' ? 'svg+xml' : ($parsedMime !== '' ? $parsedMime : 'png'),
                             'binary' => $bin,
                         ];
-                        @file_put_contents('/tmp/yagvc_debug.log', "[prepare] salvage succeeded with mime={$parsed['mime']} size=" . strlen($bin) . "\n", FILE_APPEND);
                     }
                 }
             }
@@ -253,7 +249,10 @@ class LogoProcessor
     }
 
 
-    /** Parse a data URI returning [mime,binary] or null */
+    /**
+     * Parse a data URI returning its mime and binary content.
+     * @return array{mime:string,binary:string}|null
+     */
     private function parseDataUri(string $dataUri): ?array
     {
         if (!preg_match('#^data:image/(png|jpeg|jpg|gif|svg\+xml);base64,([A-Za-z0-9+/=]+)$#', $dataUri, $m)) {
@@ -266,7 +265,10 @@ class LogoProcessor
         return ['mime' => $m[1], 'binary' => $binary];
     }
 
-    /** Simple extraction of width/height from SVG tag if present. */
+    /**
+     * Simple extraction of width/height from SVG tag if present.
+     * @return array{0:int,1:int}
+     */
     private function extractSvgDimensions(string $svg): array
     {
         $w = $h = $this->fixedSize;
@@ -290,6 +292,10 @@ class LogoProcessor
         return [$w, $h];
     }
 
+    /**
+     * Return sized svg data URI info (always mime svg+xml).
+     * @return array{dataUri:string,width:int,height:int,mime:string,binary?:string}
+     */
     private function sizeSvgDataUri(string $dataUri, ?string $logoSize, int $intrinsicWidth, int $intrinsicHeight, ?string $binary = null): array
     {
         $height = $this->fixedSize;
@@ -312,15 +318,22 @@ class LogoProcessor
             $v = max(8, min($maxDim, $v));
             $width = $height = $v; // square sizing
         }
-        return [
+        $result = [
             'dataUri' => $dataUri,
             'width' => $width,
             'height' => $height,
             'mime' => 'svg+xml',
-            'binary' => $binary,
         ];
+        if ($binary !== null) {
+            $result['binary'] = $binary; // include only when non-null
+        }
+        return $result;
     }
 
+    /**
+     * Resolve a simple-icons slug to a sized data URI (24x24 base dimensions).
+     * @return array{dataUri:string,intrinsicWidth:int,intrinsicHeight:int}|null
+     */
     private function resolveNamedLogo(string $slug): ?array
     {
         $slug = strtolower(trim($slug));
