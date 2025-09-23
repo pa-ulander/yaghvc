@@ -16,11 +16,10 @@ use Illuminate\Support\ValidatedInput;
 class ProfileViewsController extends Controller
 {
     public function __construct(
-        private BadgeRenderService $badgeRenderService,
-        private ProfileViewsRepository $profileViewsRepository
+        private readonly BadgeRenderService $badgeRenderService,
+        private readonly ProfileViewsRepository $profileViewsRepository,
     ) {
-        $this->badgeRenderService = $badgeRenderService;
-        $this->profileViewsRepository = $profileViewsRepository;
+        // Property promotion with readonly eliminates need for manual assignments.
     }
 
     public function index(ProfileViewsRequest $request): ResponseFactory|Response
@@ -35,6 +34,10 @@ class ProfileViewsController extends Controller
         return $this->createBadgeResponse($badgeRender);
     }
 
+    /**
+     * Render badge using validated input or array form.
+     * @param ValidatedInput|array<string,mixed> $safe
+     */
     private function renderBadge(ValidatedInput|array $safe, ProfileViews $profileView): string
     {
         $username = Arr::get(array: $safe, key: 'username');
