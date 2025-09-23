@@ -79,7 +79,7 @@ class ProfileViewsRequest extends FormRequest
         return [
             'username.required' => 'A GitHub account username is needed to count views',
             'username.regex' => 'The username must be a valid GitHub username',
-            'logo.regex' => 'Invalid logo parameter. If using a data URI you must percent-encode the entire value (e.g. encodeURIComponent or rawurlencode).',
+            'logo.regex' => 'Invalid logo parameter. Provide a simple-icons slug, a base64 image, or a data URI (png|jpeg|gif|svg).',
         ];
     }
 
@@ -116,24 +116,17 @@ class ProfileViewsRequest extends FormRequest
 
             if ($this->has('logo') && $this->input(key: 'logo') !== null) {
                 $rawLogo = trim(string: $this->input(key: 'logo'));
-                // Edge repair: Some clients incorrectly place an unencoded data URI directly in the query string.
-                // In that scenario, '+' characters inside the base64 section may be transformed into spaces by
-                // application/x-www-form-urlencoded semantics before reaching Laravel, causing validation to fail
-                // (our regex expects '+' not spaces). We attempt a safe, minimal repair: if the value starts with
-                // 'data:image/' and contains a ';base64,' marker, and the payload has spaces but no '+', we swap
-                // spaces back to '+', but ONLY if doing so yields a syntactically valid base64 fragment. This keeps
-                // behaviour strict while providing a graceful acceptance path for this edge case.
+                // New policy: Always attempt space → '+' repair inside base64 payload of a data URI.
+                // Rationale: Any space present is almost certainly a transport artifact of '+' being
+                // converted by x-www-form-urlencoded parsing. We treat ALL spaces as '+' and then
+                // validate the repaired fragment shape. This makes full data URIs and raw base64 inputs
+                // behave identically from a consumer perspective.
                 if (str_starts_with(strtolower($rawLogo), 'data:image/') && str_contains($rawLogo, ';base64,')) {
                     $parts = explode(';base64,', $rawLogo, 2);
                     if (count($parts) === 2) {
                         [$header, $payload] = $parts;
-                        $spaceCount = substr_count($payload, ' ');
-                        // Heuristic: only attempt repair if there are multiple spaces (>=3) and no '+' already.
-                        // A single stray space is treated as a genuine malformed data URI and will be rejected
-                        // by validation, preserving previous contract in BadgeRenderingTest.
-                        if ($spaceCount >= 3 && !str_contains($payload, '+')) {
+                        if (str_contains($payload, ' ')) {
                             $repaired = str_replace(' ', '+', $payload);
-                            // Validate repaired fragment shape before accepting.
                             if (preg_match('/^[A-Za-z0-9+\/]+=*$/', rtrim($repaired, '='))) {
                                 $rawLogo = $header . ';base64,' . $repaired;
                             }
