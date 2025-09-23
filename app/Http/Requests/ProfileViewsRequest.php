@@ -41,6 +41,10 @@ class ProfileViewsRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Validation rules.
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -74,6 +78,10 @@ class ProfileViewsRequest extends FormRequest
         ];
     }
 
+    /**
+     * Custom validation messages.
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [
@@ -116,6 +124,12 @@ class ProfileViewsRequest extends FormRequest
 
             if ($this->has('logo') && $this->input(key: 'logo') !== null) {
                 $rawLogo = trim(string: $this->input(key: 'logo'));
+                // Repair case where '+' in 'svg+xml' was converted to space by query parsing
+                // Example: data:image/svg+xml;base64,... arrives as data:image/svg xml;base64,...
+                // because '+' is interpreted as space in application/x-www-form-urlencoded when not percent-encoded.
+                if (stripos($rawLogo, 'data:image/svg xml;base64,') === 0) {
+                    $rawLogo = 'data:image/svg+xml;base64,' . substr($rawLogo, strlen('data:image/svg xml;base64,'));
+                }
                 // New policy: Always attempt space → '+' repair inside base64 payload of a data URI.
                 // Rationale: Any space present is almost certainly a transport artifact of '+' being
                 // converted by x-www-form-urlencoded parsing. We treat ALL spaces as '+' and then
@@ -205,7 +219,9 @@ class ProfileViewsRequest extends FormRequest
     // (inline mime inference moved to LogoDataHelper for DRY)
 
     /**
-     * @param  array|mixed|null  $keys
+     * Return all request input including injected user_agent.
+     * @param list<string>|string|null $keys
+     * @return array<string, mixed>
      */
     public function all(mixed $keys = null): array
     {
@@ -218,7 +234,9 @@ class ProfileViewsRequest extends FormRequest
     }
 
     /**
-     * @param  array|int|string|null  $key
+     * Return validated data plus ensured user_agent; optionally a single key.
+     * @param list<string>|string|int|null $key
+     * @return array<string,mixed>|mixed
      */
     public function validated(mixed $key = null, mixed $default = null): mixed
     {
