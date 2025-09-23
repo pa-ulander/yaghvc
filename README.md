@@ -4,7 +4,7 @@
 
 A Laravel-based GitHub profile visitor counter and github repository visitor counter that generates customizable SVG badges to display on your GitHub profile or in a repository's README.
 
-Made only for fun and to try out new latest laravel and testing features. I just wanted to have a visitorcounter on my github profile.
+Made only for fun and to try out new latest Laravel and testing utilities, like PEST & Dusk. 
 
 ## Usage
 
