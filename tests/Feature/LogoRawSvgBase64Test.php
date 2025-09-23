@@ -22,6 +22,17 @@ class LogoRawSvgBase64Test extends TestCase
         $this->assertStringContainsString('data:image/svg+xml;base64', $content);
     }
 
+    public function test_embeds_raw_svg_base64_with_xml_declaration(): void
+    {
+        $svg = '<?xml version="1.0" encoding="utf-8"?><svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="24" height="24" fill="black"/></svg>';
+        $b64 = base64_encode($svg);
+        $url = '/?username=rawsvgxml&logo=' . $b64;
+        $response = $this->withHeaders(['User-Agent' => $this->ua])->get($url);
+        $response->assertOk();
+        $content = $response->getContent();
+        $this->assertStringContainsString('<image', $content, 'SVG with XML prolog should embed');
+    }
+
     public function test_rejects_unsafe_svg_with_script(): void
     {
         $svg = '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>';
