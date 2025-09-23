@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use PUGX\Poser\Badge;
 use PUGX\Poser\Calculator\SvgTextSizeCalculator;
 use PUGX\Poser\Poser;
@@ -160,6 +161,13 @@ class BadgeRenderService
 
     private function applyLogo(string $svg, string $logo, ?string $logoSize = null, ?string $logoColor = null, ?string $labelColor = null, ?string $messageBackgroundFill = null): string
     {
+        $this->debugLog('applyLogo:start', [
+            'input_length' => strlen($logo),
+            'logo_starts_with' => substr($logo, 0, 24),
+            'has_data_prefix' => str_starts_with($logo, 'data:'),
+            'size_param' => $logoSize,
+            'logo_color' => $logoColor,
+        ]);
         $dataUri = null;
         $width = 0;
         $height = 0;
@@ -168,26 +176,22 @@ class BadgeRenderService
             $processor = new LogoProcessor;
             $prepared = $processor->prepare($logo, $logoSize);
             if (! $prepared || ! isset($prepared['dataUri'])) {
+                $this->debugLog('applyLogo:prepare-empty', ['reason' => 'no prepared dataUri']);
                 // Fallback 1: treat as data URI if it already looks like one (existing logic below)
                 // Salvage: if the raw (possibly urlencoded) value looks like a data URI, inject minimally
                 $decoded = urldecode($logo);
                 if (str_starts_with($decoded, 'data:image/')) {
                     // Basic shape check: must contain ';base64,' and small enough
                     if (str_contains($decoded, ';base64,') && strlen($decoded) < 12000) { // widen guard
-                        $dataUri = $decoded;
+                        $dataUri = $this->canonicalizeDataUri($decoded);
+                        $this->debugLog('applyLogo:fallback-data-uri', [
+                            'decoded_length' => strlen($decoded),
+                            'canonical_length' => strlen($dataUri),
+                        ]);
+                        // Use geometry-aware embedding instead of raw injection to avoid text overlap.
                         $width = 14;
                         $height = 14; // default square
-                        // Inject directly at end
-                        if (! str_contains($svg, '<image')) {
-                            $fallbackImage = '<image x="4" y="2" width="' . $width . '" height="' . $height . '" href="' . $dataUri . '" />';
-                            if (str_contains($svg, '</svg>')) {
-                                $svg = str_replace('</svg>', $fallbackImage . '</svg>', $svg);
-                            } else {
-                                $svg .= $fallbackImage;
-                            }
-                        }
-
-                        return $svg;
+                        return $this->embedLogoInSvg($svg, $dataUri, 'png', $width, $height);
                     }
                 }
 
@@ -205,11 +209,16 @@ class BadgeRenderService
                                     if ($mime === 'svg+xml') {
                                         $san = \App\Services\LogoDataHelper::sanitizeSvg($bin);
                                         if ($san === null) {
+                                            $this->debugLog('applyLogo:raw-base64-sanitization-failed');
                                             return $svg; // unsafe
                                         }
                                         $bin = $san;
                                     }
-                                    $dataUri = 'data:image/' . $mime . ';base64,' . base64_encode($bin);
+                                    $dataUri = $this->canonicalizeDataUri('data:image/' . $mime . ';base64,' . base64_encode($bin));
+                                    $this->debugLog('applyLogo:raw-base64-success', [
+                                        'mime' => $mime,
+                                        'data_uri_length' => strlen($dataUri),
+                                    ]);
                                     $width = 14;
                                     $height = 14;
                                     $svg = $this->embedLogoInSvg($svg, $dataUri, $mime, $width, $height);
@@ -218,6 +227,7 @@ class BadgeRenderService
                             }
                         }
                     } else {
+                        $this->debugLog('applyLogo:raw-base64-normalization-failed');
                     }
                 }
 
@@ -226,17 +236,32 @@ class BadgeRenderService
             if (isset($prepared['binary'])) {
                 $maxBytes = $this->safeConfig('badge.logo_max_bytes', 10000);
                 if (strlen($prepared['binary']) > $maxBytes) {
+                    $this->debugLog('applyLogo:prepared-too-large', ['bytes' => strlen($prepared['binary']), 'max' => $maxBytes]);
                     return $svg;
                 }
             }
-            $dataUri = $prepared['dataUri'];
+            $dataUri = $this->canonicalizeDataUri($prepared['dataUri']);
             $width = (int) $prepared['width'];
             $height = (int) $prepared['height'];
             $mime = (string) $prepared['mime'];
+            $this->debugLog('applyLogo:prepared-success', [
+                'mime' => $mime,
+                'width' => $width,
+                'height' => $height,
+                'data_uri_length' => strlen($dataUri),
+            ]);
+
+            // Canonicalize raster data URIs so that raw base64 input and pre-built data URI
+            // yield identical embedded base64 (decode then re-encode). SVG may be recolored later.
+            if ($mime !== 'svg+xml' && isset($prepared['binary']) && is_string($prepared['binary'])) {
+                $dataUri = $this->canonicalizeDataUri('data:image/' . $mime . ';base64,' . base64_encode($prepared['binary']));
+                $this->debugLog('applyLogo:raster-canonicalized', ['new_length' => strlen($dataUri)]);
+            }
 
             // Derive auto color BEFORE default slug fallback so explicit auto overrides default logic.
             if ($logoColor === 'auto' && $mime === 'svg+xml') {
                 $logoColor = $this->deriveAutoLogoColor(svg: $svg, providedLabelColor: $labelColor, messageBackgroundFill: $messageBackgroundFill);
+                $this->debugLog('applyLogo:logoColor-auto-derived', ['derived' => $logoColor]);
             }
             // Provide default color for simple-icons slug if none specified (slug => not data URI input)
             if ($mime === 'svg+xml' && $logoColor === null && ! str_starts_with($logo, 'data:')) {
@@ -258,16 +283,19 @@ class BadgeRenderService
                     $hex = $this->getHexColor($logoColor);
                     $recolored = $this->recolorSvg($decodedSvg, $hex);
                     if ($recolored !== null) {
-                        $dataUri = 'data:image/svg+xml;base64,' . base64_encode($recolored);
+                        $dataUri = $this->canonicalizeDataUri('data:image/svg+xml;base64,' . base64_encode($recolored));
+                        $this->debugLog('applyLogo:recolor-success', ['hex' => $hex]);
                     }
                 }
             }
             $svg = $this->embedLogoInSvg($svg, $dataUri, $mime, $width, $height);
+            $this->debugLog('applyLogo:embed-complete');
         } catch (\Throwable $e) {
+            $this->debugLog('applyLogo:exception', ['msg' => $e->getMessage()]);
             // On exception we still attempt a salvage path
             $decoded = urldecode($logo);
             if (str_starts_with($decoded, 'data:image/') && str_contains($decoded, ';base64,') && strlen($decoded) < 16000) {
-                $dataUri = $decoded;
+                $dataUri = $this->canonicalizeDataUri($decoded);
                 $width = 14;
                 $height = 14;
                 if (! str_contains($svg, '<image')) {
@@ -277,20 +305,68 @@ class BadgeRenderService
                     } else {
                         $svg .= $fallbackImage;
                     }
+                    $this->debugLog('applyLogo:salvage-success');
                 }
             }
         }
-        // Deterministic fallback guaranteeing an <image> if we have a data URI
+        // Deterministic fallback: if we have a data URI but no <image>, invoke geometry embedding
         if ($dataUri && strpos($svg, '<image') === false) {
-            $fallbackImage = '<image x="4" y="2" width="' . ($width ?: 14) . '" height="' . ($height ?: 14) . '" href="' . $dataUri . '" />';
-            if (str_contains($svg, '</svg>')) {
-                $svg = str_replace('</svg>', $fallbackImage . '</svg>', $svg);
-            } else {
-                $svg .= $fallbackImage;
-            }
+            // Default mime guess if unknown
+            $useMime = $mime !== '' ? $mime : 'png';
+            $svg = $this->embedLogoInSvg($svg, $dataUri, $useMime, $width ?: 14, $height ?: 14);
+            $this->debugLog('applyLogo:post-fallback-embed');
         }
 
         return $svg;
+    }
+
+    /**
+     * Canonicalize a data URI by:
+     *  - Ensuring it matches data:image/<mime>;base64,<payload>
+     *  - Removing all whitespace within the base64 segment
+     *  - Converting spaces to '+' (defensive) before stripping
+     *  - Validating characters and re-encoding decoded binary to normalize padding
+     */
+    private function canonicalizeDataUri(string $dataUri): string
+    {
+        if (!str_starts_with($dataUri, 'data:image/') || !str_contains($dataUri, ';base64,')) {
+            return $dataUri; // not a candidate
+        }
+        [$prefix, $payload] = explode(';base64,', $dataUri, 2);
+        // Replace spaces -> '+' (transport artifact) then strip all ASCII whitespace
+        $sanitized = str_replace(' ', '+', $payload);
+        $sanitized = preg_replace('/\s+/', '', $sanitized) ?? $sanitized;
+        if ($sanitized === '') {
+            return $dataUri;
+        }
+        $mutated = $sanitized !== $payload;
+        // If alphabet invalid OR decode fails we still return sanitized (space-free) version
+        if (!preg_match('/^[A-Za-z0-9+\/]+=*$/', $sanitized)) {
+            if ($mutated) {
+                $this->debugLog('canonicalize:invalid-alphabet', [
+                    'original_len' => strlen($payload),
+                    'sanitized_len' => strlen($sanitized),
+                ]);
+            }
+            return $prefix . ';base64,' . $sanitized; // best-effort cleanup
+        }
+        $bin = base64_decode($sanitized, true);
+        if ($bin === false || $bin === '') {
+            if ($mutated) {
+                $this->debugLog('canonicalize:decode-failed');
+            }
+            return $prefix . ';base64,' . $sanitized;
+        }
+        // Re-encode for canonical padding & ordering
+        $reencoded = base64_encode($bin);
+        if ($mutated || $reencoded !== $sanitized) {
+            $this->debugLog('canonicalize:reencoded', [
+                'original_len' => strlen($payload),
+                'sanitized_len' => strlen($sanitized),
+                'reencoded_len' => strlen($reencoded),
+            ]);
+        }
+        return $prefix . ';base64,' . $reencoded;
     }
 
     /**
@@ -461,6 +537,11 @@ class BadgeRenderService
 
     private function embedLogoInSvg(string $svg, string $logoDataUri, string $mime, int $width = 16, int $height = 16): string
     {
+        $this->debugLog('embedLogoInSvg:start', [
+            'mime' => $mime,
+            'width' => $width,
+            'height' => $height,
+        ]);
         // 1. Determine badge base metrics
         $badgeHeight = 20;
         if (preg_match('/<svg[^>]*height="([0-9.]+)"/i', $svg, $hm)) {
@@ -477,24 +558,46 @@ class BadgeRenderService
 
         // 2. Extract width & rect metrics from original badge BEFORE modifications
         if (! preg_match('/<svg[^>]*width="([0-9.]+)"/i', $svg, $mTotal)) {
+            $this->debugLog('embedLogoInSvg:missing-total-width');
             // Geometry unexpected – fallback simple inject without width shifts
             return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
         $totalWidth = (float) $mTotal[1];
-        if (! preg_match('/<rect[^>]*width="([0-9.]+)"[^>]*fill="#555"[^>]*>/', $svg, $mLabel)) {
+        // Match label rect (fill #555) regardless of attribute order
+        if (
+            ! preg_match('/<rect[^>]*fill="#555"[^>]*width="([0-9.]+)"[^>]*>/', $svg, $mLabel) &&
+            ! preg_match('/<rect[^>]*width="([0-9.]+)"[^>]*fill="#555"[^>]*>/', $svg, $mLabel)
+        ) {
+            $this->debugLog('embedLogoInSvg:missing-label-rect');
             return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
         $labelWidth = (float) $mLabel[1];
 
         // Match status rect: has x attribute and a solid color fill (e.g. #97ca00)
-        if (! preg_match('/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', $svg, $mStatus)) {
+        if (
+            ! preg_match('/<rect[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*>/', $svg, $mStatus) &&
+            ! preg_match('/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', $svg, $mStatus)
+        ) {
+            $this->debugLog('embedLogoInSvg:missing-status-rect');
             return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
-        $statusX = (float) $mStatus[1];
-        $statusWidth = (float) $mStatus[2];
+        // Normalize capture groups depending on which pattern matched
+        if (count($mStatus) === 4 && str_starts_with($mStatus[0], '<rect') && isset($mStatus[1]) && strlen($mStatus[1]) <= 8) {
+            // Pattern where fill captured first then x then width
+            $statusX = (float) $mStatus[2];
+            $statusWidth = (float) $mStatus[3];
+        } else {
+            $statusX = (float) $mStatus[1];
+            $statusWidth = (float) $mStatus[2];
+        }
 
         // Sanity: ensure pieces line up to total width
         if (abs(($labelWidth + $statusWidth) - $totalWidth) > 0.05) {
+            $this->debugLog('embedLogoInSvg:width-mismatch', [
+                'labelWidth' => $labelWidth,
+                'statusWidth' => $statusWidth,
+                'totalWidth' => $totalWidth,
+            ]);
             return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
         }
 
@@ -520,7 +623,7 @@ class BadgeRenderService
             return str_replace('width="' . $m[1] . '"', 'width="' . $newLabelWidth . '"', $m[0]);
         }, $svg, 1) ?? $svg;
         // status rect x update
-        $statusPattern = '/<rect x="([0-9.]+)" width="([0-9.]+)" height="' . $badgeHeight . '" fill="#([0-9a-fA-F]{3,8})"\/>/';
+        $statusPattern = '/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*height="' . $badgeHeight . '"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/';
         $svg = preg_replace_callback($statusPattern, function (array $m) use ($statusX, $statusWidth, $newStatusX): string {
             if ((float) $m[1] !== $statusX || (float) $m[2] !== $statusWidth) {
                 return $m[0];
@@ -546,12 +649,20 @@ class BadgeRenderService
         } else {
             $svg = str_replace('</svg>', $logoElement . '</svg>', $svg);
         }
+        $this->debugLog('embedLogoInSvg:success', [
+            'new_total_width' => $newTotal,
+            'segment_added' => $segment,
+        ]);
 
         return $svg;
     }
 
     private function simpleInjectLogo(string $svg, string $logoDataUri, int $width, int $height, int $y): string
     {
+        $this->debugLog('simpleInjectLogo', [
+            'width' => $width,
+            'height' => $height,
+        ]);
         // Minimal fallback: insert before closing svg without changing geometry
         $fallback = '<image x="4" y="' . $y . '" width="' . $width . '" height="' . $height . '" href="' . $logoDataUri . '" />';
         if (str_contains($svg, '</svg>')) {
@@ -559,5 +670,28 @@ class BadgeRenderService
         }
 
         return $svg . $fallback;
+    }
+
+    /**
+     * Conditional debug logger for badge rendering internals.
+     * Accepts scalar/array context; suppressed unless config('badge.debug_logging') true.
+     */
+    private function debugLog(string $event, array $context = []): void
+    {
+        try {
+            $enabled = $this->safeConfig('badge.debug_logging', false);
+            if (! $enabled) {
+                return;
+            }
+            // Normalize potentially large payloads
+            foreach ($context as $k => $v) {
+                if (is_string($v) && strlen($v) > 256) {
+                    $context[$k] = substr($v, 0, 252) . '...';
+                }
+            }
+            Log::debug('[BadgeRender] ' . $event, $context);
+        } catch (\Throwable $e) {
+            // swallow – logging must never break badge rendering
+        }
     }
 }
