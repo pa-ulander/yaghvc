@@ -8,7 +8,7 @@ parameters:
         - routes/
 
     # Level 9 is the highest level
-    level: 4
+    level: 6
 
 #    ignoreErrors:
 #        - '#PHPDoc tag @var#'
