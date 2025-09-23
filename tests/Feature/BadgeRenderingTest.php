@@ -64,13 +64,13 @@ class BadgeRenderingTest extends TestCase
         $this->assertStringContainsString('<image', $response->getContent(), 'Expected large base64 PNG logo to embed');
     }
 
-    public function test_rejects_unencoded_data_uri_with_space(): void
+    public function test_unencoded_data_uri_with_single_space_is_repaired(): void
     {
-        // Insert a raw space (should be %20 if encoded) to simulate user error
-        $bad = 'data:image/png;base64,iVBOR w0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-        $this->get('/?username=badspace&logo=' . $bad)
-            ->assertStatus(422)
-            ->assertJsonPath('data.logo.0', fn($msg) => str_contains($msg, 'percent-encode'));
+        // Single space corruption inside base64 should be auto-repaired (space -> '+')
+        $corrupted = 'data:image/png;base64,iVBOR w0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+        $response = $this->get('/?username=badspace&logo=' . $corrupted);
+        $response->assertStatus(200);
+        $this->assertStringContainsString('<image', $response->getContent());
     }
 
     public function test_invalid_logo_slug_triggers_validation422(): void
@@ -176,5 +176,56 @@ class BadgeRenderingTest extends TestCase
         $response = $this->get('/?username=bigencpng&label=Visitors%20for%20me&color=orange&style=for-the-badge&abbreviated=true&logo=' . $encoded);
         $response->assertSuccessful();
         $this->assertStringContainsString('<image', $response->getContent(), 'Expected percent-encoded large PNG logo to embed');
+    }
+
+    public function test_embedded_data_uri_has_no_spaces(): void
+    {
+        $b64WithSpaces = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADkAAAA5CAYAAACMGIOF AAAACXBIWXMAAA7EAAAOxAGVKw4b';
+        $response = $this->get('/?username=spacetest&logo=' . $b64WithSpaces);
+        $response->assertStatus(200);
+        $svg = $response->getContent();
+        $this->assertStringContainsString('<image', $svg);
+        // Extract data uri
+        if (preg_match('/<image[^>]*href="(data:image\/png;base64,[^"]+)"/i', $svg, $m)) {
+            $this->assertStringNotContainsString(' ', $m[1], 'Embedded data URI still contains spaces');
+        } else {
+            $this->fail('Did not find embedded image element with data URI');
+        }
+    }
+
+    public function test_data_uri_logo_expands_label_geometry(): void
+    {
+        $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PvSxNwAAAABJRU5ErkJggg==';
+        $dataUri = 'data:image/png;base64,' . $pngBase64;
+        $response = $this->get('/?username=geomuser&logo=' . urlencode($dataUri));
+        $response->assertStatus(200);
+        $svg = $response->getContent();
+        // Capture original (without logo) for comparison
+        $noLogo = $this->get('/?username=geomuser2')->getContent();
+        // Extract label rect widths
+        // Height may vary (e.g., 20, 28) depending on style; match width + fill only.
+        $rectPattern = '/<rect[^>]*width="([0-9.]+)"[^>]*fill="#555"[^>]*>/';
+        preg_match($rectPattern, $noLogo, $mNo);
+        preg_match($rectPattern, $svg, $mWith);
+        $this->assertNotEmpty($mNo, 'Missing label rect in baseline badge');
+        $this->assertNotEmpty($mWith, 'Missing label rect in logo badge');
+        $baseWidth = (float)$mNo[1];
+        $logoWidth = (float)$mWith[1];
+        $this->assertGreaterThan($baseWidth, $logoWidth, 'Label width not expanded when logo present');
+    }
+
+    public function test_total_svg_width_increases_with_data_uri_logo(): void
+    {
+        $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PvSxNwAAAABJRU5ErkJggg==';
+        $dataUri = 'data:image/png;base64,' . $pngBase64;
+        $baseline = $this->get('/?username=geomwide')->getContent();
+        $withLogo = $this->get('/?username=geomwide2&logo=' . urlencode($dataUri))->getContent();
+        preg_match('/<svg[^>]*width="([0-9.]+)"/i', $baseline, $b);
+        preg_match('/<svg[^>]*width="([0-9.]+)"/i', $withLogo, $w);
+        $this->assertNotEmpty($b, 'Missing width in baseline svg');
+        $this->assertNotEmpty($w, 'Missing width in logo svg');
+        $base = (float)$b[1];
+        $logo = (float)$w[1];
+        $this->assertGreaterThan($base, $logo, 'SVG total width not increased when logo added');
     }
 }
