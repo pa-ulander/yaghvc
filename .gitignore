@@ -13,8 +13,11 @@ storage/*
 auth.json
 yarn-error.log
 /.vscode
+/.github/*.md
 clover.xml
 test_regex.php
 
 docs
 docs/*
+/*.txt
+scratch.*
