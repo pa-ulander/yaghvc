@@ -309,7 +309,7 @@ When using a simpleicon slug, or logo/icon with a fillable format, ie `svg`, you
 
 > [!NOTE]
 > `logoColor` only affects the fill color on simple icon slugs or `svg` logos.  
-> If you try to use it on a `png` or `jpg` logo it will have no effect.
+> If you try to use it on a `png` logo it will have no effect.
 
 <table>
 	<thead>
@@ -412,13 +412,11 @@ Display large numbers in abbreviated format (1K, 1.5M, etc.):
 
 Some limtiations are applied:
 
-* Maximum allowed logo bytes. Oversize images are ignored.
-* Maximum dimensions for raster formats. Oversized images are rejected.  
-  Use a logo no larger than 64x64 pixels and it should be fine.  
-* Unsupported / unrecognized formats are silently ignored.
-* If a logo is rejected the badge still renders without `logo` so your README does not break.
-
-
+* Maximum decoded logo size: 10 KB. Larger images are silently ignored.
+* Maximum raster (PNG width/height: 32×32 pixels. Larger raster images are silently ignored (not resized).
+* Supported formats: `png` and `svg`. Anything else is ignored without error.
+* Rejected / ignored logos never break the badge – it simply renders without the `logo`.
+* Basic rate limiting protects the service. If you see HTTP 429, reduce request frequency.
 
 
 ---
