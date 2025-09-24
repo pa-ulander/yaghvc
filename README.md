@@ -209,8 +209,11 @@ The visitor counter badge can be customized with the following URL parameters:
 	</tbody>
 </table>
 
+
 > [!NOTE]
 > You must specify hex colors without the `#` prefix (e.g., `f000ff` instead of `#f000ff`).
+
+<br>
 
 ### Custom Label `label`
 
@@ -339,49 +342,46 @@ You can use your own custom logo by embedding it as a data URI.
  
 Both works, but the first is preferred as it needs less processing and therefore gets rendered a little bit quicker.
 
-### Base 64 encoded SVG 
+### Logo from a base64 encoded and urlencoded SVG using full data URI
+This is the "proper" and recommended way to add a logo or icon to your badge. 
 
 ```m̀arkdown 
 ![](https://ghvc.kabelkultur.se?username=your-username&label=Visits&style=for-the-badge&logoColor=ffff00&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMjAuOTk5MiA1Ljk1ODQ2QzIxLjAwODcgNi41NjUgMjAuOTMzMyA3LjMyNjQ5IDIwLjg2NTggNy44ODA3QzIwLjgzOTUgOC4wOTY4NiAyMC44MDM3IDguMjc2NzYgMjAuNzY1MyA4LjQyNDUzQzIxLjYyMjcgMTAuMDEgMjIgMTEuOTE3NCAyMiAxNEMyMiAxNi40Njg0IDIwLjgxMjcgMTguNTAxIDE4Ljk2MzggMTkuODg3MUMxNy4xMzE5IDIxLjI2MDUgMTQuNjYwNiAyMiAxMiAyMkM5LjMzOTM5IDIyIDYuODY4MDkgMjEuMjYwNSA1LjAzNjIgMTkuODg3MUMzLjE4NzI3IDE4LjUwMSAyIDE2LjQ2ODQgMiAxNEMyIDExLjkxNzQgMi4zNzczMiAxMC4wMSAzLjIzNDcyIDguNDI0NTJDMy4xOTYzMSA4LjI3Njc2IDMuMTYwNTUgOC4wOTY4NSAzLjEzNDIyIDcuODgwN0MzLjA2NjczIDcuMzI2NDkgMi45OTEzMyA2LjU2NSAzLjAwMDgxIDUuOTU4NDZDMy4wMTE0OSA1LjI3NTA2IDMuMTAwODIgNC41OTE3IDMuMTk5ODggMy45MTM3OUMzLjI0NTY5IDMuNjAwMjggMy4zMTg0MyAzLjMwNTQ3IDMuNjU4ODMgMy4xMTkxN0M0LjAwNjU1IDIuOTI4ODYgNC4zNzI3NCAyLjk5OTgxIDQuNzMzOTggMy4xMDIxQzUuOTUyNDcgMy40NDcxMyA3LjA5NDg3IDMuOTMxMDggOC4xNjgwMyA0LjUxMjg3QzkuMjk5NSA0LjE3Mjg3IDEwLjU3ODMgNCAxMiA0QzEzLjQyMTcgNCAxNC43MDA1IDQuMTcyODcgMTUuODMyIDQuNTEyODdDMTYuOTA1MSAzLjkzMTA4IDE4LjA0NzUgMy40NDcxMyAxOS4yNjYgMy4xMDIxQzE5LjYyNzMgMi45OTk4MSAxOS45OTM1IDIuOTI4ODYgMjAuMzQxMiAzLjExOTE3QzIwLjY4MTYgMy4zMDU0NyAyMC43NTQzIDMuNjAwMjggMjAuODAwMSAzLjkxMzc5QzIwLjg5OTIgNC41OTE3IDIwLjk4ODUgNS4yNzUwNiAyMC45OTkyIDUuOTU4NDZaTTIwIDE0QzIwIDEyLjMxMjggMTkuNjEyMiAxMCAxNy41IDEwQzE2LjU0NzggMTAgMTUuNjQ3NCAxMC4yNTAyIDE0Ljc0NzQgMTAuNTAwNEMxMy44NDgyIDEwLjc1MDIgMTIuOTQ5NSAxMSAxMiAxMUMxMS4wNTA1IDExIDEwLjE1MTggMTAuNzUwMiA5LjI1MjYzIDEwLjUwMDRDOC4zNTI2MSAxMC4yNTAyIDcuNDUyMTYgMTAgNi41IDEwQzQuMzkzNzkgMTAgNCAxMi4zMTk3IDQgMTRDNCAxNS43NjM2IDQuODI3NDUgMTcuMjMxIDYuMjM1ODggMTguMjg2OUM3LjY2MTM1IDE5LjM1NTYgOS42OTAwNSAyMCAxMiAyMEMxNC4zMDk5IDIwIDE2LjMzODYgMTkuMzU1NSAxNy43NjQxIDE4LjI4NjlDMTkuMTcyNiAxNy4yMzEgMjAgMTUuNzYzNiAyMCAxNFpNMTAgMTQuNUMxMCAxNS44ODA3IDkuMzI4NDMgMTcgOC41IDE3QzcuNjcxNTcgMTcgNyAxNS44ODA3IDcgMTQuNUM3IDEzLjExOTMgNy42NzE1NyAxMiA4LjUgMTJDOS4zMjg0MyAxMiAxMCAxMy4xMTkzIDEwIDE0LjVaTTE1LjUgMTdDMTYuMzI4NCAxNyAxNyAxNS44ODA3IDE3IDE0LjVDMTcgMTMuMTE5MyAxNi4zMjg0IDEyIDE1LjUgMTJDMTQuNjcxNiAxMiAxNCAxMy4xMTkzIDE0IDE0LjVDMTQgMTUuODgwNyAxNC42NzE2IDE3IDE1LjUgMTdaIiBmaWxsPSIjMDAwMDAwIi8%2BDQo8L3N2Zz4%3D)
 ```
-<img src="./public_html/assets/logo-slug-refinedgithub.svg" alt="counter badge with yellow octocat as logo" />
+<img src="./public_html/assets/urlencoded-svg.svg" alt="counter badge with yellow octocat as logo" />
 
 
-### Base 64 encoded PNG:
+### Logo from a raw base64 encoded PNG using full data URI
 
-Small PNG via data URI:
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
+```markdown
+![](https://ghvc.kabelkultur.se/?username=your-username&label=Visits&style=for-the-badge&color=orange&labelColor=green&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKQSURBVFiFtdffi1VVFAfwzz3MOA4yDWr5A6VMHX0oIhlhBkPxReYlgp6MKFHM8Af4qqSI/gGJT9pTPkpvPUmo5NNERk1UoGFagSKi5kihAyP3Tg/7HOfM8ez7y3u/sOCw14/vOuvsvdY+Fa2hB8N4C6uwMF2fxN/4BT+h2mLchhjFWTzCTAOZxJcY6QTxm7jUBGlMLuKNdogrOIzpFyDPZBr7WyGfh686QFyUM+htRN6Dr7tAnsk5obpRnOoieSZHYuTvolYwPoTF+BgTLZBM4KPU93BBV8W2jDQrRz+u4bVCUqO4kj4n2CX0gB/xFx6mukV4HRvxq3Bka6luE8YLcX/DBrl+cTDyJmsj1WoF6yKxd2YGFdyIGG3uQAJbIrGvo5IIJVpT4lg1W8YXQVV5ax7CSIKxiONpz3+7djCOLyK6MbigvERlVWkXQxGObwhTrKi43UHyDHdKeP5M8HKJ8f0uJHCvZO2VROj9RQx0IYGXStb6ErPNJI8lGvTsFpGkMYt4mOBBiWIAb3cwgWEsKFm/l+BqxOmDDiawPbJ+FQ4oPyJPdOYoDmEqwrGP0KuLUzCTP4TLZ7tYjZuR2DW5WfNtTjGO73NJ/SvM8KUtEC/HMfwXIZ8R7ovP8H5OcR6vYoe5d8Iqfsbnyk9IBSeFcRyraF7eKzpfzim/wyBOlDjurfPmnzZBPCPctJ/DenM3yx5hA53AXTzGD+p/ipVNkE8J+64UH5ot3y0sSwmH8I7G94PeBuQ1TRzvz3IOvwv7Y1D4TCvU75A9DRI41Ig8w27xn5KeOn6xCjyVnvlWsFXoA8VgZcMrQ1+J/fU0Vlvox3H8kwvY12QCD4ReML9d8mIin6jzU5HD0dS2v5nA/wOcRnFtFu2FpwAAAABJRU5ErkJggg==)
 ```
 
-![](https://81307b99fe4c.ngrok-free.app/?username=tuut&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
-
-Raw base64 (no data URI) – same image:
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)
-```
-
-URL‑encoded raw base64 also works (decoded automatically):
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg%3D%3D)
-```
+<img src="./public_html/assets/encoded-png.svg" alt="counter badge with yellow octocat as logo" />
 
 
+<br>
 
-### Logo Size
+> [!NOTE]
+> The above examples will work also if the data uri part: ` data:image/png;base64, ` is omitted and only the raw encoded string is used.  <br><br>
+> But that is not recommended as it takes longer to process, and the logo can also be refused by validation or just ignored.  
+> Use the recommended way to avoid feelings of hurt  🫶 
+> <br>
+> The best option is to use the full data uri and also urlencode the logo string.
+
+<br>
+
+## Logo Size
 
 When using logo, you can also set logoSize
 
-SVG with automatic aspect scaling:
+### Automatic aspect scaling:
 
 ```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=<your-encoded-svg-data-uri>&logoSize=auto)
+![](https://ghvc.kabelkultur.se?username=your-username&logo=<your-encoded-image-data-uri>&logoSize=auto)
 ```
 
-Sizing:
+### Sizing:
 
 ```
 logoSize=auto   # scale width to maintain intrinsic aspect ratio at target height
@@ -408,7 +408,7 @@ Display large numbers in abbreviated format (1K, 1.5M, etc.):
 
 
 
-### Limitations
+## Limitations
 
 Some limtiations are applied:
 
