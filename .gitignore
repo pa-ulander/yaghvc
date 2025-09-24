@@ -19,5 +19,9 @@ test_regex.php
 
 docs
 docs/*
+scripts
+scripts/*
+stubs
+stubs/*
 /*.txt
 scratch.*
