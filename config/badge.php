@@ -18,4 +18,10 @@ return [
     'logo_cache_ttl' => 3600, // seconds
     // Enable verbose geometry / logo debug logging (disabled by default for perf)
     'debug_logging' => env('BADGE_DEBUG_LOG', false),
+    // Requests per minute per IP for the badge endpoint (throttle:badge)
+    'rate_limit_per_minute' => env('BADGE_RATE_LIMIT_PER_MINUTE', 120),
+    // Optional burst limiting (short window). When enabled (>0), a secondary limiter
+    // caps the number of requests within the defined number of seconds for the same key.
+    'rate_limit_burst_max' => env('BADGE_RATE_LIMIT_BURST_MAX', 0), // 0 disables
+    'rate_limit_burst_decay_seconds' => env('BADGE_RATE_LIMIT_BURST_DECAY', 10),
 ];
