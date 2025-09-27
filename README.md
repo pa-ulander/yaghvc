@@ -98,7 +98,7 @@ The visitor counter badge can be customized with the following URL parameters:
 		</tr>
 		<tr>
 			<td><code>logoSize</code></td>
-			<td>Logo sizing: <code>auto</code> (SVG adapt) or fixed px (8–64)</td>
+			<td>Logo sizing: <code>auto</code> (SVG adapt) or fixed px (8–32)</td>
 			<td>14</td>
 			<td><code>logoSize=auto</code>, <code>logoSize=32</code></td>
 		</tr>
@@ -273,6 +273,17 @@ The visitor counter badge can be customized with the following URL parameters:
 	</tbody>
 </table>
 
+### Number Abbreviation
+
+Display large numbers in abbreviated format (1K, 1.5M, etc.):
+
+```
+![](https://ghvc.kabelkultur.se?username=your-username&abbreviated=true)
+```
+
+![](./public_html/assets/abbr.svg)
+
+
 ## Logo or icon usage
 
 Supported image types: <code>png | svg</code>
@@ -359,21 +370,18 @@ This is the "proper" and recommended way to add a logo or icon to your badge.
 
 <img src="./public_html/assets/encoded-png.svg" alt="counter badge with yellow octocat as logo" />
 
-
 <br>
 
 > [!NOTE]
-> The above examples will work also if the data uri part: ` data:image/png;base64, ` is omitted and only the raw encoded string is used.  <br><br>
+> The above examples will work also if the data uri part: ` data:image/png;base64, ` is omitted and only the raw encoded string is used. 
 > But that is not recommended as it takes longer to process, and the logo can also be refused by validation or just ignored.  
-> Use the recommended way to avoid feelings of hurt  🫶 
-> <br>
-> The best option is to use the full data uri and also urlencode the logo string.
+> The recommended way is to use the full data uri and also urlencode the logo string.
 
-<br>
 
 ## Logo Size
 
-When using logo, you can also set logoSize
+When using logo, you can also set logoSize.  
+Max value is 32.
 
 ### Automatic aspect scaling:
 
@@ -387,24 +395,11 @@ When using logo, you can also set logoSize
 logoSize=auto   # scale width to maintain intrinsic aspect ratio at target height
 logoSize=32     # fixed square size (clamped to configured max)
 ```
-
-### Number Abbreviation
-
-Display large numbers in abbreviated format (1K, 1.5M, etc.):
-
+### Example with fixed size (28px):
 ```
-![](https://ghvc.kabelkultur.se?username=your-username&abbreviated=true)
+![](https://ghvc.kabelkultur.se?username=your-username&logo=<your-encoded-image-data-uri>&logoSize=28)
 ```
 
-![](./public_html/assets/abbr.svg)
-
-### Full Customization Example
-
-```
-![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&abbreviated=true)
-```
-
-![](./public_html/assets/full.svg)
 
 
 
@@ -419,7 +414,18 @@ Some limtiations are applied:
 * Basic rate limiting protects the service. If you see HTTP 429, reduce request frequency.
 
 
----
+
+## Full Customization Example
+
+```
+![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&abbreviated=true)
+```
+
+![](./public_html/assets/full.svg)
+
+
+<br>
+
 
 ## Acknowledgments
 
