@@ -1,10 +1,11 @@
 docker/db/data
 docker/var
-vendor
+/vendor
+/scripts
+/stubs
 
 *.cache
 storage/*
-/vendor
 .env
 .env.backup
 .env.production
@@ -15,13 +16,7 @@ yarn-error.log
 /.vscode
 /.github/*.md
 clover.xml
-test_regex.php
 
-docs
-docs/*
-scripts
-scripts/*
-stubs
-stubs/*
+/docs
 /*.txt
 scratch.*
