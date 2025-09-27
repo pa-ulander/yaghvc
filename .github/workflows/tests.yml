@@ -54,6 +54,13 @@ jobs:
             cp .env.ci.testing .env
             php artisan key:generate
 
+      - name: Ensure Laravel storage and cache directories exist
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/cache/data
+          mkdir -p storage/framework/views
+          mkdir -p storage/logs
+
       - name: Execute tests
         run: composer test
 
