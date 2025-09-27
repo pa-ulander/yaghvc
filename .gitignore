@@ -1,7 +1,6 @@
 docker/db/data
 docker/var
 /vendor
-/scripts
 /stubs
 
 *.cache
