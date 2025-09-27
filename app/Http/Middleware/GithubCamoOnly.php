@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
+/** @package App\Http\Middleware */
 class GithubCamoOnly
 {
     /**
@@ -19,10 +20,12 @@ class GithubCamoOnly
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $userAgent = $request->header('User-Agent');
+        $userAgent = $request->header(key: 'User-Agent');
+
+        $githubCamoOnly = $this->boolConfig(key: 'auth.github_camo_only', default: true);
 
         // Check if GitHub Camo restriction is disabled entirely
-        if (!config('auth.github_camo_only', true)) {
+        if (! $githubCamoOnly) {
             return $next($request);
         }
 
@@ -32,23 +35,67 @@ class GithubCamoOnly
         }
 
         // Allow all user agents if explicitly configured
-        if (config('auth.allow_all_user_agents', false)) {
+        if ($this->boolConfig(key: 'auth.allow_all_user_agents', default: false)) {
             return $next($request);
         }
 
         // Check if current environment is in the exceptions list
-        $environmentExceptions = config('auth.environment_exceptions', ['local', 'testing']);
-        if (in_array(app()->environment(), $environmentExceptions, true)) {
+        $environmentExceptions = $this->stringListConfig(key: 'auth.environment_exceptions', default: ['local', 'testing']);
+        if (in_array(needle: app()->environment(), haystack: $environmentExceptions, strict: true)) {
             return $next($request);
         }
 
         // Otherwise, block access
-        Log::warning('Unauthorized access attempt', [
+        Log::warning(message: 'Unauthorized access attempt', context: [
             'ip' => $request->ip(),
             'user_agent' => $userAgent,
             'path' => $request->path()
         ]);
 
-        return response('Unauthorized', 403);
+        return response(content: 'Unauthorized', status: 403);
+    }
+
+    private function boolConfig(string $key, bool $default): bool
+    {
+        $value = config(key: $key, default: $default);
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_string($value)) {
+            $normalized = strtolower($value);
+            if (in_array($normalized, ['1', 'true', 'yes', 'on'], true)) {
+                return true;
+            }
+            if (in_array($normalized, ['0', 'false', 'no', 'off'], true)) {
+                return false;
+            }
+        }
+        if (is_numeric($value)) {
+            return (int) $value === 1;
+        }
+        return $default;
+    }
+
+    /**
+     * @param list<string> $default
+     * @return list<string>
+     */
+    private function stringListConfig(string $key, array $default): array
+    {
+        $value = config(key: $key, default: $default);
+        if (! is_array($value)) {
+            return $default;
+        }
+        $strings = [];
+        foreach ($value as $item) {
+            if (is_string($item) && $item !== '') {
+                $strings[] = $item;
+            }
+        }
+        if ($strings === []) {
+            return $default;
+        }
+
+        return $strings;
     }
 }
