@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Services\LogoDataHelper;
 
+/** @package App\Http\Requests */
 class ProfileViewsRequest extends FormRequest
 {
     private const int MAX_USERNAME_LENGTH = 39;
@@ -61,6 +62,7 @@ class ProfileViewsRequest extends FormRequest
             'abbreviated' => ['nullable', 'boolean'],
             'labelColor' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
             'logoColor' => ['nullable', 'regex:/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|^[a-zA-Z]+$/'],
+
             // logo can be ONE of:
             //  1) simple-icons slug: [a-z0-9-]{1,60}
             //  2) raw data URI: data:image/<mime>;base64,<payload>
@@ -71,7 +73,7 @@ class ProfileViewsRequest extends FormRequest
             'logo' => [
                 'nullable',
                 'regex:' . self::LOGO_REGEX,
-                'max:5000', // preserve previous semantics
+                'max:5000',
             ],
             'logoSize' => ['nullable', 'regex:/^(auto|[0-9]{1,2})$/'],
             'user_agent' => ['required', 'string'],
@@ -93,7 +95,7 @@ class ProfileViewsRequest extends FormRequest
 
     public function failedValidation(Validator $validator): never
     {
-        Log::warning(message: 'Validation errors: ' . print_r($this->all(), true), context: $validator->errors()->toArray());
+        Log::warning(message: 'Validation errors: ' . print_r(value: $this->all(), return: true), context: $validator->errors()->toArray());
 
         throw new HttpResponseException(response: response()->json(data: [
             'success' => false,
@@ -108,40 +110,39 @@ class ProfileViewsRequest extends FormRequest
             'user_agent' => $this->header(key: 'User-Agent', default: ''),
         ];
 
-        if ($this->has('username') && ! empty($this->input(key: 'username'))) {
-            $mergeData['username'] = trim(string: preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $this->input(key: 'username')));
+        $usernameValue = $this->input(key: 'username');
+        if (is_string($usernameValue) && $usernameValue !== '') {
+            $sanitizedUsername = preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $usernameValue);
+            $mergeData['username'] = trim(string: $sanitizedUsername ?? $usernameValue);
 
             $optionalFields = ['label', 'color', 'style', 'base', 'repository', 'labelColor', 'logoColor', 'logoSize'];
 
             foreach ($optionalFields as $field) {
-                if ($this->input(key: $field) === null) {
+                $rawValue = $this->input(key: $field);
+                if ($rawValue === null || ! is_scalar($rawValue)) {
                     continue;
                 }
-                if ($this->has($field)) {
-                    $mergeData[$field] = trim(string: strip_tags(string: $this->input(key: $field)));
-                }
+                $cleaned = strip_tags(string: (string) $rawValue);
+                $mergeData[$field] = trim(string: $cleaned);
             }
 
-            if ($this->has('logo') && $this->input(key: 'logo') !== null) {
-                $rawLogo = trim(string: $this->input(key: 'logo'));
-                // Repair case where '+' in 'svg+xml' was converted to space by query parsing
-                // Example: data:image/svg+xml;base64,... arrives as data:image/svg xml;base64,...
-                // because '+' is interpreted as space in application/x-www-form-urlencoded when not percent-encoded.
-                if (stripos($rawLogo, 'data:image/svg xml;base64,') === 0) {
-                    $rawLogo = 'data:image/svg+xml;base64,' . substr($rawLogo, strlen('data:image/svg xml;base64,'));
+            $logoValue = $this->input(key: 'logo');
+            if (is_string($logoValue) && $logoValue !== '') {
+                $rawLogo = trim(string: $logoValue);
+
+                if (stripos(haystack: $rawLogo, needle: 'data:image/svg xml;base64,') === 0) {
+                    $suffix = (string) substr(string: $rawLogo, offset: strlen(string: 'data:image/svg xml;base64,'));
+                    $rawLogo = 'data:image/svg+xml;base64,' . $suffix;
                 }
-                // New policy: Always attempt space → '+' repair inside base64 payload of a data URI.
-                // Rationale: Any space present is almost certainly a transport artifact of '+' being
-                // converted by x-www-form-urlencoded parsing. We treat ALL spaces as '+' and then
-                // validate the repaired fragment shape. This makes full data URIs and raw base64 inputs
-                // behave identically from a consumer perspective.
-                if (str_starts_with(strtolower($rawLogo), 'data:image/') && str_contains($rawLogo, ';base64,')) {
-                    $parts = explode(';base64,', $rawLogo, 2);
-                    if (count($parts) === 2) {
+
+                if (str_starts_with(haystack: strtolower(string: $rawLogo), needle: 'data:image/') && str_contains(haystack: $rawLogo, needle: ';base64,')) {
+                    $parts = explode(separator: ';base64,', string: $rawLogo, limit: 2);
+                    if (count(value: $parts) === 2) {
                         [$header, $payload] = $parts;
-                        if (str_contains($payload, ' ')) {
-                            $repaired = str_replace(' ', '+', $payload);
-                            if (preg_match('/^[A-Za-z0-9+\/]+=*$/', rtrim($repaired, '='))) {
+                        if (str_contains(haystack: $payload, needle: ' ')) {
+                            $repaired = str_replace(search: ' ', replace: '+', subject: $payload);
+                            $trimmed = rtrim(string: $repaired, characters: '=');
+                            if ($trimmed !== '' && preg_match(pattern: '/^[A-Za-z0-9+\/]+$/', subject: $trimmed)) {
                                 $rawLogo = $header . ';base64,' . $repaired;
                             }
                         }
@@ -161,45 +162,45 @@ class ProfileViewsRequest extends FormRequest
     protected function passedValidation(): void
     {
         // Additional semantic validation for raw / urlencoded base64 logos that are not yet data URIs or slugs.
-        $logo = $this->input('logo');
-        if ($logo === null || $logo === '') {
+        $logo = $this->input(key: 'logo');
+        if (! is_string($logo) || $logo === '') {
             return;
         }
         // Skip if already data URI or slug pattern
-        if (preg_match('/^(data:image\/|data%3Aimage%2F)/i', $logo) || preg_match('/^[a-z0-9-]{1,60}$/i', $logo)) {
+        if (preg_match(pattern: '/^(data:image\/|data%3Aimage%2F)/i', subject: $logo) || preg_match(pattern: '/^[a-z0-9-]{1,60}$/i', subject: $logo)) {
             return;
         }
         // Candidate raw/encoded base64 – normalize & attempt decode + mime inference
-        $decodedOnce = urldecode($logo);
+        $decodedOnce = urldecode(string: $logo);
         // A raw base64 value in a query string may have had '+' interpreted as space. Reconstitute.
-        if (str_contains($decodedOnce, ' ') && !str_contains($decodedOnce, '+')) {
-            $decodedOnce = str_replace(' ', '+', $decodedOnce);
+        if (str_contains(haystack: $decodedOnce, needle: ' ') && !str_contains(haystack: $decodedOnce, needle: '+')) {
+            $decodedOnce = str_replace(search: ' ', replace: '+', subject: $decodedOnce);
         }
-        $candidate = preg_replace('/\s+/', '', $decodedOnce) ?? '';
-        if ($candidate === '' || !preg_match('/^[A-Za-z0-9+\/]+=*$/', $candidate)) {
-            $this->failLogo('Invalid base64 logo payload.');
+        $candidate = preg_replace(pattern: '/\s+/', replacement: '', subject: $decodedOnce) ?? $decodedOnce;
+        if ($candidate === '' || !preg_match(pattern: '/^[A-Za-z0-9+\/]+=*$/', subject: $candidate)) {
+            $this->failLogo(message: 'Invalid base64 logo payload.');
             return;
         }
-        $binary = base64_decode($candidate, true);
+        $binary = base64_decode(string: $candidate, strict: true);
         if ($binary === false || $binary === '') {
-            $this->failLogo('Invalid base64 logo payload.');
+            $this->failLogo(message: 'Invalid base64 logo payload.');
             return;
         }
         // MIME inference (must match allowed list)
-        $mime = LogoDataHelper::inferMime($binary);
+        $mime = LogoDataHelper::inferMime(binary: $binary);
         if ($mime === null) {
-            $this->failLogo('Unsupported or ambiguous logo format.');
+            $this->failLogo(message: 'Unsupported or ambiguous logo format.');
             return;
         }
         // Size enforcement (mirror LogoProcessor early constraints)
-        $maxBytes = (int) config('badge.logo_max_bytes', 10000);
-        if (!LogoDataHelper::withinSize($binary, $maxBytes)) {
-            $this->failLogo('Logo image exceeds maximum allowed size.');
+        $maxBytes = $this->intConfig(key: 'badge.logo_max_bytes', default: 10000);
+        if (!LogoDataHelper::withinSize(binary: $binary, maxBytes: $maxBytes)) {
+            $this->failLogo(message: 'Logo image exceeds maximum allowed size.');
             return;
         }
         if ($mime === 'svg+xml') {
-            if (LogoDataHelper::sanitizeSvg($binary) === null) {
-                $this->failLogo('Unsafe SVG content rejected.');
+            if (LogoDataHelper::sanitizeSvg(svg: $binary) === null) {
+                $this->failLogo(message: 'Unsafe SVG content rejected.');
                 return;
             }
         }
@@ -208,18 +209,17 @@ class ProfileViewsRequest extends FormRequest
     private function failLogo(string $message): void
     {
         $validator = $this->getValidatorInstance();
-        $validator->errors()->add('logo', $message);
-        throw new HttpResponseException(response()->json([
+        $validator->errors()->add(key: 'logo', message: $message);
+        throw new HttpResponseException(response: response()->json([
             'success' => false,
             'message' => 'Validation errors',
             'data' => $validator->errors(),
-        ], 422));
+        ], status: 422));
     }
-
-    // (inline mime inference moved to LogoDataHelper for DRY)
 
     /**
      * Return all request input including injected user_agent.
+     *
      * @param list<string>|string|null $keys
      * @return array<string, mixed>
      */
@@ -235,16 +235,35 @@ class ProfileViewsRequest extends FormRequest
 
     /**
      * Return validated data plus ensured user_agent; optionally a single key.
-     * @param list<string>|string|int|null $key
+     *
+     * @param array-key|null $key
      * @return array<string,mixed>|mixed
      */
     public function validated(mixed $key = null, mixed $default = null): mixed
     {
         $validated = $this->validator->validated();
         $all = $this->all();
+        $merged =  [...$validated, ...['user_agent' => $all['user_agent']]];
 
-        $merged = array_merge($validated, ['user_agent' => $all['user_agent']]);
+        if ($key !== null) {
+            return Arr::get(array: $merged, key: $key, default: $default);
+        }
 
-        return $key ? Arr::get(array: $merged, key: $key, default: $default) : $merged;
+        return $merged;
+    }
+
+    private function intConfig(string $key, int $default): int
+    {
+        $value = config(key: $key, default: $default);
+        if (is_int($value)) {
+            return $value;
+        }
+        if (is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+        if (is_float($value)) {
+            return (int) $value;
+        }
+        return $default;
     }
 }
