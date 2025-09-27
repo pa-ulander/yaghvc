@@ -117,7 +117,7 @@ class BadgeRenderService
             $svg = $this->applyLabelColor($svg, $labelColor);
         }
 
-        return $svg;
+        return $this->ensureAccessibleLabels($svg, $label, $message);
     }
 
     private function formatNumber(
@@ -157,6 +157,30 @@ class BadgeRenderService
         $genericPattern = '/(<rect[^>]*)(fill="[^"]*")([^>]*>)/';
         $replacement = '$1fill="#' . $hexColor . '"$3';
         return preg_replace($genericPattern, $replacement, $svg, 1) ?? $svg;
+    }
+
+    private function ensureAccessibleLabels(string $svg, string $label, string $message): string
+    {
+        $safeLabel = htmlspecialchars($label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeMessage = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $ariaContent = $safeLabel . ': ' . $safeMessage;
+
+        $updatedSvg = preg_replace('/aria-label="[^"]*"/', 'aria-label="' . $ariaContent . '"', $svg, 1);
+        if ($updatedSvg !== null) {
+            $svg = $updatedSvg;
+        }
+
+        $titlePattern = '/<title>[^<]*<\/title>/';
+        if (preg_match($titlePattern, $svg)) {
+            $replaced = preg_replace($titlePattern, '<title>' . $ariaContent . '</title>', $svg, 1);
+            if ($replaced !== null) {
+                return $replaced;
+            }
+            return $svg;
+        }
+
+        $injected = preg_replace('/<svg[^>]*>/', '$0<title>' . $ariaContent . '</title>', $svg, 1);
+        return $injected !== null ? $injected : $svg;
     }
 
     private function applyLogo(string $svg, string $logo, ?string $logoSize = null, ?string $logoColor = null, ?string $labelColor = null, ?string $messageBackgroundFill = null): string
@@ -389,9 +413,9 @@ class BadgeRenderService
         if (strlen($hex) === 3) {
             $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
         }
-        $int = hexdec(substr($hex, 0, 2));
-        $int2 = hexdec(substr($hex, 2, 2));
-        $int3 = hexdec(substr($hex, 4, 2));
+        $int = (int) hexdec(substr($hex, 0, 2));
+        $int2 = (int) hexdec(substr($hex, 2, 2));
+        $int3 = (int) hexdec(substr($hex, 4, 2));
         return [$int, $int2, $int3];
     }
 
@@ -503,14 +527,16 @@ class BadgeRenderService
                 return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
             }
             $totalWidth = (float) $mTotal[1];
-            if (! preg_match('/<rect[^>]*fill="#555"[^>]*width="([0-9.]+)"[^>]*>/', $svg, $mLabel) &&
+            if (
+                ! preg_match('/<rect[^>]*fill="#555"[^>]*width="([0-9.]+)"[^>]*>/', $svg, $mLabel) &&
                 ! preg_match('/<rect[^>]*width="([0-9.]+)"[^>]*fill="#555"[^>]*>/', $svg, $mLabel)
             ) {
                 $this->debugLog('embedLogoInSvg:missing-label-rect');
                 return $this->simpleInjectLogo($svg, $logoDataUri, $width, $height, $y);
             }
             $labelWidth = (float) $mLabel[1];
-            if (! preg_match('/<rect[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*>/', $svg, $mStatus) &&
+            if (
+                ! preg_match('/<rect[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*>/', $svg, $mStatus) &&
                 ! preg_match('/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', $svg, $mStatus)
             ) {
                 $this->debugLog('embedLogoInSvg:missing-status-rect');
