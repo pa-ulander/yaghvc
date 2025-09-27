@@ -57,19 +57,13 @@ class LogoProcessor
             }
         }
 
-        $cacheTtl = 0;
-        if (function_exists('config')) {
-            try {
-                $cacheTtl = (int) config('badge.logo_cache_ttl', 0);
-            } catch (\Throwable $e) {
-                $cacheTtl = 0; // container not ready
-            }
-        }
+        $cacheTtl = $this->configInt('badge.logo_cache_ttl', 0);
         $cacheKey = null;
         if ($cacheTtl > 0 && class_exists(Cache::class)) {
             $cacheKey = 'logo:' . sha1($raw . '|' . ($logoSize ?? ''));
             $cached = Cache::get($cacheKey);
-            if (is_array($cached)) {
+            if (is_array($cached) && $this->isPreparedPayload($cached)) {
+                /** @var array{dataUri:string,width:int,height:int,mime:string,binary?:string} $cached */
                 return $cached;
             }
         }
@@ -109,7 +103,7 @@ class LogoProcessor
                     $b64 = preg_replace('/\s+/', '', $b64) ?? $b64;
                     $bin = base64_decode($b64, true);
                     if ($bin !== false && $bin !== '') {
-                        $parsedMime = preg_replace('/[^a-z0-9+]+/i', '', $mime);
+                        $parsedMime = preg_replace('/[^a-z0-9+]+/i', '', $mime) ?? '';
                         $parsed = [
                             'mime' => $parsedMime === 'svg+xml' ? 'svg+xml' : ($parsedMime !== '' ? $parsedMime : 'png'),
                             'binary' => $bin,
@@ -126,13 +120,7 @@ class LogoProcessor
         // Leave sizing to outer code; return fixed by default.
         if ($parsed['mime'] !== 'svg+xml') {
             // Enforce byte size limit
-            $maxBytes = 10000;
-            if (function_exists('config')) {
-                try {
-                    $maxBytes = (int) config('badge.logo_max_bytes', 10000);
-                } catch (\Throwable $e) {
-                }
-            }
+            $maxBytes = $this->configInt('badge.logo_max_bytes', 10000);
             if (strlen($parsed['binary']) > $maxBytes) {
                 return null;
             }
@@ -146,13 +134,7 @@ class LogoProcessor
                     $intrinsicW = (int) $info[0];
                     $intrinsicH = (int) $info[1];
                     if ($intrinsicW > 0 && $intrinsicH > 0) {
-                        $maxDim = 64;
-                        if (function_exists('config')) {
-                            try {
-                                $maxDim = (int) config('badge.logo_max_dimension', 64);
-                            } catch (\Throwable $e) {
-                            }
-                        }
+                        $maxDim = $this->configInt('badge.logo_max_dimension', 64);
                         if ($intrinsicW > $maxDim || $intrinsicH > $maxDim) {
                             return null; // reject oversize raster
                         }
@@ -161,13 +143,7 @@ class LogoProcessor
             }
             if ($logoSize && $logoSize !== 'auto' && ctype_digit($logoSize)) {
                 $v = (int) $logoSize;
-                $maxDim = 64;
-                if (function_exists('config')) {
-                    try {
-                        $maxDim = (int) config('badge.logo_max_dimension', 64);
-                    } catch (\Throwable $e) {
-                    }
-                }
+                $maxDim = $this->configInt('badge.logo_max_dimension', 64);
                 $v = max(8, min($maxDim, $v));
                 $width = $height = $v;
             }
@@ -195,6 +171,48 @@ class LogoProcessor
             Cache::put($cacheKey, $cachePayload, $cacheTtl);
         }
         return $result;
+    }
+
+    /**
+     * @param array<mixed,mixed> $payload
+     */
+    private function isPreparedPayload(array $payload): bool
+    {
+        if (! isset($payload['dataUri'], $payload['width'], $payload['height'], $payload['mime'])) {
+            return false;
+        }
+        if (! is_string($payload['dataUri']) || ! is_string($payload['mime'])) {
+            return false;
+        }
+        if (! is_int($payload['width']) || ! is_int($payload['height'])) {
+            return false;
+        }
+        if (isset($payload['binary']) && ! is_string($payload['binary'])) {
+            return false;
+        }
+        return true;
+    }
+
+    private function configInt(string $key, int $default): int
+    {
+        if (! function_exists('config')) {
+            return $default;
+        }
+        try {
+            $value = config($key, $default);
+        } catch (\Throwable $e) {
+            return $default;
+        }
+        if (is_int($value)) {
+            return $value;
+        }
+        if (is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+        if (is_float($value)) {
+            return (int) $value;
+        }
+        return $default;
     }
 
     /** Convert spaces to plus, strip whitespace, ensure prefix stays. */
@@ -235,13 +253,7 @@ class LogoProcessor
             }
             $binary = $sanitized;
         }
-        $maxBytes = 10000;
-        if (function_exists('config')) {
-            try {
-                $maxBytes = (int) config('badge.logo_max_bytes', 10000);
-            } catch (\Throwable $e) {
-            }
-        }
+        $maxBytes = $this->configInt('badge.logo_max_bytes', 10000);
         if (!LogoDataHelper::withinSize($binary, $maxBytes)) {
             return null;
         }
@@ -308,13 +320,7 @@ class LogoProcessor
             $width = max(1, min(2 * $this->targetHeight, $width)); // clamp
         } elseif ($logoSize && ctype_digit($logoSize)) {
             $v = (int) $logoSize;
-            $maxDim = 64;
-            if (function_exists('config')) {
-                try {
-                    $maxDim = (int) config('badge.logo_max_dimension', 64);
-                } catch (\Throwable $e) {
-                }
-            }
+            $maxDim = $this->configInt('badge.logo_max_dimension', 64);
             $v = max(8, min($maxDim, $v));
             $width = $height = $v; // square sizing
         }
@@ -361,7 +367,10 @@ class LogoProcessor
         }
         // Ensure width/height attributes for sizing (icons usually provide viewBox only)
         if (!preg_match('/width="/i', $svgContent)) {
-            $svgContent = preg_replace('/<svg /i', '<svg width="24" height="24" ', $svgContent, 1);
+            $patched = preg_replace('/<svg /i', '<svg width="24" height="24" ', $svgContent, 1);
+            if (is_string($patched)) {
+                $svgContent = $patched;
+            }
         }
         $svg = $svgContent;
         $dataUri = 'data:image/svg+xml;base64,' . base64_encode($svg);
