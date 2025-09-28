@@ -28,7 +28,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+        with:
+          fetch-depth: 0
+
       - name: Ensure Laravel storage and cache directories exist
         run: |
           mkdir -p bootstrap/cache
@@ -40,7 +42,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions:  gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
+          extensions: gd, pdo, zip, exif, bcmath, opcache, calendar, pdo_mysql, pdo_sqlite
           coverage: xdebug
 
       - name: Get Composer Cache Directory
@@ -54,16 +56,23 @@ jobs:
 
       - name: Install Composer dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
-        run: composer install --prefer-dist --no-interaction --no-progress 
+        run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Prepare Laravel Application
         run: |
-            cp .env.ci.testing .env
-            php artisan key:generate
+          cp .env.ci.testing .env
+          php artisan key:generate
       - name: Execute tests
         env:
           XDEBUG_MODE: coverage
         run: composer test
+
+      - name: Sync with latest main
+        run: |
+          git fetch origin main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rebase origin/main
 
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
