@@ -22,7 +22,7 @@ class GithubCamoOnly
     {
         $userAgent = $request->header(key: 'User-Agent');
 
-        $githubCamoOnly = $this->boolConfig(key: 'auth.github_camo_only', default: true);
+        $githubCamoOnly = $this->boolConfig('auth.github_camo_only', true);
 
         // Check if GitHub Camo restriction is disabled entirely
         if (! $githubCamoOnly) {
@@ -35,12 +35,12 @@ class GithubCamoOnly
         }
 
         // Allow all user agents if explicitly configured
-        if ($this->boolConfig(key: 'auth.allow_all_user_agents', default: false)) {
+        if ($this->boolConfig('auth.allow_all_user_agents', false)) {
             return $next($request);
         }
 
         // Check if current environment is in the exceptions list
-        $environmentExceptions = $this->stringListConfig(key: 'auth.environment_exceptions', default: ['local', 'testing']);
+        $environmentExceptions = $this->stringListConfig('auth.environment_exceptions', ['local', 'testing']);
         if (in_array(needle: app()->environment(), haystack: $environmentExceptions, strict: true)) {
             return $next($request);
         }
@@ -57,7 +57,7 @@ class GithubCamoOnly
 
     private function boolConfig(string $key, bool $default): bool
     {
-        $value = config(key: $key, default: $default);
+        $value = config($key, $default);
         if (is_bool($value)) {
             return $value;
         }
@@ -82,7 +82,7 @@ class GithubCamoOnly
      */
     private function stringListConfig(string $key, array $default): array
     {
-        $value = config(key: $key, default: $default);
+        $value = config($key, $default);
         if (! is_array($value)) {
             return $default;
         }
