@@ -61,6 +61,8 @@ jobs:
             cp .env.ci.testing .env
             php artisan key:generate
       - name: Execute tests
+        env:
+          XDEBUG_MODE: coverage
         run: composer test
 
       - name: Make code coverage badge

@@ -9,9 +9,11 @@ use App\Http\Requests\ProfileViewsRequest;
 use App\Models\ProfileViews;
 use App\Repositories\ProfileViewsRepository;
 use App\Services\BadgeRenderService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\ValidatedInput;
 
 beforeEach(function () {
     $badgeRenderService = app(BadgeRenderService::class);
@@ -250,5 +252,126 @@ it('handles multiple repositories for same user', function () {
     foreach ($repos as $repo) {
         $repoView = ProfileViews::where('username', $username)->where('repository', $repo)->first();
         expect($repoView->visit_count)->toBe(1);
+    }
+});
+
+it('returns 304 when if-none-match header matches badge etag', function () {
+    $controller = app('test.controller');
+    $method = new \ReflectionMethod(ProfileViewsController::class, 'createBadgeResponse');
+    $method->setAccessible(true);
+
+    $badge = '<svg>etag-me</svg>';
+    $etag = 'W/"' . sha1($badge) . '"';
+    $originalHeader = request()->headers->get('If-None-Match');
+
+    try {
+        request()->headers->set('If-None-Match', $etag);
+
+        $response = $method->invoke($controller, $badge);
+
+        expect($response->getStatusCode())->toBe(304)
+            ->and($response->getContent())->toBe('');
+    } finally {
+        if ($originalHeader === null) {
+            request()->headers->remove('If-None-Match');
+        } else {
+            request()->headers->set('If-None-Match', $originalHeader);
+        }
+    }
+});
+
+it('normalises validated input and arrays consistently', function () {
+    $controller = app('test.controller');
+    $reflection = new \ReflectionMethod(ProfileViewsController::class, 'normaliseValidatedInput');
+    $reflection->setAccessible(true);
+
+    $validated = new ValidatedInput(['foo' => 'bar']);
+    $asArray = $reflection->invoke($controller, $validated);
+    $directArray = $reflection->invoke($controller, ['baz' => 'qux']);
+
+    expect($asArray)->toBe(['foo' => 'bar'])
+        ->and($directArray)->toBe(['baz' => 'qux']);
+});
+
+it('extracts strings safely from normalised data', function () {
+    $controller = app('test.controller');
+    $method = new \ReflectionMethod(ProfileViewsController::class, 'stringFromSafe');
+    $method->setAccessible(true);
+
+    $missing = $method->invoke($controller, [], 'label');
+    $string = $method->invoke($controller, ['label' => 'visits'], 'label');
+    $intString = $method->invoke($controller, ['label' => 123], 'label');
+    $floatString = $method->invoke($controller, ['label' => 1.5], 'label');
+    $invalid = $method->invoke($controller, ['label' => ['nope']], 'label');
+
+    expect($missing)->toBeNull()
+        ->and($string)->toBe('visits')
+        ->and($intString)->toBe('123')
+        ->and($floatString)->toBe('1.5')
+        ->and($invalid)->toBeNull();
+});
+
+it('normalises booleans from varied safe input', function () {
+    $controller = app('test.controller');
+    $method = new \ReflectionMethod(ProfileViewsController::class, 'boolFromSafe');
+    $method->setAccessible(true);
+
+    $defaultTrue = $method->invoke($controller, [], 'flag', true);
+    $explicitFalse = $method->invoke($controller, ['flag' => false], 'flag', true);
+    $stringYes = $method->invoke($controller, ['flag' => 'YES'], 'flag', false);
+    $stringOff = $method->invoke($controller, ['flag' => 'off'], 'flag', true);
+    $stringZero = $method->invoke($controller, ['flag' => '0'], 'flag', true);
+    $numeric = $method->invoke($controller, ['flag' => 1], 'flag', false);
+    $invalid = $method->invoke($controller, ['flag' => ['maybe']], 'flag', true);
+
+    expect($defaultTrue)->toBeTrue()
+        ->and($explicitFalse)->toBeFalse()
+        ->and($stringYes)->toBeTrue()
+        ->and($stringOff)->toBeFalse()
+        ->and($stringZero)->toBeFalse()
+        ->and($numeric)->toBeTrue()
+        ->and($invalid)->toBeTrue();
+});
+
+it('reads configuration values with sane fallbacks', function () {
+    $controller = app('test.controller');
+    $stringMethod = new \ReflectionMethod(ProfileViewsController::class, 'stringConfig');
+    $stringMethod->setAccessible(true);
+    $boolMethod = new \ReflectionMethod(ProfileViewsController::class, 'boolConfig');
+    $boolMethod->setAccessible(true);
+
+    Config::set('tests.controller.string', 'value');
+    Config::set('tests.controller.string_invalid', ['nope']);
+    Config::set('tests.controller.bool_true', 'yes');
+    Config::set('tests.controller.bool_false', 'no');
+    Config::set('tests.controller.bool_numeric', 1);
+    Config::set('tests.controller.bool_invalid', ['array']);
+
+    expect($stringMethod->invoke($controller, 'tests.controller.string', 'fallback'))->toBe('value')
+        ->and($stringMethod->invoke($controller, 'tests.controller.string_invalid', 'fallback'))->toBe('fallback')
+        ->and($boolMethod->invoke($controller, 'tests.controller.bool_true', false))->toBeTrue()
+        ->and($boolMethod->invoke($controller, 'tests.controller.bool_false', true))->toBeFalse()
+        ->and($boolMethod->invoke($controller, 'tests.controller.bool_numeric', false))->toBeTrue()
+        ->and($boolMethod->invoke($controller, 'tests.controller.bool_invalid', true))->toBeTrue();
+});
+
+it('pulls query strings safely', function () {
+    $controller = app('test.controller');
+    $method = new \ReflectionMethod(ProfileViewsController::class, 'queryString');
+    $method->setAccessible(true);
+
+    $originalQuery = request()->query->all();
+
+    try {
+        request()->query->replace([
+            'label' => 'views',
+            'multi' => ['a', 'b'],
+        ]);
+
+        expect($method->invoke($controller, 'label'))->toBe('views')
+            ->and($method->invoke($controller, 'multi'))->toBeNull()
+            ->and($method->invoke($controller, 'missing'))->toBeNull();
+    } finally {
+        request()->query->replace($originalQuery);
     }
 });
