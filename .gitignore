@@ -14,7 +14,6 @@ auth.json
 yarn-error.log
 /.vscode
 /.github/*.md
-clover.xml
 
 /docs
 /*.txt
