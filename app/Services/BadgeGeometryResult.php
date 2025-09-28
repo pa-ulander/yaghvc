@@ -6,6 +6,8 @@ namespace App\Services;
 
 /**
  * Immutable value object encapsulating parsed badge geometry.
+ *
+ * @package App\Services
  */
 final class BadgeGeometryResult
 {
@@ -27,11 +29,11 @@ final class BadgeGeometryResult
         float $statusWidth,
         float $statusX,
     ): self {
-        return new self(true, 'none', $totalWidth, $height, $labelWidth, $statusWidth, $statusX);
+        return new self(success: true, reason: 'none', totalWidth: $totalWidth, height: $height, labelWidth: $labelWidth, statusWidth: $statusWidth, statusX: $statusX);
     }
 
     public static function failure(string $reason): self
     {
-        return new self(false, $reason);
+        return new self(success: false, reason: $reason);
     }
 }
