@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <coverage generated="1759100805">
   <project timestamp="1759100805" name="Clover Coverage">
+=======
+<coverage generated="1759100637">
+  <project timestamp="1759100637" name="Clover Coverage">
+>>>>>>> d3614d430aa5f2f0e48de5d5e5116791da4a5524
     <package name="App\Console">
       <file name="/home/pa/projects/yagvc/app/Console/Kernel.php">
         <class name="App\Console\Kernel" namespace="App\Console">
@@ -274,7 +279,7 @@
         <line num="171" type="stmt" count="23"/>
         <line num="174" type="stmt" count="8"/>
         <line num="176" type="stmt" count="8"/>
-        <line num="177" type="stmt" count="5"/>
+        <line num="177" type="stmt" count="4"/>
         <line num="179" type="stmt" count="8"/>
         <line num="180" type="stmt" count="8"/>
         <line num="181" type="stmt" count="0"/>
