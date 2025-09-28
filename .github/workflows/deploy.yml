@@ -41,11 +41,15 @@ jobs:
             --exclude='.github*' \
             --exclude='.phan*' \
             --exclude='.env*' \
+            --exclude='.vscode' \
             --exclude='Makefile' \
             --exclude='.dockerignore' \
             --exclude='.styleci.yml' \
             --exclude='README.md' \
             --exclude='vendor' \
+            --exclude='docs' \
+            --exclude='scripts' \
+            --exclude='stubs' \
             --exclude='docker' \
             --exclude='Dockerfile' \
             --exclude='docker-compose.yml' \
