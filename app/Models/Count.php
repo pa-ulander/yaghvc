@@ -22,8 +22,8 @@ class Count extends Model
 
     public function __construct(int|float $count = 1)
     {
-        if (is_float($count)) {
-            if (! is_finite($count) || floor($count) !== $count) {
+        if (is_float(value: $count)) {
+            if (! is_finite(num: $count) || floor(num: $count) !== $count) {
                 throw new \InvalidArgumentException(message: 'Number of views must be a whole number');
             }
         }
@@ -57,7 +57,7 @@ class Count extends Model
     public function plus(self $that): self
     {
         if ($this->count > PHP_INT_MAX - $that->count) {
-            throw new \InvalidArgumentException('Max number of views reached');
+            throw new \InvalidArgumentException(message: 'Max number of views reached');
         }
 
         $sum = $this->count + $that->count;
