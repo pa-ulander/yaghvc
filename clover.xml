@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1759101080">
-  <project timestamp="1759101080" name="Clover Coverage">
+<coverage generated="1759101085">
+  <project timestamp="1759101085" name="Clover Coverage">
     <package name="App\Console">
       <file name="/home/runner/work/yaghvc/yaghvc/app/Console/Kernel.php">
         <class name="App\Console\Kernel" namespace="App\Console">
