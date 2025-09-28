@@ -50,10 +50,10 @@ class ProfileViews extends Model
             if ($repository !== null) {
                 $query->where(column: 'repository', operator: '=', value: $repository);
             } else {
-                $query->whereNull('repository');
+                $query->whereNull(columns: 'repository');
             }
 
-            $profileView = $query->first(['visit_count']);
+            $profileView = $query->first(columns: ['visit_count']);
             if ($profileView === null) {
                 return 0;
             }
