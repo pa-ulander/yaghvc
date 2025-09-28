@@ -112,8 +112,8 @@ class ProfileViewsRequest extends FormRequest
 
         $usernameValue = $this->input(key: 'username');
         if (is_string($usernameValue) && $usernameValue !== '') {
-            $sanitizedUsername = preg_replace(pattern: '/[^\p{L}\p{N}_-]/u', replacement: '', subject: $usernameValue);
-            $mergeData['username'] = trim(string: $sanitizedUsername ?? $usernameValue);
+            $sanitizedUsername = preg_replace('/[^\p{L}\p{N}_-]/u', '', $usernameValue);
+            $mergeData['username'] = trim($sanitizedUsername ?? $usernameValue);
 
             $optionalFields = ['label', 'color', 'style', 'base', 'repository', 'labelColor', 'logoColor', 'logoSize'];
 
@@ -122,13 +122,13 @@ class ProfileViewsRequest extends FormRequest
                 if ($rawValue === null || ! is_scalar($rawValue)) {
                     continue;
                 }
-                $cleaned = strip_tags(string: (string) $rawValue);
-                $mergeData[$field] = trim(string: $cleaned);
+                $cleaned = strip_tags((string) $rawValue);
+                $mergeData[$field] = trim($cleaned);
             }
 
             $logoValue = $this->input(key: 'logo');
             if (is_string($logoValue) && $logoValue !== '') {
-                $rawLogo = trim(string: $logoValue);
+                $rawLogo = trim($logoValue);
 
                 if (stripos(haystack: $rawLogo, needle: 'data:image/svg xml;base64,') === 0) {
                     $suffix = (string) substr(string: $rawLogo, offset: strlen(string: 'data:image/svg xml;base64,'));
@@ -136,13 +136,13 @@ class ProfileViewsRequest extends FormRequest
                 }
 
                 if (str_starts_with(haystack: strtolower(string: $rawLogo), needle: 'data:image/') && str_contains(haystack: $rawLogo, needle: ';base64,')) {
-                    $parts = explode(separator: ';base64,', string: $rawLogo, limit: 2);
-                    if (count(value: $parts) === 2) {
+                    $parts = explode(';base64,', $rawLogo, 2);
+                    if (count($parts) === 2) {
                         [$header, $payload] = $parts;
                         if (str_contains(haystack: $payload, needle: ' ')) {
-                            $repaired = str_replace(search: ' ', replace: '+', subject: $payload);
-                            $trimmed = rtrim(string: $repaired, characters: '=');
-                            if ($trimmed !== '' && preg_match(pattern: '/^[A-Za-z0-9+\/]+$/', subject: $trimmed)) {
+                            $repaired = str_replace(' ', '+', $payload);
+                            $trimmed = rtrim($repaired, '=');
+                            if ($trimmed !== '' && preg_match('/^[A-Za-z0-9+\/]+$/', $trimmed)) {
                                 $rawLogo = $header . ';base64,' . $repaired;
                             }
                         }
@@ -156,7 +156,7 @@ class ProfileViewsRequest extends FormRequest
             }
         }
 
-        $this->merge(input: $mergeData);
+        $this->merge($mergeData);
     }
 
     protected function passedValidation(): void
@@ -171,17 +171,17 @@ class ProfileViewsRequest extends FormRequest
             return;
         }
         // Candidate raw/encoded base64 – normalize & attempt decode + mime inference
-        $decodedOnce = urldecode(string: $logo);
+        $decodedOnce = urldecode($logo);
         // A raw base64 value in a query string may have had '+' interpreted as space. Reconstitute.
-        if (str_contains(haystack: $decodedOnce, needle: ' ') && !str_contains(haystack: $decodedOnce, needle: '+')) {
-            $decodedOnce = str_replace(search: ' ', replace: '+', subject: $decodedOnce);
+        if (str_contains($decodedOnce, ' ') && ! str_contains($decodedOnce, '+')) {
+            $decodedOnce = str_replace(' ', '+', $decodedOnce);
         }
-        $candidate = preg_replace(pattern: '/\s+/', replacement: '', subject: $decodedOnce) ?? $decodedOnce;
-        if ($candidate === '' || !preg_match(pattern: '/^[A-Za-z0-9+\/]+=*$/', subject: $candidate)) {
+        $candidate = preg_replace('/\s+/', '', $decodedOnce) ?? $decodedOnce;
+        if ($candidate === '' || ! preg_match('/^[A-Za-z0-9+\/]+=*$/', $candidate)) {
             $this->failLogo(message: 'Invalid base64 logo payload.');
             return;
         }
-        $binary = base64_decode(string: $candidate, strict: true);
+        $binary = base64_decode($candidate, true);
         if ($binary === false || $binary === '') {
             $this->failLogo(message: 'Invalid base64 logo payload.');
             return;
@@ -193,7 +193,7 @@ class ProfileViewsRequest extends FormRequest
             return;
         }
         // Size enforcement (mirror LogoProcessor early constraints)
-        $maxBytes = $this->intConfig(key: 'badge.logo_max_bytes', default: 10000);
+        $maxBytes = $this->intConfig('badge.logo_max_bytes', 10000);
         if (!LogoDataHelper::withinSize(binary: $binary, maxBytes: $maxBytes)) {
             $this->failLogo(message: 'Logo image exceeds maximum allowed size.');
             return;
@@ -209,8 +209,8 @@ class ProfileViewsRequest extends FormRequest
     private function failLogo(string $message): void
     {
         $validator = $this->getValidatorInstance();
-        $validator->errors()->add(key: 'logo', message: $message);
-        throw new HttpResponseException(response: response()->json([
+        $validator->errors()->add('logo', $message);
+        throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Validation errors',
             'data' => $validator->errors(),
@@ -225,9 +225,9 @@ class ProfileViewsRequest extends FormRequest
      */
     public function all(mixed $keys = null): array
     {
-        $data = parent::all(keys: $keys);
+        $data = parent::all($keys);
         if (! isset($data['user_agent'])) {
-            $data['user_agent'] = $this->header(key: 'User-Agent', default: '');
+            $data['user_agent'] = $this->header('User-Agent', '');
         }
 
         return $data;
@@ -246,7 +246,7 @@ class ProfileViewsRequest extends FormRequest
         $merged =  [...$validated, ...['user_agent' => $all['user_agent']]];
 
         if ($key !== null) {
-            return Arr::get(array: $merged, key: $key, default: $default);
+            return Arr::get($merged, $key, $default);
         }
 
         return $merged;
@@ -254,14 +254,14 @@ class ProfileViewsRequest extends FormRequest
 
     private function intConfig(string $key, int $default): int
     {
-        $value = config(key: $key, default: $default);
-        if (is_int($value)) {
+        $value = config($key, $default);
+        if (is_int(value: $value)) {
             return $value;
         }
-        if (is_string($value) && is_numeric($value)) {
+        if (is_string(value: $value) && is_numeric(value: $value)) {
             return (int) $value;
         }
-        if (is_float($value)) {
+        if (is_float(value: $value)) {
             return (int) $value;
         }
         return $default;
