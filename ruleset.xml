@@ -5,6 +5,7 @@
         <exclude name="PEAR.Functions.ValidDefaultValue"/>
         <exclude name="PSR2.Classes.PropertyDeclaration.Underscore"/>
     </rule>
+    <rule ref="./phpcs/Standards/Yagvc/Sniffs/Functions/NamedArgumentDenylistSniff.php"/>
     <exclude-pattern>vendor</exclude-pattern>
     <exclude-pattern>client</exclude-pattern>
 </ruleset>

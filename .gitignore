@@ -1,10 +1,10 @@
 docker/db/data
 docker/var
-vendor
+/vendor
+/stubs
 
 *.cache
 storage/*
-/vendor
 .env
 .env.backup
 .env.production
@@ -13,4 +13,9 @@ storage/*
 auth.json
 yarn-error.log
 /.vscode
+/.github/*.md
 clover.xml
+
+/docs
+/*.txt
+scratch.*

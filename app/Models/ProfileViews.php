@@ -4,20 +4,26 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @method static \Database\Factories\ProfileViewsFactory factory(...$parameters)
+ *
+ * @package App\Models
+ */
 class ProfileViews extends Model
 {
+    /** @use HasFactory<\Database\Factories\ProfileViewsFactory> */
     use HasFactory;
 
     public const UPDATED_AT = null;
-
     /**
      * The attributes that are mass assignable.
      */
+    /** @var list<string> */
     protected $fillable = [
         'username',
         'repository',
@@ -27,26 +33,35 @@ class ProfileViews extends Model
 
     public $timestamps = true;
 
+    /** @var array<string,string> */
     protected $casts = [
         'last_visit' => 'datetime',
+        'visit_count' => 'int',
     ];
 
-    public function getCount(string $username, ?string $repository = null): mixed
+    public function getCount(string $username, ?string $repository = null): int
     {
         $cacheKey = $repository ? "count-{$username}-{$repository}" : "count-{$username}";
 
-        return Cache::remember(key: $cacheKey, ttl: 1, callback: function () use ($username, $repository): int {
-            $query = self::where(column: 'username', operator: $username);
+        /** @var int $count */
+        $count = Cache::remember(key: $cacheKey, ttl: 1, callback: function () use ($username, $repository): int {
+            $query = self::query()->where(column: 'username', operator: '=', value: $username);
 
             if ($repository !== null) {
-                $query->where(column: 'repository', operator: $repository);
+                $query->where(column: 'repository', operator: '=', value: $repository);
             } else {
-                $query->whereNull('repository');
+                $query->whereNull(columns: 'repository');
             }
 
-            $profileView = $query->first();
-            return $profileView->visit_count ?? 0;
+            $profileView = $query->first(columns: ['visit_count']);
+            if ($profileView === null) {
+                return 0;
+            }
+
+            return (int) ($profileView->visit_count ?? 0);
         });
+
+        return $count;
     }
 
     public function incrementCount(): void
@@ -62,5 +77,13 @@ class ProfileViews extends Model
         // Clear both profile and repository-specific caches
         $cacheKey = $this->repository ? "count-{$this->username}-{$this->repository}" : "count-{$this->username}";
         Cache::forget(key: $cacheKey);
+    }
+
+    /**
+     * @return \Database\Factories\ProfileViewsFactory
+     */
+    protected static function newFactory(): \Database\Factories\ProfileViewsFactory
+    {
+        return \Database\Factories\ProfileViewsFactory::new();
     }
 }
