@@ -68,6 +68,7 @@ jobs:
         run: composer test
 
       - name: Sync with latest main
+        if: matrix.php == '8.4'
         run: |
           git fetch origin main
           git config user.name "github-actions[bot]"
@@ -75,8 +76,10 @@ jobs:
           git reset --soft origin/main
 
       - name: Make code coverage badge
+        if: matrix.php == '8.4'
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
           coverage_badge_path: code_coverage_badge.svg
+          report: clover.xml
           push_badge: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
