@@ -16,3 +16,9 @@ parameters:
     excludePaths:
         - ./storage?
         - ./routes/console.php
+
+services:
+    -
+        class: Yagvc\PHPStan\Rules\NoNamedArgumentsOnFunctionsRule
+        tags:
+            - phpstan.rules.rule
