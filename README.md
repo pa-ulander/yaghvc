@@ -378,29 +378,27 @@ This is the "proper" and recommended way to add a logo or icon to your badge.
 > The recommended way is to use the full data uri and also urlencode the logo string.
 
 
-## Logo Size
 
-When using logo, you can also set logoSize.  
-Max value is 32.
+## Logo size options
 
-### Automatic aspect scaling:
+Use the logoSize parameter to control how large the logo appears on your badge:
 
+`logoSize=auto` – keeps the logo’s original proportions while fitting it to the badge.
+`logoSize=12` – sets the logo to a specific size (any number from 8 up to 32). Handy when a logo feels too large or too small.  
+
+Examples:
+
+```markdown
+...&logo=github&logoSize=auto
+...&logo=github&logoSize=12
 ```
-![](https://ghvc.kabelkultur.se?username=your-username&logo=<your-encoded-image-data-uri>&logoSize=auto)
-```
 
-### Sizing:
+Try different values, refresh the badge, and pick the look you like best.
 
-```
-logoSize=auto   # scale width to maintain intrinsic aspect ratio at target height
-logoSize=32     # fixed square size (clamped to configured max)
-```
 ### Example with fixed size (28px):
 ```
 ![](https://ghvc.kabelkultur.se?username=your-username&logo=<your-encoded-image-data-uri>&logoSize=28)
 ```
-
-
 
 
 ## Limitations
