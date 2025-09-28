@@ -42,7 +42,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Yagvc\\PHPStan\\": "phpstan/",
+            "Yagvc\\Standards\\": "phpcs/Standards/Yagvc/"
         }
     },
     "scripts": {
