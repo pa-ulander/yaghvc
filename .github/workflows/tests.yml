@@ -67,13 +67,6 @@ jobs:
           XDEBUG_MODE: coverage
         run: composer test
 
-      - name: Sync with latest main
-        run: |
-          git fetch origin main
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rebase origin/main
-
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
