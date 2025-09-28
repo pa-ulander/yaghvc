@@ -8,7 +8,7 @@ parameters:
         - routes/
 
     # Level 9 is the highest level
-    level: 4
+    level: 9
 
 #    ignoreErrors:
 #        - '#PHPDoc tag @var#'
@@ -16,3 +16,9 @@ parameters:
     excludePaths:
         - ./storage?
         - ./routes/console.php
+
+services:
+    -
+        class: Yagvc\PHPStan\Rules\NoNamedArgumentsOnFunctionsRule
+        tags:
+            - phpstan.rules.rule

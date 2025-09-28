@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\ProfileViews;
 
+/** @package App\Repositories */
 class ProfileViewsRepository
 {
     public function findOrCreate(string $username, ?string $repository = null): ProfileViews

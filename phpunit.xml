@@ -21,6 +21,8 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- Lift badge rate limit during tests to avoid incidental throttling; feature tests will set specific values as needed -->
+        <env name="BADGE_RATE_LIMIT_PER_MINUTE" value="5000"/>
     </php>
     <source>
         <include>

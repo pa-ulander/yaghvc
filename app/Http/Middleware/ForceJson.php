@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/** @package App\Http\Middleware */
 class ForceJson
 {
     /**

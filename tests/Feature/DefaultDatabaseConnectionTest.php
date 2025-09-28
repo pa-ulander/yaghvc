@@ -17,6 +17,6 @@ class DefaultDatabaseConnectionTest extends TestCase
     {
         // dump(database_path('database.sqlite'));
         // dump(database_path('database.sqlite_testing'));
-        $this->assertSame(expected: 'sqlite_testing', actual: config(key: 'database.default'));
+        $this->assertSame(expected: 'sqlite_testing', actual: config('database.default'));
     }
 }
