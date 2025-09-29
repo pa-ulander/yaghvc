@@ -260,7 +260,7 @@ The visitor counter badge can be customized with the following URL parameters:
 | inactive    | `#9f9f9f` | —             | —         |
 
 > [!NOTE]
-**Any hex color can be used instead**   :art:
+> **Any hex color can be used instead**   :art:
 </details>
 
 ### Custom Label `label`
