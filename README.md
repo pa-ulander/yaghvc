@@ -273,6 +273,26 @@ The visitor counter badge can be customized with the following URL parameters:
 	</tbody>
 </table>
 
+### Color Combinations
+
+<details>
+<summary>All the named colors supported and the corresponding hex values:</summary>
+
+| Color Name  | Swatch                                                                                                                      | Color Name    | Swatch                                                                                                                      |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| brightgreen | <span style="display:inline-block;width:20px;height:20px;background-color:#44cc11;border:1px solid #ccc;"></span> `#44cc11` | green         | <span style="display:inline-block;width:20px;height:20px;background-color:#97ca00;border:1px solid #ccc;"></span> `#97ca00` |
+| yellowgreen | <span style="display:inline-block;width:20px;height:20px;background-color:#a4a61d;border:1px solid #ccc;"></span> `#a4a61d` | yellow        | <span style="display:inline-block;width:20px;height:20px;background-color:#dfb317;border:1px solid #ccc;"></span> `#dfb317` |
+| orange      | <span style="display:inline-block;width:20px;height:20px;background-color:#fe7d37;border:1px solid #ccc;"></span> `#fe7d37` | red           | <span style="display:inline-block;width:20px;height:20px;background-color:#e05d44;border:1px solid #ccc;"></span> `#e05d44` |
+| blue        | <span style="display:inline-block;width:20px;height:20px;background-color:#007ec6;border:1px solid #ccc;"></span> `#007ec6` | lightgray     | <span style="display:inline-block;width:20px;height:20px;background-color:#9f9f9f;border:1px solid #ccc;"></span> `#9f9f9f` |
+| lightgrey   | <span style="display:inline-block;width:20px;height:20px;background-color:#9f9f9f;border:1px solid #ccc;"></span> `#9f9f9f` | gray          | <span style="display:inline-block;width:20px;height:20px;background-color:#555555;border:1px solid #ccc;"></span> `#555555` |
+| grey        | <span style="display:inline-block;width:20px;height:20px;background-color:#555555;border:1px solid #ccc;"></span> `#555555` | blueviolet    | <span style="display:inline-block;width:20px;height:20px;background-color:#8a2be2;border:1px solid #ccc;"></span> `#8a2be2` |
+| success     | <span style="display:inline-block;width:20px;height:20px;background-color:#97ca00;border:1px solid #ccc;"></span> `#97ca00` | important     | <span style="display:inline-block;width:20px;height:20px;background-color:#fe7d37;border:1px solid #ccc;"></span> `#fe7d37` |
+| critical    | <span style="display:inline-block;width:20px;height:20px;background-color:#e05d44;border:1px solid #ccc;"></span> `#e05d44` | informational | <span style="display:inline-block;width:20px;height:20px;background-color:#007ec6;border:1px solid #ccc;"></span> `#007ec6` |
+| inactive    | <span style="display:inline-block;width:20px;height:20px;background-color:#9f9f9f;border:1px solid #ccc;"></span> `#9f9f9f` | —             | —                                                                                                                           |
+>[!NOTE]
+**Any hex color can be used instead**   :art:
+</details>
+
 ### Number Abbreviation
 
 Display large numbers in abbreviated format (1K, 1.5M, etc.):
