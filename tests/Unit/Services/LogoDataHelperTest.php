@@ -34,6 +34,24 @@ class LogoDataHelperTest extends TestCase
         $this->assertSame('svg+xml', LogoDataHelper::inferMime($svg));
     }
 
+    public function test_infer_mime_detects_jpeg(): void
+    {
+        $bin = hex2bin('FFD8FFDB');
+        $this->assertSame('jpeg', LogoDataHelper::inferMime($bin));
+    }
+
+    public function test_infer_mime_detects_gif87a(): void
+    {
+        $bin = 'GIF87a' . str_repeat("\x00", 10);
+        $this->assertSame('gif', LogoDataHelper::inferMime($bin));
+    }
+
+    public function test_infer_mime_detects_gif89a(): void
+    {
+        $bin = 'GIF89a' . str_repeat("\x00", 10);
+        $this->assertSame('gif', LogoDataHelper::inferMime($bin));
+    }
+
     public function test_sanitize_svg_rejects_script(): void
     {
         $unsafe = "<svg><script>alert(1)</script></svg>";
@@ -44,6 +62,18 @@ class LogoDataHelperTest extends TestCase
     {
         $safe = "<svg width='10' height='10'><rect width='10' height='10'/></svg>";
         $this->assertNotNull(LogoDataHelper::sanitizeSvg($safe));
+    }
+
+    public function test_sanitize_svg_rejects_javascript_href(): void
+    {
+        $unsafe = '<svg><a href="javascript:alert(1)"></a></svg>';
+        $this->assertNull(LogoDataHelper::sanitizeSvg($unsafe));
+    }
+
+    public function test_sanitize_svg_rejects_no_svg_element(): void
+    {
+        $unsafe = "<div><rect width='10' height='10'/></div>";
+        $this->assertNull(LogoDataHelper::sanitizeSvg($unsafe));
     }
 
     public function test_within_size(): void

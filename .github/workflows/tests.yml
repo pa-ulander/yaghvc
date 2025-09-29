@@ -49,20 +49,12 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
       - name: Install Composer dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Prepare Laravel Application
         run: |
           cp .env.ci.testing .env
           php artisan key:generate
-
-      - name: Clean previous coverage artifacts
-        if: matrix.php == '8.4'
-        run: |
-          rm -f clover.xml
-          rm -f coverage.clover
-          rm -f code_coverage_badge.svg
 
       - name: Execute tests
         env:
@@ -74,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: clover-coverage
-          path: clover.xml
+          path: coverage/clover.xml
 
   coverage-badge:
     needs: tests

@@ -31,7 +31,7 @@
     </source>
     <coverage>
         <report>
-            <clover outputFile="clover.xml" />
+            <clover outputFile="coverage/clover.xml" />
         </report>
     </coverage>
 </phpunit>

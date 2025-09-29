@@ -12,7 +12,25 @@ it('creates a Count instance with a valid count', function () {
 it('throws an exception when count is greater than PHP_INT_MAX', function () {
     $this->expectException(InvalidArgumentException::class);
     $this->expectExceptionMessage('Max number of views reached');
-    new Count(PHP_INT_MAX+1);
+    new Count(PHP_INT_MAX + 1);
+});
+
+it('throws an exception when float count is greater than or equal to PHP_INT_MAX', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Max number of views reached');
+    new Count((float) PHP_INT_MAX);
+});
+
+it('throws an exception when count is non-finite float', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Number of views must be a whole number');
+    new Count(INF);
+});
+
+it('throws an exception when count is non-whole float', function () {
+    $this->expectException(InvalidArgumentException::class);
+    $this->expectExceptionMessage('Number of views must be a whole number');
+    new Count(5.5);
 });
 
 it('throws an exception when count is zero or negative', function ($invalidCount) {

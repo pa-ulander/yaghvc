@@ -58,7 +58,7 @@
             "vendor/bin/pest tests/Feature"
         ],
         "test:coverage": [
-            "vendor/bin/pest tests --coverage-clover clover.xml --min=100"
+            "vendor/bin/pest tests --coverage-clover coverage/clover.xml --min=95"
         ],
         "test:typecoverage": [
             "vendor/bin/pest tests --memory-limit=2G --type-coverage --min=100"

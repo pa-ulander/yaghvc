@@ -15,6 +15,13 @@ yarn-error.log
 /.vscode
 /.github/*.md
 
+# Coverage files (keep badges in root)
+/coverage/
+*.clover
+clover.xml
+
+# Docs and scratch files
 /docs
 /*.txt
 scratch.*
+coverage/clover.xml
