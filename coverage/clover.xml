@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1759149301">
-  <project timestamp="1759149301" name="Clover Coverage">
+<coverage generated="1759153112">
+  <project timestamp="1759153112" name="Clover Coverage">
     <package name="App\Console">
       <file name="/home/runner/work/yaghvc/yaghvc/app/Console/Kernel.php">
         <class name="App\Console\Kernel" namespace="App\Console">
@@ -274,7 +274,7 @@
         <line num="177" type="stmt" count="23"/>
         <line num="180" type="stmt" count="13"/>
         <line num="182" type="stmt" count="13"/>
-        <line num="183" type="stmt" count="6"/>
+        <line num="183" type="stmt" count="5"/>
         <line num="185" type="stmt" count="13"/>
         <line num="186" type="stmt" count="13"/>
         <line num="187" type="stmt" count="1"/>
