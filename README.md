@@ -213,37 +213,6 @@ The visitor counter badge can be customized with the following URL parameters:
 > [!NOTE]
 > You must specify hex colors without the `#` prefix (e.g., `f000ff` instead of `#f000ff`).
 
-<br>
-
-### Custom Label `label`
-
-<table>
-	<thead>
-		<tr>
-			<th width="160px">Custom Label</th>
-			<th width="200px">Example</th>
-			<th>Markdown</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td><code>Profile%20Visitors</code></td>
-			<td><img src="./public_html/assets/label-pfv.svg" alt="Profile Visitors" /></td>
-			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)</code></td>
-		</tr>
-		<tr>
-			<td><code>Chocolate%20Cookies</code></td>
-			<td><img src="./public_html/assets/label-cho.svg" alt="Chocolate Cookies" /></td>
-			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)</code></td>
-		</tr>
-		<tr>
-			<td><code>Horsepowers</code></td>
-			<td><img src="./public_html/assets/label-hp.svg" alt="Horsepowers" /></td>
-			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)</code></td>
-		</tr>
-	</tbody>
-</table>
-
 ### Custom Label Color `labelColor`:
 
 <table>
@@ -292,6 +261,35 @@ The visitor counter badge can be customized with the following URL parameters:
 >[!NOTE]
 **Any hex color can be used instead**   :art:
 </details>
+
+### Custom Label `label`
+
+<table>
+	<thead>
+		<tr>
+			<th width="160px">Custom Label</th>
+			<th width="200px">Example</th>
+			<th>Markdown</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>Profile%20Visitors</code></td>
+			<td><img src="./public_html/assets/label-pfv.svg" alt="Profile Visitors" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Profile%20Visitors)</code></td>
+		</tr>
+		<tr>
+			<td><code>Chocolate%20Cookies</code></td>
+			<td><img src="./public_html/assets/label-cho.svg" alt="Chocolate Cookies" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Chocolate%20Cookies)</code></td>
+		</tr>
+		<tr>
+			<td><code>Horsepowers</code></td>
+			<td><img src="./public_html/assets/label-hp.svg" alt="Horsepowers" /></td>
+			<td><code>![](https://ghvc.kabelkultur.se?username=your-username&label=Horsepowers)</code></td>
+		</tr>
+	</tbody>
+</table>
 
 ### Number Abbreviation
 
