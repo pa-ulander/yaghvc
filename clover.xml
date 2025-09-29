@@ -2,7 +2,7 @@
 <coverage generated="1759144039">
   <project timestamp="1759144039" name="Clover Coverage">
     <package name="App\Console">
-      <file name="/home/pa/projects/yagvc/app/Console/Kernel.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Console/Kernel.php">
         <class name="App\Console\Kernel" namespace="App\Console">
           <metrics complexity="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="1" elements="2" coveredelements="2"/>
         </class>
@@ -12,13 +12,13 @@
       </file>
     </package>
     <package name="App\Http\Controllers">
-      <file name="/home/pa/projects/yagvc/app/Http/Controllers/Controller.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Http/Controllers/Controller.php">
         <class name="App\Http\Controllers\Controller" namespace="App\Http\Controllers">
           <metrics complexity="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
         </class>
         <metrics loc="18" ncloc="13" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Http/Controllers/ProfileViewsController.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Http/Controllers/ProfileViewsController.php">
         <class name="App\Http\Controllers\ProfileViewsController" namespace="App\Http\Controllers">
           <metrics complexity="36" methods="10" coveredmethods="10" conditionals="0" coveredconditionals="0" statements="95" coveredstatements="95" elements="105" coveredelements="105"/>
         </class>
@@ -131,7 +131,7 @@
       </file>
     </package>
     <package name="App\Http\Middleware">
-      <file name="/home/pa/projects/yagvc/app/Http/Middleware/ForceJson.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Http/Middleware/ForceJson.php">
         <class name="App\Http\Middleware\ForceJson" namespace="App\Http\Middleware">
           <metrics complexity="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="2" elements="3" coveredelements="3"/>
         </class>
@@ -140,7 +140,7 @@
         <line num="23" type="stmt" count="57"/>
         <metrics loc="26" ncloc="20" classes="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="2" elements="3" coveredelements="3"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Http/Middleware/GithubCamoOnly.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Http/Middleware/GithubCamoOnly.php">
         <class name="App\Http\Middleware\GithubCamoOnly" namespace="App\Http\Middleware">
           <metrics complexity="17" methods="3" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="39" coveredstatements="39" elements="42" coveredelements="42"/>
         </class>
@@ -190,7 +190,7 @@
       </file>
     </package>
     <package name="App\Http\Requests">
-      <file name="/home/pa/projects/yagvc/app/Http/Requests/ProfileViewsRequest.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Http/Requests/ProfileViewsRequest.php">
         <class name="App\Http\Requests\ProfileViewsRequest" namespace="App\Http\Requests">
           <metrics complexity="45" methods="10" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="120" coveredstatements="114" elements="130" coveredelements="123"/>
         </class>
@@ -328,7 +328,7 @@
       </file>
     </package>
     <package name="App\Models">
-      <file name="/home/pa/projects/yagvc/app/Models/Count.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Models/Count.php">
         <class name="App\Models\Count" namespace="App\Models">
           <metrics complexity="11" methods="5" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="20" coveredstatements="19" elements="25" coveredelements="23"/>
         </class>
@@ -359,7 +359,7 @@
         <line num="72" type="stmt" count="1"/>
         <metrics loc="75" ncloc="66" classes="1" methods="5" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="20" coveredstatements="19" elements="25" coveredelements="23"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Models/ProfileViews.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Models/ProfileViews.php">
         <class name="App\Models\ProfileViews" namespace="App\Models">
           <metrics complexity="8" methods="3" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="20" coveredstatements="20" elements="23" coveredelements="23"/>
         </class>
@@ -390,7 +390,7 @@
       </file>
     </package>
     <package name="App\Providers">
-      <file name="/home/pa/projects/yagvc/app/Providers/AppServiceProvider.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Providers/AppServiceProvider.php">
         <class name="App\Providers\AppServiceProvider" namespace="App\Providers">
           <metrics complexity="16" methods="5" coveredmethods="5" conditionals="0" coveredconditionals="0" statements="44" coveredstatements="44" elements="49" coveredelements="49"/>
         </class>
@@ -425,7 +425,7 @@
         <line num="57" type="stmt" count="58"/>
         <line num="58" type="stmt" count="58"/>
         <line num="59" type="stmt" count="58"/>
-        <line num="60" type="stmt" count="2"/>
+        <line num="60" type="stmt" count="57"/>
         <line num="63" type="stmt" count="58"/>
         <line num="64" type="stmt" count="220"/>
         <line num="70" type="method" name="sanitizeKeySegment" visibility="private" complexity="2" crap="2" count="59"/>
@@ -437,9 +437,9 @@
         <line num="81" type="stmt" count="58"/>
         <line num="84" type="method" name="intFromMixed" visibility="private" complexity="5" crap="5" count="59"/>
         <line num="86" type="stmt" count="59"/>
-        <line num="87" type="stmt" count="59"/>
-        <line num="89" type="stmt" count="53"/>
-        <line num="90" type="stmt" count="53"/>
+        <line num="87" type="stmt" count="7"/>
+        <line num="89" type="stmt" count="56"/>
+        <line num="90" type="stmt" count="56"/>
         <line num="92" type="stmt" count="1"/>
         <line num="93" type="stmt" count="1"/>
         <line num="95" type="stmt" count="1"/>
@@ -447,7 +447,7 @@
       </file>
     </package>
     <package name="App\Repositories">
-      <file name="/home/pa/projects/yagvc/app/Repositories/ProfileViewsRepository.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Repositories/ProfileViewsRepository.php">
         <class name="App\Repositories\ProfileViewsRepository" namespace="App\Repositories">
           <metrics complexity="2" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="10" coveredstatements="10" elements="11" coveredelements="11"/>
         </class>
@@ -466,7 +466,7 @@
       </file>
     </package>
     <package name="App\Services">
-      <file name="/home/pa/projects/yagvc/app/Services/BadgeGeometryParser.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Services/BadgeGeometryParser.php">
         <class name="App\Services\BadgeGeometryParser" namespace="App\Services">
           <metrics complexity="8" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="20" coveredstatements="20" elements="21" coveredelements="21"/>
         </class>
@@ -493,7 +493,7 @@
         <line num="52" type="stmt" count="51"/>
         <metrics loc="55" ncloc="48" classes="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="20" coveredstatements="20" elements="21" coveredelements="21"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Services/BadgeGeometryResult.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Services/BadgeGeometryResult.php">
         <class name="App\Services\BadgeGeometryResult" namespace="App\Services">
           <metrics complexity="3" methods="3" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="3" coveredstatements="3" elements="6" coveredelements="6"/>
         </class>
@@ -505,7 +505,7 @@
         <line num="37" type="stmt" count="4"/>
         <metrics loc="40" ncloc="35" classes="1" methods="3" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="3" coveredstatements="3" elements="6" coveredelements="6"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Services/BadgeRenderService.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Services/BadgeRenderService.php">
         <class name="App\Services\BadgeRenderService" namespace="App\Services">
           <metrics complexity="134" methods="21" coveredmethods="12" conditionals="0" coveredconditionals="0" statements="462" coveredstatements="419" elements="483" coveredelements="431"/>
         </class>
@@ -994,7 +994,7 @@
         <line num="758" type="stmt" count="0"/>
         <metrics loc="763" ncloc="691" classes="1" methods="21" coveredmethods="12" conditionals="0" coveredconditionals="0" statements="462" coveredstatements="419" elements="483" coveredelements="431"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Services/LogoDataHelper.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Services/LogoDataHelper.php">
         <class name="App\Services\LogoDataHelper" namespace="App\Services">
           <metrics complexity="18" methods="4" coveredmethods="2" conditionals="0" coveredconditionals="0" statements="31" coveredstatements="27" elements="35" coveredelements="29"/>
         </class>
@@ -1035,7 +1035,7 @@
         <line num="96" type="stmt" count="14"/>
         <metrics loc="99" ncloc="67" classes="1" methods="4" coveredmethods="2" conditionals="0" coveredconditionals="0" statements="31" coveredstatements="27" elements="35" coveredelements="29"/>
       </file>
-      <file name="/home/pa/projects/yagvc/app/Services/LogoProcessor.php">
+      <file name="/home/runner/work/yaghvc/yaghvc/app/Services/LogoProcessor.php">
         <class name="App\Services\LogoProcessor" namespace="App\Services">
           <metrics complexity="91" methods="10" coveredmethods="5" conditionals="0" coveredconditionals="0" statements="202" coveredstatements="185" elements="212" coveredelements="190"/>
         </class>
