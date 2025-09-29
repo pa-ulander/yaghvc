@@ -424,13 +424,11 @@ Some limtiations are applied:
 
 
 ## Self-hosting
-This is a Laravel-based application that can be self-hosted. See the project structure and Docker configuration for details on how to set up your own instance.  
-Documentation for development and self-hosting is in the making and will be added at some point. But if you know basic Laravel and Docker it should be fairly straightforward to get it up and running.  
+This is a Laravel-based application that can be self-hosted.  
+See the project structure and Docker configuration for details on how to set up your own instance.  
+Documentation for development and self-hosting is in the making and will be added at some point.  
+If you know basic Laravel and Docker it should be fairly straightforward to get it up and running.  
 Clone away and have badges of fun!  
-   
-Suggestions and questions, pr's etc are welcome. This project is made for fun and to learn & practise stuff, so any help or feedback is appreciated.
-
-<br>
 
 ## Acknowledgments
 
