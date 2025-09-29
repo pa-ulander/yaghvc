@@ -159,6 +159,12 @@ class ProfileViewsRequest extends FormRequest
         $this->merge($mergeData);
     }
 
+    /**
+     * Additional semantic validation and hardening for the `logo` parameter when supplied
+     * as raw (possibly URL‑encoded) base64 instead of a simple‑icons slug or data URI.
+     * All branches (invalid alphabet, decode failure, unsupported mime, oversize raster,
+     * unsafe svg, success) are covered by tests to ensure future refactors remain safe.
+     */
     protected function passedValidation(): void
     {
         // Additional semantic validation for raw / urlencoded base64 logos that are not yet data URIs or slugs.
