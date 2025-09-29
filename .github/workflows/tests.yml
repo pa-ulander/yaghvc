@@ -76,11 +76,43 @@ jobs:
           XDEBUG_MODE: coverage
         run: composer test
 
-      - name: Make code coverage badge
+      - name: Upload coverage artifact
         if: matrix.php == '8.4'
+        uses: actions/upload-artifact@v4
+        with:
+          name: clover-coverage
+          path: clover.xml
+
+  coverage-badge:
+    needs: tests
+    runs-on: ubuntu-24.04
+    if: needs.tests.result == 'success'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync with latest main
+        run: |
+          git fetch origin main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git reset --soft origin/main
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: clover-coverage
+          path: coverage
+
+      - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
           coverage_badge_path: code_coverage_badge.svg
-          report: clover.xml
+          report: coverage/clover.xml
           push_badge: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
