@@ -259,7 +259,7 @@ The visitor counter badge can be customized with the following URL parameters:
 | critical    | `#e05d44` | informational | `#007ec6` |
 | inactive    | `#9f9f9f` | —             | —         |
 
->[!NOTE]
+> [!NOTE]
 **Any hex color can be used instead**   :art:
 </details>
 
