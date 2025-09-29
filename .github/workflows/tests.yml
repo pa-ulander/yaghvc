@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4]
+        php: ["8.3", "8.4"]
 
     name: PHP ${{ matrix.php }}
 
@@ -69,6 +69,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git reset --soft origin/main
+
+      - name: Clean previous coverage artifacts
+        if: matrix.php == '8.4'
+        run: |
+          rm -f clover.xml
+          rm -f coverage.clover
+          rm -f code_coverage_badge.svg
 
       - name: Execute tests
         env:
