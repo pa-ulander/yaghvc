@@ -247,21 +247,19 @@ The visitor counter badge can be customized with the following URL parameters:
 <details>
 <summary>All the named colors supported and the corresponding hex values:</summary>
 
-| Color Name  | Swatch    | Color Name    | Swatch    |
-| ----------- | --------- | ------------- | --------- |
-| brightgreen | `#44cc11` | green         | `#97ca00` |
-| yellowgreen | `#a4a61d` | yellow        | `#dfb317` |
-| orange      | `#fe7d37` | red           | `#e05d44` |
-| blue        | `#007ec6` | lightgray     | `#9f9f9f` |
-| lightgrey   | `#9f9f9f` | gray          | `#555555` |
-| grey        | `#555555` | blueviolet    | `#8a2be2` |
-| success     | `#97ca00` | important     | `#fe7d37` |
-| critical    | `#e05d44` | informational | `#007ec6` |
-| inactive    | `#9f9f9f` | —             | —         |
+| Color Name    | Hex       | Color Name      | Hex       |
+| ------------- | --------- | --------------- | --------- |
+| `brightgreen` | `#44cc11` | `green`         | `#97ca00` |
+| `yellowgreen` | `#a4a61d` | `yellow`        | `#dfb317` |
+| `orange`      | `#fe7d37` | `red`           | `#e05d44` |
+| `blue`        | `#007ec6` | `lightgray`     | `#9f9f9f` |
+| `lightgrey`   | `#9f9f9f` | `gray`          | `#555555` |
+| `grey`        | `#555555` | `blueviolet`    | `#8a2be2` |
+| `success`     | `#97ca00` | `important`     | `#fe7d37` |
+| `critical`    | `#e05d44` | `informational` | `#007ec6` |
+| `inactive`    | `#9f9f9f` | —               | —         |
 
-
-**Any hex color can be used instead** :art:
-
+Any hex color can be used instead :art:
 </details>
 
 ### Custom Label `label`
