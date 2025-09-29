@@ -56,13 +56,6 @@ jobs:
         run: |
           cp .env.ci.testing .env
           php artisan key:generate
-      - name: Sync with latest main
-        if: matrix.php == '8.4'
-        run: |
-          git fetch origin main
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git reset --soft origin/main
 
       - name: Clean previous coverage artifacts
         if: matrix.php == '8.4'
