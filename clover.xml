@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1759144039">
-  <project timestamp="1759144039" name="Clover Coverage">
+<coverage generated="1759144486">
+  <project timestamp="1759144486" name="Clover Coverage">
     <package name="App\Console">
       <file name="/home/runner/work/yaghvc/yaghvc/app/Console/Kernel.php">
         <class name="App\Console\Kernel" namespace="App\Console">
@@ -274,7 +274,7 @@
         <line num="171" type="stmt" count="23"/>
         <line num="174" type="stmt" count="13"/>
         <line num="176" type="stmt" count="13"/>
-        <line num="177" type="stmt" count="5"/>
+        <line num="177" type="stmt" count="6"/>
         <line num="179" type="stmt" count="13"/>
         <line num="180" type="stmt" count="13"/>
         <line num="181" type="stmt" count="1"/>
@@ -507,7 +507,7 @@
       </file>
       <file name="/home/runner/work/yaghvc/yaghvc/app/Services/BadgeRenderService.php">
         <class name="App\Services\BadgeRenderService" namespace="App\Services">
-          <metrics complexity="134" methods="21" coveredmethods="12" conditionals="0" coveredconditionals="0" statements="462" coveredstatements="419" elements="483" coveredelements="431"/>
+          <metrics complexity="134" methods="21" coveredmethods="12" conditionals="0" coveredconditionals="0" statements="462" coveredstatements="421" elements="483" coveredelements="433"/>
         </class>
         <line num="33" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="138"/>
         <line num="35" type="stmt" count="138"/>
@@ -734,9 +734,9 @@
         <line num="365" type="stmt" count="3"/>
         <line num="366" type="stmt" count="3"/>
         <line num="369" type="stmt" count="47"/>
-        <line num="379" type="method" name="safeConfig" visibility="private" complexity="3" crap="4.12" count="33"/>
-        <line num="381" type="stmt" count="33"/>
-        <line num="383" type="stmt" count="33"/>
+        <line num="379" type="method" name="safeConfig" visibility="private" complexity="3" crap="4.12" count="44"/>
+        <line num="381" type="stmt" count="44"/>
+        <line num="383" type="stmt" count="44"/>
         <line num="384" type="stmt" count="0"/>
         <line num="387" type="stmt" count="0"/>
         <line num="390" type="method" name="deriveAutoLogoColor" visibility="private" complexity="7" crap="7" count="12"/>
@@ -966,33 +966,33 @@
         <line num="707" type="stmt" count="3"/>
         <line num="708" type="stmt" count="3"/>
         <line num="710" type="stmt" count="0"/>
-        <line num="718" type="method" name="debugLog" visibility="private" complexity="13" crap="16.71" count="63"/>
+        <line num="718" type="method" name="debugLog" visibility="private" complexity="13" crap="14.35" count="63"/>
         <line num="722" type="stmt" count="63"/>
         <line num="723" type="stmt" count="63"/>
-        <line num="724" type="stmt" count="63"/>
-        <line num="727" type="stmt" count="0"/>
+        <line num="724" type="stmt" count="35"/>
+        <line num="727" type="stmt" count="28"/>
         <line num="728" type="stmt" count="0"/>
         <line num="729" type="stmt" count="0"/>
         <line num="732" type="stmt" count="63"/>
         <line num="733" type="stmt" count="63"/>
-        <line num="734" type="stmt" count="0"/>
-        <line num="735" type="stmt" count="63"/>
-        <line num="736" type="stmt" count="63"/>
-        <line num="737" type="stmt" count="63"/>
+        <line num="734" type="stmt" count="28"/>
+        <line num="735" type="stmt" count="35"/>
+        <line num="736" type="stmt" count="35"/>
+        <line num="737" type="stmt" count="35"/>
         <line num="738" type="stmt" count="0"/>
-        <line num="739" type="stmt" count="63"/>
-        <line num="740" type="stmt" count="59"/>
+        <line num="739" type="stmt" count="35"/>
+        <line num="740" type="stmt" count="31"/>
         <line num="741" type="stmt" count="4"/>
         <line num="742" type="stmt" count="4"/>
         <line num="745" type="stmt" count="0"/>
         <line num="748" type="stmt" count="63"/>
-        <line num="749" type="stmt" count="4"/>
-        <line num="751" type="stmt" count="59"/>
-        <line num="752" type="stmt" count="58"/>
+        <line num="749" type="stmt" count="32"/>
+        <line num="751" type="stmt" count="31"/>
+        <line num="752" type="stmt" count="30"/>
         <line num="753" type="stmt" count="1"/>
-        <line num="757" type="stmt" count="59"/>
+        <line num="757" type="stmt" count="31"/>
         <line num="758" type="stmt" count="0"/>
-        <metrics loc="763" ncloc="691" classes="1" methods="21" coveredmethods="12" conditionals="0" coveredconditionals="0" statements="462" coveredstatements="419" elements="483" coveredelements="431"/>
+        <metrics loc="763" ncloc="691" classes="1" methods="21" coveredmethods="12" conditionals="0" coveredconditionals="0" statements="462" coveredstatements="421" elements="483" coveredelements="433"/>
       </file>
       <file name="/home/runner/work/yaghvc/yaghvc/app/Services/LogoDataHelper.php">
         <class name="App\Services\LogoDataHelper" namespace="App\Services">
@@ -1001,7 +1001,7 @@
         <line num="25" type="method" name="normalizeRawBase64" visibility="public" complexity="4" crap="4" count="31"/>
         <line num="27" type="stmt" count="31"/>
         <line num="28" type="stmt" count="31"/>
-        <line num="29" type="stmt" count="5"/>
+        <line num="29" type="stmt" count="6"/>
         <line num="31" type="stmt" count="31"/>
         <line num="32" type="stmt" count="31"/>
         <line num="33" type="stmt" count="6"/>
@@ -1254,6 +1254,6 @@
         <metrics loc="384" ncloc="316" classes="1" methods="10" coveredmethods="5" conditionals="0" coveredconditionals="0" statements="202" coveredstatements="185" elements="212" coveredelements="190"/>
       </file>
     </package>
-    <metrics files="15" loc="2281" ncloc="1963" classes="14" methods="78" coveredmethods="60" conditionals="0" coveredconditionals="0" statements="1069" coveredstatements="998" elements="1147" coveredelements="1058"/>
+    <metrics files="15" loc="2281" ncloc="1963" classes="14" methods="78" coveredmethods="60" conditionals="0" coveredconditionals="0" statements="1069" coveredstatements="1000" elements="1147" coveredelements="1060"/>
   </project>
 </coverage>
