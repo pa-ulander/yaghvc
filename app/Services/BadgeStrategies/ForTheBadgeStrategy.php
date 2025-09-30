@@ -18,7 +18,8 @@ class ForTheBadgeStrategy implements BadgeRendererStrategyInterface
 {
     public function __construct(
         private readonly SvgForTheBadgeRenderer $renderer
-    ) {}
+    ) {
+    }
 
     /**
      * Render a for-the-badge-style badge.
