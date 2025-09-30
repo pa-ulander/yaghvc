@@ -60,6 +60,8 @@ class DataUriLogoHandler extends AbstractLogoHandler
 
     /**
      * Process raster (PNG, JPEG, GIF) images.
+     *
+     * @param array{mime:string,binary:string} $parsed
      */
     private function processRasterImage(string $dataUri, array $parsed, LogoRequest $request): ?LogoResult
     {
@@ -68,7 +70,7 @@ class DataUriLogoHandler extends AbstractLogoHandler
         // Try to detect intrinsic size
         if (function_exists('getimagesizefromstring')) {
             $info = @getimagesizefromstring($parsed['binary']);
-            if (is_array($info) && isset($info[0], $info[1])) {
+            if (is_array($info)) {
                 $intrinsicW = (int) $info[0];
                 $intrinsicH = (int) $info[1];
 
@@ -99,8 +101,10 @@ class DataUriLogoHandler extends AbstractLogoHandler
 
     /**
      * Process SVG images with dimension extraction.
+     *
+     * @param array{mime:string,binary:string} $parsed
      */
-    private function processSvgImage(string $dataUri, array $parsed, LogoRequest $request): ?LogoResult
+    private function processSvgImage(string $dataUri, array $parsed, LogoRequest $request): LogoResult
     {
         $svg = $parsed['binary'];
         [$intrinsicW, $intrinsicH] = $this->extractSvgDimensions($svg, $request->fixedSize);
