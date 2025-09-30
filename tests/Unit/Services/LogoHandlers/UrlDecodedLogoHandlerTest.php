@@ -104,7 +104,8 @@ it('rejects decoded URIs that do not start with data:image/', function () {
 
     /** @var LogoHandlerInterface&\Mockery\MockInterface $mockNext */
     $mockNext = Mockery::mock(LogoHandlerInterface::class);
-    $mockNext->shouldNotReceive('handle');
+    // Handler decodes and passes to next handler, which then rejects it
+    $mockNext->shouldReceive('handle')->once()->andReturn(null);
     $handler->setNext($mockNext);
 
     $request = new LogoRequest(
