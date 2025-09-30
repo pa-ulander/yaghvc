@@ -26,7 +26,8 @@ class BadgeRenderService
 
     public function __construct(
         private readonly BadgeRendererFactory $badgeRendererFactory
-    ) {}
+    ) {
+    }
 
     public function renderBadgeWithCount(
         string $label,
