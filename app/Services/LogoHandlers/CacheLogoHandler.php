@@ -34,9 +34,12 @@ class CacheLogoHandler extends AbstractLogoHandler
 
         // Try to get from cache
         $cached = Cache::get($cacheKey);
-        if (is_array($cached) && $this->isValidCachePayload($cached)) {
-            /** @var array{dataUri:string,width:int,height:int,mime:string,binary?:string} $cached */
-            return LogoResult::fromArray($cached);
+        if (is_array($cached)) {
+            /** @var array<string,mixed> $cached */
+            if ($this->isValidCachePayload($cached)) {
+                /** @var array{dataUri:string,width:int,height:int,mime:string,binary?:string} $cached */
+                return LogoResult::fromArray($cached);
+            }
         }
 
         // Cache miss - delegate to next handler
