@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Factories\BadgeRendererFactory;
 use App\Services\BadgeRenderService;
 use Illuminate\Support\Facades\Config;
 use PUGX\Poser\Poser; // add for Poser::class assertion
@@ -16,6 +17,12 @@ beforeAll(function () {
     putenv('BADGE_DEBUG_LOG=1');
 });
 
+/** Helper to create BadgeRenderService with factory injection */
+function makeBadgeRenderService(): BadgeRenderService
+{
+    return new BadgeRenderService(new BadgeRendererFactory());
+}
+
 /** Helper to invoke private methods via reflection. */
 function invokeBadgePrivate(object $svc, string $method, array $args = [])
 {
@@ -26,7 +33,7 @@ function invokeBadgePrivate(object $svc, string $method, array $args = [])
 }
 
 it('falls back to percent-decoded data uri when prepare returns null', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     // URL encoded 1x1 png data URI
     $raw = rawurlencode('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=');
     $svg = invokeBadgePrivate($svc, 'applyLogo', [
@@ -41,7 +48,7 @@ it('falls back to percent-decoded data uri when prepare returns null', function 
 });
 
 it('handles raw base64 success path embedding image', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     // Provide raw base64 (no data: prefix) that is valid PNG
     $base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=';
     $out = invokeBadgePrivate($svc, 'applyLogo', [
@@ -56,7 +63,7 @@ it('handles raw base64 success path embedding image', function () {
 });
 
 it('returns original svg when normalization fails for random slug', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $original = '<svg width="80" height="20" aria-label="l:m"><rect fill="#555" width="30" height="20"></rect><rect fill="#007ec6" x="30" width="50" height="20"></rect></svg>';
     $out = invokeBadgePrivate($svc, 'applyLogo', [$original, 'unknown-slug-not-real-xyz', null, null, null, null]);
     expect($out)->toBe($original);
@@ -64,7 +71,7 @@ it('returns original svg when normalization fails for random slug', function () 
 
 it('rejects oversize prepared binary using lowered config limit', function () {
     Config::set('badge.logo_max_bytes', 10); // tiny to force rejection
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     // Provide raw base64 logo (not data uri) so size check happens on raw-base64 path
     $raw = base64_encode(random_bytes(32)); // >10 bytes binary
     $orig = '<svg width="100" height="20" aria-label="o:p"><rect fill="#555" width="60" height="20"></rect><rect fill="#007ec6" x="60" width="40" height="20"></rect></svg>';
@@ -73,7 +80,7 @@ it('rejects oversize prepared binary using lowered config limit', function () {
 });
 
 it('recolors svg logo when logoColor provided', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $svgLogo = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M0 0h10v10H0z" fill="#000"/></svg>';
     $dataUri = 'data:image/svg+xml;base64,' . base64_encode($svgLogo);
     $result = invokeBadgePrivate($svc, 'applyLogo', [
@@ -88,7 +95,7 @@ it('recolors svg logo when logoColor provided', function () {
 });
 
 it('auto derives logo color and recolors when logoColor=auto with svg', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $svgLogo = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M0 0h10v10H0z" fill="#123456"/></svg>';
     $dataUri = 'data:image/svg+xml;base64,' . base64_encode($svgLogo);
     $res = invokeBadgePrivate($svc, 'applyLogo', [
@@ -103,14 +110,14 @@ it('auto derives logo color and recolors when logoColor=auto with svg', function
 });
 
 it('recolorSvg returns null when svg does not contain <svg tag (non-svg fragment)', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $fragment = '<path fill="#123456" d="M0 0h5v5H0z"/>';
     $res = invokeBadgePrivate($svc, 'recolorSvg', [$fragment, '123456']);
     expect($res)->toBeNull(); // early return branch
 });
 
 it('recolorSvg injects color for currentColor usage', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $res = invokeBadgePrivate($svc, 'recolorSvg', [
         '<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5"><path fill="currentColor" d="M0 0h5v5H0z"/></svg>',
         '00aa00',
@@ -119,7 +126,7 @@ it('recolorSvg injects color for currentColor usage', function () {
 });
 
 it('recolorSvg injects fill on first path with no fill', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $res = invokeBadgePrivate($svc, 'recolorSvg', [
         '<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5"><path d="M0 0h5v5H0z"/></svg>',
         '112233',
@@ -128,34 +135,34 @@ it('recolorSvg injects fill on first path with no fill', function () {
 });
 
 it('canonicalizeDataUri leaves non-data uri unchanged', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $out = invokeBadgePrivate($svc, 'canonicalizeDataUri', ['not-a-data-uri']);
     expect($out)->toBe('not-a-data-uri');
 });
 
 it('canonicalizeDataUri handles invalid alphabet without decode', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $data = 'data:image/png;base64,AAAA-AAAA';
     $out = invokeBadgePrivate($svc, 'canonicalizeDataUri', [$data]);
     expect($out)->toBe($data); // unchanged payload part
 });
 
 it('canonicalizeDataUri handles decode failure after mutation', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $data = 'data:image/png;base64,A===A'; // passes regex? A===A includes invalid padding but sanitized keeps
     $out = invokeBadgePrivate($svc, 'canonicalizeDataUri', [$data]);
     expect($out)->toBe($data);
 });
 
 it('canonicalizeDataUri replaces space with plus but leaves invalid decode intact', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $orig = 'data:image/png;base64,AA AA'; // becomes AA+AA; still invalid -> returns mutated
     $out = invokeBadgePrivate($svc, 'canonicalizeDataUri', [$orig]);
     expect($out)->toBe('data:image/png;base64,AA+AA');
 });
 
 it('deriveAutoLogoColor uses provided label color then brightness threshold', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $color = invokeBadgePrivate($svc, 'deriveAutoLogoColor', [
         '<svg width="10" height="10"><rect fill="#123456" width="5" height="10"></rect></svg>',
         'blueviolet',
@@ -165,7 +172,7 @@ it('deriveAutoLogoColor uses provided label color then brightness threshold', fu
 });
 
 it('deriveAutoLogoColor extracts from rect then fallback to message background', function () {
-    $svc = new BadgeRenderService();
+    $svc = makeBadgeRenderService();
     $color = invokeBadgePrivate($svc, 'deriveAutoLogoColor', [
         '<svg width="10" height="10"><rect fill="#abcdef" width="5" height="10"></rect></svg>',
         null,
@@ -175,7 +182,7 @@ it('deriveAutoLogoColor extracts from rect then fallback to message background',
 });
 
 it('renders badge with count', function () {
-    $result = (new BadgeRenderService)->renderBadgeWithCount('Views', 1000, 'blue', 'flat', false, null, null, null);
+    $result = makeBadgeRenderService()->renderBadgeWithCount('Views', 1000, 'blue', 'flat', false, null, null, null);
 
     expect($result)->toBeString();
     expect($result)->toContain('<svg');
@@ -184,7 +191,7 @@ it('renders badge with count', function () {
 });
 
 it('renders badge with abbreviated count', function () {
-    $result = (new BadgeRenderService)->renderBadgeWithCount('Views', 1500, 'green', 'flat-square', true, null, null, null);
+    $result = makeBadgeRenderService()->renderBadgeWithCount('Views', 1500, 'green', 'flat-square', true, null, null, null);
 
     expect($result)->toBeString();
     expect($result)->toContain('<svg');
@@ -193,7 +200,7 @@ it('renders badge with abbreviated count', function () {
 });
 
 it('renders badge with error', function () {
-    $result = (new BadgeRenderService)->renderBadgeWithError('Error', 'Not Found', 'plastic');
+    $result = makeBadgeRenderService()->renderBadgeWithError('Error', 'Not Found', 'plastic');
     expect($result)->toBeString();
     expect($result)->toContain('<svg');
     expect($result)->toContain('Error');
@@ -202,12 +209,12 @@ it('renders badge with error', function () {
 });
 
 it('renders pixel', function () {
-    $result = (new BadgeRenderService)->renderPixel();
+    $result = makeBadgeRenderService()->renderPixel();
     expect($result)->toBe('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>');
 });
 
 it('formats number without abbreviation', function () {
-    $badgeRenderService = new BadgeRenderService;
+    $badgeRenderService = makeBadgeRenderService();
     $reflection = new ReflectionClass($badgeRenderService);
     $method = $reflection->getMethod('formatNumber');
     $method->setAccessible(true);
@@ -228,7 +235,7 @@ it('formats abbreviated number', function () {
     ];
 
     foreach ($testCases as [$input, $expected]) {
-        $result = (new BadgeRenderService)->formatAbbreviatedNumber($input);
+        $result = makeBadgeRenderService()->formatAbbreviatedNumber($input);
         expect($result)->toBe($expected);
     }
 });
@@ -240,29 +247,29 @@ it('uses correct color', function () {
     $colors = ['#e05d44', '#97ca00', '#007ec6', '#dfb317'];
 
     foreach ($colors as $color) {
-        $result = (new BadgeRenderService)->renderBadgeWithCount('Test', 100, $color, 'flat', false, null, null, null);
+        $result = makeBadgeRenderService()->renderBadgeWithCount('Test', 100, $color, 'flat', false, null, null, null);
         expect($result)->toContain($color);
     }
 });
 
 it('applies label color correctly', function () {
-    $result = (new BadgeRenderService)->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'red', null, null);
+    $result = makeBadgeRenderService()->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'red', null, null);
     expect($result)->toContain('fill="#e05d44"'); // red color
 });
 
 it('handles named label colors', function () {
-    $result = (new BadgeRenderService)->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'green', null, null);
+    $result = makeBadgeRenderService()->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'green', null, null);
     expect($result)->toContain('fill="#97ca00"'); // green color
 });
 
 it('handles hex label colors', function () {
-    $result = (new BadgeRenderService)->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'ff0000', null, null);
+    $result = makeBadgeRenderService()->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, 'ff0000', null, null);
     expect($result)->toContain('fill="#ff0000"'); // red color
 });
 
 it('handles logo parameter without errors', function () {
     $base64Logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-    $result = (new BadgeRenderService)->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, null, $base64Logo);
+    $result = makeBadgeRenderService()->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, null, $base64Logo);
     expect($result)->toBeString();
     expect($result)->toContain('<svg');
 });
@@ -272,20 +279,20 @@ it('handles logo base64 where plus signs may be spaces from query decoding', fun
     $original = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAACmElEQVQokUWSa0iTcRTGn//26u4b6ZQ0U8lKMqykwPpgZVBEHyLp8jEoIZJADCQ0iCiStIwuZmHRioIuroQss2VkrkIrdeFckiZqdhctTXPOve8Tr7M6X8/zO+fwPEfIwy7IwQA0GgExGYQwyhCmMLRX1z2hJCJSN+xZgqAZnPgCaAUQ0EHICjSYLlKBCDdNQb7HLmeRoy3zQFnzYk/1WTckGUIXCVD+Kw+BpAxtuBXCpkN7bdXt/JL3W3J3xuHg3iTsL/NkNFWVPoWkQOj/wxooCrRhFgiTjI4n9ZVHHQObjxVEY8UGIi1zEhVFCahwdq5qvn+hHkKC0EcBigxwvAnkW3ge7L6TMi+VztOLOOKOY8ulKL68GM2emnjeLF3AZSlz2FCZ6yaHwLGv6pkv8MyxsUoHLcsLwBuHwE0rtdy2UuLWNTpmpkkszQEfnAPDAd47tbaB7NaJR+eXujfmtGTUXgFWp5uwPd8Oi1GBJEmwWYlP34L4PSFw7chPeD+MYnkWUVmy0CeNfe5N8ANIjNWpNmHzqklYrDIGRwRm2gXsM/xofRMOf1AgcbYOAfgxMvgxCmS9+dbh5A6VarxuIMdBDoJ0g+vSreytNpAEux7qqWrK82I+kC2xYOAzyFbz5QNJPrXhdRo4XK/n3WILkxPsbKqwsr8xBB3PjukhGyJJv+qqB+QvkN0mR2Fim5pU1hobzxTYOPbcyJoTNpoAlu6wdZKvIslR0O9VXe0Clc5p2Ge4WDh36ux3ThM/1RqnNhXvilU32cjvINtAf4cKdkzlSHpBTqgNY11JfLtFA+o14NU8Wx/piggNfg2yGVR8EF9/dP37PyCIoDQLs8z9hmv71nsC4wFz9klX2tD4/AEG+gBoQ7KghD8MZ2xdnt7s7wAAAABJRU5ErkJggg==';
     // Simulate what would happen if '+' became ' ' in query decoding (already handled now)
     $withSpaces = str_replace('+', ' ', $original);
-    $service = new BadgeRenderService;
+    $service = makeBadgeRenderService();
     $result = $service->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, null, $withSpaces);
     expect($result)->toBeString();
     expect($result)->toContain('<svg');
 });
 
 it('handles named logo slug (github)', function () {
-    $service = new BadgeRenderService;
+    $service = makeBadgeRenderService();
     $result = $service->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, null, 'github', null);
     expect($result)->toContain('<image');
 });
 
 it('applies auto logoSize for svg maintaining aspect ratio', function () {
-    $service = new BadgeRenderService;
+    $service = makeBadgeRenderService();
     // simple svg data uri 20x10 (aspect 2:1)
     $svg = 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="10"><rect width="20" height="10" fill="red"/></svg>');
     $result = $service->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, null, $svg, 'auto');
@@ -298,7 +305,7 @@ it('applies auto logoSize for svg maintaining aspect ratio', function () {
 });
 
 it('applies fixed numeric logoSize when provided', function () {
-    $service = new BadgeRenderService;
+    $service = makeBadgeRenderService();
     $svg = 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="15" fill="blue"/></svg>');
     $result = $service->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, null, $svg, '10');
     preg_match('/<image[^>]*width="(\d+)"[^>]*height="(\d+)"/i', $result, $m);
@@ -309,13 +316,13 @@ it('applies fixed numeric logoSize when provided', function () {
 });
 
 it('applies logoColor to simple icon slug', function () {
-    $service = new BadgeRenderService;
+    $service = makeBadgeRenderService();
     $result = $service->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, 'red', 'github', null);
     expect($result)->toContain('<image');
 });
 
 it('applies logoColor hex to inline svg data uri', function () {
-    $service = new BadgeRenderService;
+    $service = makeBadgeRenderService();
     $inlineSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M0 0h10v10H0z"/></svg>';
     $dataUri = 'data:image/svg+xml;base64,' . base64_encode($inlineSvg);
     $result = $service->renderBadgeWithCount('Test', 100, 'blue', 'flat', false, null, 'ff0000', $dataUri, null);
@@ -323,7 +330,7 @@ it('applies logoColor hex to inline svg data uri', function () {
 });
 
 it('recolors svg with existing fill attributes', function () {
-    $service = new BadgeRenderService();
+    $service = makeBadgeRenderService();
     $inlineSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path fill="#123456" d="M0 0h10v10H0z"/></svg>';
     $dataUri = 'data:image/svg+xml;base64,' . base64_encode($inlineSvg);
     $result = $service->renderBadgeWithCount('Test', 42, 'green', 'flat', false, null, 'ff8800', $dataUri, null);
@@ -331,34 +338,34 @@ it('recolors svg with existing fill attributes', function () {
 });
 
 it('applies default logoColor for simple-icons slug when omitted', function () {
-    $service = new BadgeRenderService();
+    $service = makeBadgeRenderService();
     $result = $service->renderBadgeWithCount('Test', 10, 'blue', 'flat', false, null, null, 'github', null);
     // We can't easily extract internal recolored svg without decoding, but ensure image present
     expect($result)->toContain('<image');
 });
 
 it('honors explicit logoColor over default for slug', function () {
-    $service = new BadgeRenderService();
+    $service = makeBadgeRenderService();
     $result = $service->renderBadgeWithCount('Test', 10, 'blue', 'flat', false, null, 'red', 'github', null);
     expect($result)->toContain('<image');
 });
 
 it('applies auto logoColor choosing light on dark label', function () {
-    $service = new BadgeRenderService();
+    $service = makeBadgeRenderService();
     // dark label (default #555) expect light f5f5f5 chosen → encoded inside data uri; just ensure image present
     $result = $service->renderBadgeWithCount('Test', 10, 'green', 'flat', false, null, 'auto', 'github', null);
     expect($result)->toContain('<image');
 });
 
 it('applies auto logoColor choosing dark on light custom labelColor', function () {
-    $service = new BadgeRenderService();
+    $service = makeBadgeRenderService();
     // Provide a light labelColor (yellow maps to dfb317 ~ light) expect dark 333333 chosen
     $result = $service->renderBadgeWithCount('Test', 10, 'green', 'flat', false, 'yellow', 'auto', 'github', null);
     expect($result)->toContain('<image');
 });
 
 it('applies auto logoColor for inline svg data uri', function () {
-    $service = new BadgeRenderService();
+    $service = makeBadgeRenderService();
     $inlineSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M0 0h10v10H0z"/></svg>';
     $dataUri = 'data:image/svg+xml;base64,' . base64_encode($inlineSvg);
     $result = $service->renderBadgeWithCount('Test', 5, 'blue', 'flat', false, null, 'auto', $dataUri, null);
