@@ -137,8 +137,9 @@ class DataUriLogoHandler extends AbstractLogoHandler
      */
     private function decodeDataUrlFromQueryParam(string $value): ?string
     {
-        $candidate = urldecode($value);
-        $candidate = str_replace(' ', '+', $candidate);
+        // Use rawurldecode to preserve + characters in base64
+        $candidate = rawurldecode($value);
+        // Remove any whitespace (from %20 or other sources)
         $candidate = preg_replace('/\s+/', '', $candidate) ?? '';
 
         if (!str_starts_with($candidate, 'data:')) {
@@ -197,6 +198,12 @@ class DataUriLogoHandler extends AbstractLogoHandler
 
         $parsedMime = preg_replace('/[^a-z0-9+]+/i', '', $mime) ?? '';
         $parsedMime = $parsedMime === 'svg+xml' ? 'svg+xml' : ($parsedMime !== '' ? $parsedMime : 'png');
+
+        // Validate MIME type is in allowed list
+        $allowedMimes = ['png', 'jpeg', 'jpg', 'gif', 'svg+xml'];
+        if (!in_array($parsedMime, $allowedMimes, true)) {
+            return null;
+        }
 
         return [
             'mime' => $parsedMime,
