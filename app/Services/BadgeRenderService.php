@@ -4,49 +4,29 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Factories\BadgeRendererFactory;
 use Illuminate\Support\Facades\Log;
-use PUGX\Poser\Badge; // for DEFAULT_FORMAT constant
-use PUGX\Poser\Poser;
-use PUGX\Poser\Render\SvgFlatRender;           // style: flat
-use PUGX\Poser\Render\SvgFlatSquareRender;     // style: flat-square
-use PUGX\Poser\Render\SvgForTheBadgeRenderer;  // style: for-the-badge
-use PUGX\Poser\Render\SvgPlasticRender;        // style: plastic
-use PUGX\Poser\Calculator\SvgTextSizeCalculator; // text size calculator
 
 /**
  * Service responsible for generating and post-processing badge SVGs.
  * Handles: counts, abbreviation, label color overrides, logo embedding & recoloring,
  * geometry-safe width shifting, and robust data URI canonicalization.
  *
+ * Uses Strategy pattern for badge rendering styles via BadgeRendererFactory.
+ *
  * @package App\Services
  */
 class BadgeRenderService
 {
-    private Poser $poser;
-
     /**
      * Abbreviation suffixes for thousands+ formatting.
      * @var array<int,string>
      */
     private static array $abbreviations = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
 
-    public function __construct()
-    {
-        $this->poser = new Poser(renders: [
-            new SvgPlasticRender(
-                textSizeCalculator: new SvgTextSizeCalculator,
-            ),
-            new SvgFlatRender(
-                textSizeCalculator: new SvgTextSizeCalculator,
-            ),
-            new SvgFlatSquareRender(
-                textSizeCalculator: new SvgTextSizeCalculator,
-            ),
-            new SvgForTheBadgeRenderer(
-                textSizeCalculator: new SvgTextSizeCalculator,
-            ),
-        ]);
-    }
+    public function __construct(
+        private readonly BadgeRendererFactory $badgeRendererFactory
+    ) {}
 
     public function renderBadgeWithCount(
         string $label,
@@ -103,15 +83,15 @@ class BadgeRenderService
         ?string $logo = null,
         ?string $logoSize = null,
     ): string {
-        $svg = (string) $this->poser->generate(
-            subject: $label,
-            status: $message,
-            color: $messageBackgroundFill,
-            style: $badgeStyle,
-            format: Badge::DEFAULT_FORMAT,
+        // Use Strategy pattern to render the badge based on style
+        $strategy = $this->badgeRendererFactory->create($badgeStyle);
+        $svg = $strategy->render(
+            label: $label,
+            message: $message,
+            color: $messageBackgroundFill
         );
 
-        // Embed logo BEFORE recoloring to ensure geometry detection uses original label rect fill.
+        // Embed logo before recoloring to ensure geometry detection uses original label rect fill.
         if ($logo) {
             $svg = $this->applyLogo(svg: $svg, logo: $logo, logoSize: $logoSize, logoColor: $logoColor, labelColor: $labelColor, messageBackgroundFill: $messageBackgroundFill);
         }
@@ -150,14 +130,17 @@ class BadgeRenderService
     {
         $hexColor = $this->getHexColor(color: $labelColor);
         $labelPattern = '/(<rect[^>]*fill="#555"[^>]*>)/';
+
         if (preg_match($labelPattern, $svg)) {
             return preg_replace_callback($labelPattern, function (array $m) use ($hexColor): string {
                 $replaced = preg_replace('/fill="#555"/', 'fill="#' . $hexColor . '"', $m[0], 1);
                 return is_string($replaced) ? $replaced : $m[0];
             }, $svg, 1) ?? $svg;
         }
+
         $genericPattern = '/(<rect[^>]*)(fill="[^"]*")([^>]*>)/';
         $replacement = '$1fill="#' . $hexColor . '"$3';
+
         return preg_replace($genericPattern, $replacement, $svg, 1) ?? $svg;
     }
 
