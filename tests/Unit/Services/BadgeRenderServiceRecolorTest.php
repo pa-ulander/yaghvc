@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Services\BadgeRenderService;
+use App\Factories\BadgeRendererFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
@@ -13,7 +14,7 @@ final class BadgeRenderServiceRecolorTest extends TestCase
 {
     private function invokeRecolor(string $fragment, string $hex): ?string
     {
-        $svc = new BadgeRenderService();
+        $svc = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($svc);
         $m = $ref->getMethod('recolorSvg');
         $m->setAccessible(true);
