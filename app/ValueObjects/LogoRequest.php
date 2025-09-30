@@ -28,7 +28,8 @@ final readonly class LogoRequest
         public int $maxBytes = 10000,
         public int $maxDimension = 32,
         public int $cacheTtl = 3600,
-    ) {}
+    ) {
+    }
 
     /**
      * Get cache key for this request.
