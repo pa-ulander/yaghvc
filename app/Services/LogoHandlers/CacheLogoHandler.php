@@ -62,10 +62,16 @@ class CacheLogoHandler extends AbstractLogoHandler
      */
     private function isValidCachePayload(array $payload): bool
     {
-        return isset($payload['dataUri'], $payload['width'], $payload['height'], $payload['mime'])
-            && is_string($payload['dataUri'])
-            && is_int($payload['width'])
-            && is_int($payload['height'])
-            && is_string($payload['mime']);
+        if (! isset($payload['dataUri'], $payload['width'], $payload['height'], $payload['mime'])) {
+            return false;
+        }
+        if (! is_string($payload['dataUri']) || ! is_int($payload['width']) || ! is_int($payload['height']) || ! is_string($payload['mime'])) {
+            return false;
+        }
+        // Validate optional binary field type
+        if (isset($payload['binary']) && ! is_string($payload['binary'])) {
+            return false;
+        }
+        return true;
     }
 }
