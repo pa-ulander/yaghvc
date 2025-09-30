@@ -18,7 +18,8 @@ class PlasticBadgeStrategy implements BadgeRendererStrategyInterface
 {
     public function __construct(
         private readonly SvgPlasticRender $renderer
-    ) {}
+    ) {
+    }
 
     /**
      * Render a plastic-style badge.
