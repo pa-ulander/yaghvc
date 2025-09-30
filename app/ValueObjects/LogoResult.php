@@ -24,7 +24,8 @@ final readonly class LogoResult
         public int $height,
         public string $mime,
         public ?string $binary = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Convert to array format for backward compatibility.
