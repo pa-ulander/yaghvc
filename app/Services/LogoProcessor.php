@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Factories\LogoProcessorChainFactory;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -38,143 +39,50 @@ class LogoProcessor
         if ($raw === null || $raw === '') {
             return null;
         }
-        // Step 1: Attempt to interpret any non data: string as raw base64 BEFORE slug resolution.
-        // This prevents misclassification when a base64 payload accidentally matches future slug patterns.
-        if (!str_starts_with($raw, 'data:')) {
-            $maybe = $this->normaliseLooseBase64($raw);
-            if ($maybe !== null) {
-                $raw = $maybe; // Promote to data URI path.
-            }
-        }
 
-        // If the logo appears to be a percent-encoded data URI, decode it once so later logic
-        // recognises it as a data: URL. Users are instructed to percent-encode the entire value,
-        // so handling the encoded prefix here improves robustness.
-        if (preg_match('/^data%3Aimage%2F/i', $raw) === 1) {
-            $decodedOnce = urldecode($raw);
-            if (str_starts_with($decodedOnce, 'data:image/')) {
-                $raw = $decodedOnce;
-            }
-        }
+        // Create request value object
+        $request = LogoProcessorChainFactory::createRequest(
+            raw: $raw,
+            logoSize: $logoSize,
+            targetHeight: $this->targetHeight,
+            fixedSize: $this->fixedSize,
+            maxBytes: $this->configInt('badge.logo_max_bytes', 10000),
+            maxDimension: $this->configInt('badge.logo_max_dimension', 64),
+            cacheTtl: $this->configInt('badge.logo_cache_ttl', 0)
+        );
 
-        $cacheTtl = $this->configInt('badge.logo_cache_ttl', 0);
-        $cacheKey = null;
-        if ($cacheTtl > 0 && class_exists(Cache::class)) {
-            $cacheKey = 'logo:' . sha1($raw . '|' . ($logoSize ?? ''));
-            $cached = Cache::get($cacheKey);
-            if (is_array($cached) && $this->isPreparedPayload($cached)) {
-                /** @var array{dataUri:string,width:int,height:int,mime:string,binary?:string} $cached */
-                return $cached;
-            }
-        }
+        // Build and execute handler chain
+        $chain = LogoProcessorChainFactory::create($request);
+        $result = $chain->handle($request);
 
-        // Determine if named slug (only when clearly slug-shaped: letters/digits hyphen only)
-        if (!str_starts_with($raw, 'data:') && preg_match('/^[a-z0-9-]{1,60}$/i', $raw)) {
-            $named = $this->resolveNamedLogo($raw);
-            if ($named === null) {
-                return null; // Unknown slug
-            }
-            $result = $this->sizeSvgDataUri($named['dataUri'], $logoSize, $named['intrinsicWidth'], $named['intrinsicHeight']);
-            if ($cacheKey && $cacheTtl > 0) {
-                $cachePayload = $result;
-                unset($cachePayload['binary']);
-                Cache::put($cacheKey, $cachePayload, $cacheTtl);
-            }
-            return $result;
-        }
-
-        $dataUri = $this->decodeDataUrlFromQueryParam($raw);
-        // (debug removed)
-        if ($dataUri === null) {
+        if ($result === null) {
             return null;
         }
 
-        $parsed = $this->parseDataUri($dataUri);
-        // (debug removed)
-        if ($parsed === null) {
-            // Salvage attempt: tolerate uncommon base64 variants (e.g., urlencoded edge cases)
-            if (str_starts_with($dataUri, 'data:image/')) {
-                $semi = strpos($dataUri, ';base64,');
-                if ($semi !== false) {
-                    $prefix = substr($dataUri, 0, $semi);
-                    $mime = substr($prefix, strlen('data:image/'));
-                    $b64 = substr($dataUri, $semi + 8);
-                    // Remove any stray whitespace
-                    $b64 = preg_replace('/\s+/', '', $b64) ?? $b64;
-                    $bin = base64_decode($b64, true);
-                    if ($bin !== false && $bin !== '') {
-                        $parsedMime = preg_replace('/[^a-z0-9+]+/i', '', $mime) ?? '';
-                        $parsed = [
-                            'mime' => $parsedMime === 'svg+xml' ? 'svg+xml' : ($parsedMime !== '' ? $parsedMime : 'png'),
-                            'binary' => $bin,
-                        ];
-                    }
-                }
-            }
-            if ($parsed === null) {
-                return null;
-            }
+        // Convert LogoResult to legacy array format
+        $array = [
+            'dataUri' => $result->dataUri,
+            'width' => $result->width,
+            'height' => $result->height,
+            'mime' => $result->mime,
+        ];
+
+        if ($result->binary !== null) {
+            $array['binary'] = $result->binary;
         }
 
-        // For raster formats we cannot easily know intrinsic width/height without decoding binary
-        // Leave sizing to outer code; return fixed by default.
-        if ($parsed['mime'] !== 'svg+xml') {
-            // Enforce byte size limit
-            $maxBytes = $this->configInt('badge.logo_max_bytes', 10000);
-            if (strlen($parsed['binary']) > $maxBytes) {
-                return null;
-            }
-            $width = $this->fixedSize;
-            $height = $this->fixedSize;
-            // Try to detect intrinsic size & enforce max dimensions
-            if (function_exists('getimagesizefromstring')) {
-                $info = @getimagesizefromstring($parsed['binary']);
-                if (is_array($info)) {
-                    // indexes 0 and 1 always exist for valid image size arrays
-                    $intrinsicW = (int) $info[0];
-                    $intrinsicH = (int) $info[1];
-                    if ($intrinsicW > 0 && $intrinsicH > 0) {
-                        $maxDim = $this->configInt('badge.logo_max_dimension', 64);
-                        if ($intrinsicW > $maxDim || $intrinsicH > $maxDim) {
-                            return null; // reject oversize raster
-                        }
-                    }
-                }
-            }
-            if ($logoSize && $logoSize !== 'auto' && ctype_digit($logoSize)) {
-                $v = (int) $logoSize;
-                $maxDim = $this->configInt('badge.logo_max_dimension', 64);
-                $v = max(8, min($maxDim, $v));
-                $width = $height = $v;
-            }
-            $result = [
-                'dataUri' => $dataUri,
-                'width' => $width,
-                'height' => $height,
-                'mime' => $parsed['mime'],
-                'binary' => $parsed['binary'],
-            ];
-            if ($cacheKey && $cacheTtl > 0) {
-                $cachePayload = $result;
-                unset($cachePayload['binary']);
-                Cache::put($cacheKey, $cachePayload, $cacheTtl);
-            }
-            return $result;
-        }
-
-        // SVG: attempt simple width/height extraction (optional)
-        [$intrinsicWidth, $intrinsicHeight] = $this->extractSvgDimensions($parsed['binary']);
-        $result = $this->sizeSvgDataUri($dataUri, $logoSize, $intrinsicWidth, $intrinsicHeight, $parsed['binary']);
-        if ($cacheKey && $cacheTtl > 0) {
-            $cachePayload = $result;
-            unset($cachePayload['binary']);
-            Cache::put($cacheKey, $cachePayload, $cacheTtl);
-        }
-        return $result;
+        return $array;
     }
+
+    // ========================================================================
+    // DEPRECATED: The methods below are kept for backward compatibility with
+    // existing tests. New code should use the Chain of Responsibility handlers.
+    // ========================================================================
 
     /**
      * @param array<mixed,mixed> $payload
+     * @deprecated Use LogoResult value object instead
+     * @phpstan-ignore method.unused
      */
     private function isPreparedPayload(array $payload): bool
     {
@@ -215,7 +123,10 @@ class LogoProcessor
         return $default;
     }
 
-    /** Convert spaces to plus, strip whitespace, ensure prefix stays. */
+    /**
+     * @deprecated Use UrlDecodedLogoHandler instead
+     * @phpstan-ignore method.unused
+     */
     private function decodeDataUrlFromQueryParam(string $value): ?string
     {
         // Original logic: urldecode then convert spaces back to plus; compress whitespace
@@ -229,8 +140,8 @@ class LogoProcessor
     }
 
     /**
-     * Attempt to interpret a raw (maybe URL-encoded) base64 blob as an image and wrap in a data URI.
-     * Returns normalised data URI string or null if not base64 or undecidable.
+     * @deprecated Use RawBase64LogoHandler instead
+     * @phpstan-ignore method.unused
      */
     private function normaliseLooseBase64(string $input): ?string
     {
@@ -262,8 +173,9 @@ class LogoProcessor
 
 
     /**
-     * Parse a data URI returning its mime and binary content.
+     * @deprecated Use DataUriLogoHandler instead
      * @return array{mime:string,binary:string}|null
+     * @phpstan-ignore method.unused
      */
     private function parseDataUri(string $dataUri): ?array
     {
@@ -278,8 +190,9 @@ class LogoProcessor
     }
 
     /**
-     * Simple extraction of width/height from SVG tag if present.
+     * @deprecated Use DataUriLogoHandler instead
      * @return array{0:int,1:int}
+     * @phpstan-ignore method.unused
      */
     private function extractSvgDimensions(string $svg): array
     {
@@ -305,8 +218,9 @@ class LogoProcessor
     }
 
     /**
-     * Return sized svg data URI info (always mime svg+xml).
+     * @deprecated Logic moved to handler chain
      * @return array{dataUri:string,width:int,height:int,mime:string,binary?:string}
+     * @phpstan-ignore method.unused
      */
     private function sizeSvgDataUri(string $dataUri, ?string $logoSize, int $intrinsicWidth, int $intrinsicHeight, ?string $binary = null): array
     {
@@ -337,8 +251,9 @@ class LogoProcessor
     }
 
     /**
-     * Resolve a simple-icons slug to a sized data URI (24x24 base dimensions).
+     * @deprecated Use SlugLogoHandler instead
      * @return array{dataUri:string,intrinsicWidth:int,intrinsicHeight:int}|null
+     * @phpstan-ignore method.unused
      */
     private function resolveNamedLogo(string $slug): ?array
     {
