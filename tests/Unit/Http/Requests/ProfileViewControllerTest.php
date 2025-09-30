@@ -146,9 +146,10 @@ it('renders badge with correct parameters', function () {
         'abbreviated' => true
     ];
 
+    $badgeRequest = \App\ValueObjects\BadgeRequest::fromValidatedData($safe);
     $profileViews = app(ProfileViewsRepository::class)->findOrCreate('test-user');
 
-    $svgContent = $renderBadgeMethod->invoke($controller, $safe, $profileViews);
+    $svgContent = $renderBadgeMethod->invoke($controller, $badgeRequest, $profileViews);
 
     expect($svgContent)->toBeString()
         ->and($svgContent)->toContain('<svg')
@@ -293,67 +294,14 @@ it('normalises validated input and arrays consistently', function () {
         ->and($directArray)->toBe(['baz' => 'qux']);
 });
 
-it('extracts strings safely from normalised data', function () {
-    $controller = app('test.controller');
-    $method = new \ReflectionMethod(ProfileViewsController::class, 'stringFromSafe');
-    $method->setAccessible(true);
+// Removed: stringFromSafe logic is now in BadgeConfiguration value object
+// See tests/Unit/ValueObjects/BadgeConfigurationTest.php for comprehensive tests
 
-    $missing = $method->invoke($controller, [], 'label');
-    $string = $method->invoke($controller, ['label' => 'visits'], 'label');
-    $intString = $method->invoke($controller, ['label' => 123], 'label');
-    $floatString = $method->invoke($controller, ['label' => 1.5], 'label');
-    $invalid = $method->invoke($controller, ['label' => ['nope']], 'label');
+// Removed: boolFromSafe logic is now in BadgeConfiguration value object
+// See tests/Unit/ValueObjects/BadgeConfigurationTest.php for comprehensive tests
 
-    expect($missing)->toBeNull()
-        ->and($string)->toBe('visits')
-        ->and($intString)->toBe('123')
-        ->and($floatString)->toBe('1.5')
-        ->and($invalid)->toBeNull();
-});
-
-it('normalises booleans from varied safe input', function () {
-    $controller = app('test.controller');
-    $method = new \ReflectionMethod(ProfileViewsController::class, 'boolFromSafe');
-    $method->setAccessible(true);
-
-    $defaultTrue = $method->invoke($controller, [], 'flag', true);
-    $explicitFalse = $method->invoke($controller, ['flag' => false], 'flag', true);
-    $stringYes = $method->invoke($controller, ['flag' => 'YES'], 'flag', false);
-    $stringOff = $method->invoke($controller, ['flag' => 'off'], 'flag', true);
-    $stringZero = $method->invoke($controller, ['flag' => '0'], 'flag', true);
-    $numeric = $method->invoke($controller, ['flag' => 1], 'flag', false);
-    $invalid = $method->invoke($controller, ['flag' => ['maybe']], 'flag', true);
-
-    expect($defaultTrue)->toBeTrue()
-        ->and($explicitFalse)->toBeFalse()
-        ->and($stringYes)->toBeTrue()
-        ->and($stringOff)->toBeFalse()
-        ->and($stringZero)->toBeFalse()
-        ->and($numeric)->toBeTrue()
-        ->and($invalid)->toBeTrue();
-});
-
-it('reads configuration values with sane fallbacks', function () {
-    $controller = app('test.controller');
-    $stringMethod = new \ReflectionMethod(ProfileViewsController::class, 'stringConfig');
-    $stringMethod->setAccessible(true);
-    $boolMethod = new \ReflectionMethod(ProfileViewsController::class, 'boolConfig');
-    $boolMethod->setAccessible(true);
-
-    Config::set('tests.controller.string', 'value');
-    Config::set('tests.controller.string_invalid', ['nope']);
-    Config::set('tests.controller.bool_true', 'yes');
-    Config::set('tests.controller.bool_false', 'no');
-    Config::set('tests.controller.bool_numeric', 1);
-    Config::set('tests.controller.bool_invalid', ['array']);
-
-    expect($stringMethod->invoke($controller, 'tests.controller.string', 'fallback'))->toBe('value')
-        ->and($stringMethod->invoke($controller, 'tests.controller.string_invalid', 'fallback'))->toBe('fallback')
-        ->and($boolMethod->invoke($controller, 'tests.controller.bool_true', false))->toBeTrue()
-        ->and($boolMethod->invoke($controller, 'tests.controller.bool_false', true))->toBeFalse()
-        ->and($boolMethod->invoke($controller, 'tests.controller.bool_numeric', false))->toBeTrue()
-        ->and($boolMethod->invoke($controller, 'tests.controller.bool_invalid', true))->toBeTrue();
-});
+// Removed: stringConfig and boolConfig logic is now in BadgeConfiguration value object
+// See tests/Unit/ValueObjects/BadgeConfigurationTest.php for comprehensive tests
 
 it('pulls query strings safely', function () {
     $controller = app('test.controller');
