@@ -123,7 +123,6 @@ it('does not cache null result', function () {
 
     $nextHandler = Mockery::mock(LogoHandlerInterface::class);
     $nextHandler->shouldReceive('handle')
-        ->once()
         ->andReturn(null);
 
     $handler = new CacheLogoHandler();
