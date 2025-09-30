@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Providers;
 
+use App\Factories\BadgeRendererFactory;
 use App\Providers\AppServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -71,5 +72,25 @@ final class AppServiceProviderTest extends TestCase
         $this->assertSame('UserName', $out);
         $out2 = $m->invoke(null, null, '/[^A-Za-z0-9_-]/', 'none', 10);
         $this->assertSame('none', $out2);
+    }
+
+    public function testBadgeRendererFactoryIsResolvable(): void
+    {
+        $factory = $this->app->make(BadgeRendererFactory::class);
+        $this->assertInstanceOf(BadgeRendererFactory::class, $factory);
+    }
+
+    public function testBadgeRendererFactoryIsSingleton(): void
+    {
+        $factory1 = $this->app->make(BadgeRendererFactory::class);
+        $factory2 = $this->app->make(BadgeRendererFactory::class);
+        $this->assertSame($factory1, $factory2);
+    }
+
+    public function testBadgeRendererFactoryCanCreateStrategies(): void
+    {
+        $factory = $this->app->make(BadgeRendererFactory::class);
+        $strategy = $factory->create('flat');
+        $this->assertInstanceOf(\App\Contracts\BadgeRendererStrategyInterface::class, $strategy);
     }
 }
