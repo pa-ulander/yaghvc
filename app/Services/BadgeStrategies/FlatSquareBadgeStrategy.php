@@ -18,7 +18,8 @@ class FlatSquareBadgeStrategy implements BadgeRendererStrategyInterface
 {
     public function __construct(
         private readonly SvgFlatSquareRender $renderer
-    ) {}
+    ) {
+    }
 
     /**
      * Render a flat-square-style badge.
