@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Services\BadgeRenderService;
+use App\Factories\BadgeRendererFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
@@ -13,7 +14,7 @@ final class BadgeRenderServiceCanonicalizeTest extends TestCase
 {
     private function invokeCanonicalize(string $uri): string
     {
-        $svc = new BadgeRenderService();
+        $svc = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($svc);
         $m = $ref->getMethod('canonicalizeDataUri');
         $m->setAccessible(true);
