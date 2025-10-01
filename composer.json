@@ -1,11 +1,19 @@
 {
-    "name": "laravel/laravel",
+    "name": "yagvc/yagvc",
     "type": "project",
-    "version": "v11.0.0",
-    "description": "The skeleton application for the Laravel framework.",
+    "version": "v1.2.0",
+    "description": "Laravel based visitor counter badges for readme's in github profiles & repositories.",
     "keywords": [
-        "laravel",
-        "framework"
+        "Laravel",
+        "visitor",
+        "counter",
+        "badges",
+        "readme",
+        "profile",
+        "repositories",
+        "visitor-counter",
+        "visitor-count-badges",
+        "github-profile-views-counter"
     ],
     "license": "MIT",
     "require": {
