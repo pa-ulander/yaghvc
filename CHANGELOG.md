@@ -2,8 +2,6 @@
 
 All notable changes to this project are documented in this file.
 
-### [Unreleased]
-
 ### [1.2.0] - 2025-10-01
 
 **Focus:** Design Pattern Refactoring.  
@@ -53,7 +51,6 @@ Ie new badge styles, logo types, config options etc.
 - 100% backward compatibility - no breaking changes.
 - Existing API endpoint and query parameters work identically
 
-**For complete details, see:** `releasenotes-v1.2.0.md`
 
 ### [1.1.0] - 2025-10-01
 
