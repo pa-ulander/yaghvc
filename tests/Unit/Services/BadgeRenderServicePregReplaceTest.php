@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Services\BadgeRenderService;
+use App\Factories\BadgeRendererFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,7 +16,7 @@ final class BadgeRenderServicePregReplaceTest extends TestCase
 {
     public function test_ensure_accessible_labels_handles_preg_replace_null(): void
     {
-        $service = new BadgeRenderService();
+        $service = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($service);
         $method = $ref->getMethod('ensureAccessibleLabels');
         $method->setAccessible(true);
@@ -30,7 +31,7 @@ final class BadgeRenderServicePregReplaceTest extends TestCase
 
     public function test_ensure_accessible_labels_with_no_existing_title(): void
     {
-        $service = new BadgeRenderService();
+        $service = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($service);
         $method = $ref->getMethod('ensureAccessibleLabels');
         $method->setAccessible(true);

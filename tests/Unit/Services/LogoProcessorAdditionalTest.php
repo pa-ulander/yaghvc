@@ -76,14 +76,15 @@ final class LogoProcessorAdditionalTest extends TestCase
     public function testParseDataUriSalvage(): void
     {
         $p = new LogoProcessor();
-        // Break regex by adding unsupported mime token but salvage logic should attempt decode
-        $raw = 'data:image/xxpng;base64,' . base64_encode('PNG');
+        // Use valid MIME but with spaces to trigger salvage path (primary regex rejects spaces)
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>';
+        $raw = 'data:image/svg+xml;base64, ' . base64_encode($svg) . ' ';
         $res = $this->invokePrivate($p, 'parseDataUri', [$raw]);
-        $this->assertNull($res); // direct parse fails
-        // Now call prepare to execute salvage path; salvage returns sized structure with custom mime token
+        $this->assertNull($res); // direct parse fails due to spaces
+        // Now call prepare to execute salvage path
         $prepared = $p->prepare($raw);
         $this->assertIsArray($prepared);
-        $this->assertSame('xxpng', $prepared['mime']);
+        $this->assertSame('svg+xml', $prepared['mime']);
     }
 
     public function testDecodeDataUrlFromQueryParamEarlyReturn(): void

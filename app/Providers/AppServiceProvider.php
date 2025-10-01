@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Factories\BadgeRendererFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
@@ -16,7 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Bind BadgeRendererFactory as singleton for performance and memory efficiency
+        // Single instance shares the text size calculator across all strategy creations
+        $this->app->singleton(BadgeRendererFactory::class);
     }
 
     /**
