@@ -2,6 +2,59 @@
 
 All notable changes to this project are documented in this file.
 
+### [Unreleased]
+
+### [1.2.0] - 2025-10-01
+
+**Focus:** Design Pattern Refactoring.  
+Introducing three complementary design patterns.  
+Aim is to make it easier to add new features.  
+Ie new badge styles, logo types, config options etc.
+
+#### Added
+- **Value Object Pattern Implementation:**
+  - Created `BadgeRequest` composite value object combining profile identifier, badge configuration, and base count.
+  - Created `ProfileIdentifier` value object with GitHub username/repository validation & cache key generation.
+  - Created `BadgeConfiguration` value object with immutable badge rendering configuration and style validation.
+  - Comprehensive tests for BadgeConfiguration, ProfileIdentifier & BadgeRequest.
+  
+- **Chain of Responsibility Pattern for Logo Processing:**
+  - Implemented modular logo processing handler chain with 5 specialized handlers:
+    - `CacheLogoHandler` - Caches processed logos for performance optimization
+    - `RawBase64LogoHandler` - Normalizes raw base64 strings to data URIs
+    - `UrlDecodedLogoHandler` - Handles percent-encoded data URIs
+    - `SlugLogoHandler` - Resolves simple-icons slugs to SVG files
+    - `DataUriLogoHandler` - Terminal validator for data URIs (png|jpg|gif|svg+xml)
+  - Created `LogoRequest` and `LogoResult` value objects for type-safe logo processing
+  - Implemented `LogoProcessorChainFactory` for handler chain building
+  - Added comprehensive handler tests ensuring graceful degradation
+
+- **Strategy Pattern for Badge Rendering:**
+  - Created `BadgeRendererStrategyInterface` for swappable rendering strategies
+  - Implemented factory-based badge renderer creation with style mapping
+  - Added post-processing pipeline (logo embedding, color swaps, abbreviation)
+
+#### Changed
+- **Code Quality Improvements:**
+  - Refactored `ProfileViewsController` from 220 to 130 lines
+  - Reduced `LogoProcessor::prepare()` from 170 to 35 lines
+  - Removed 5 helper methods from controller (logic moved to value objects)
+  - Increased total tests from 366 to 440
+  - Eased up on testcoverage. Set lowest limit to 88%. Pretty much a sweet spot in this little app. 
+
+- **Architecture:**
+  - Type safety enforced at controller boundaries with immutable value objects
+  - Each handler now has single responsibility with clear extension points
+  - Factory pattern enables easy addition of new badge styles
+  - Single source of truth for validation logic
+
+#### Technical Details
+- Bumped PHPStan Level to 9.
+- 100% backward compatibility - no breaking changes.
+- Existing API endpoint and query parameters work identically
+
+**For complete details, see:** `releasenotes-v1.2.0.md`
+
 ### [1.1.0] - 2025-10-01
 
 #### Added
@@ -58,6 +111,7 @@ Initial stable release derived from the accumulated work on `main` up to this da
 ### Historical (Pre-1.0.0) Work
 Early WIP commits (March–October 2024) established the foundational Laravel application structure, initial badge endpoint, and iterative configuration/testing scaffolding before formal versioning.
 
-[Unreleased]: https://github.com/pa-ulander/yaghvc/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/pa-ulander/yaghvc/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/pa-ulander/yaghvc/releases/tag/v1.2.0
 [1.1.0]: https://github.com/pa-ulander/yaghvc/releases/tag/v1.1.0
 [1.0.0]: https://github.com/pa-ulander/yaghvc/releases/tag/v1.0.0
