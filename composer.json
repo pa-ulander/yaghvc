@@ -34,7 +34,7 @@
         "laravel/sail": "v1.46.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "8.8.2",
-        "pestphp/pest": "4.1.0",
+        "pestphp/pest": "4.1.1",
         "pestphp/pest-plugin-type-coverage": "4.0.2",
         "phpunit/phpunit": "^12.3.8",
         "spatie/laravel-ignition": "^2.9.1",
