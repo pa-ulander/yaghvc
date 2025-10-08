@@ -20,7 +20,7 @@
         "php": "^8.3",
         "badges/poser": "3.1.1",
         "intervention/image": "^3.11.4",
-        "laravel/framework": "12.32.5",
+        "laravel/framework": "12.33.0",
         "laravel/sanctum": "v4.2.0",
         "laravel/tinker": "v2.10.1",
         "simple-icons/simple-icons": "^15.16.0",
