@@ -434,7 +434,7 @@ Some limtiations are applied:
 ## Full Customization Example
 
 ```
-![](https://ghvc.kabelkultur.se?username=your-username&label=Visitors&color=orange&style=for-the-badge&abbreviated=true)
+![](https://ghvc.kabelkultur.se?username=your-username&label=Visitss&labelColor=blue&color=orange&style=for-the-badge&abbreviated=true&logo=github&&logoColor=ffff00&logoSize=18)
 ```
 
 ![](./public_html/assets/full-example.svg)
@@ -457,5 +457,6 @@ Clone away and have badges of fun!
 [Simple Icons](https://github.com/simple-icons/simple-icons) SVG icons for popular brands.
 
 ## License
+
 
 [MIT](LICENSE)
