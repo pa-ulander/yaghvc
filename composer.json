@@ -22,7 +22,7 @@
         "intervention/image": "^3.11.4",
         "laravel/framework": "12.41.1",
         "laravel/sanctum": "v4.2.0",
-        "laravel/tinker": "v2.10.1",
+        "laravel/tinker": "v2.10.2",
         "simple-icons/simple-icons": "^15.16.0",
         "webmozart/assert": "^1.11"
     },
