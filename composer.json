@@ -23,7 +23,7 @@
         "laravel/framework": "12.41.1",
         "laravel/sanctum": "v4.2.1",
         "laravel/tinker": "v2.10.2",
-        "simple-icons/simple-icons": "^15.16.0",
+        "simple-icons/simple-icons": "^16.1.0",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
