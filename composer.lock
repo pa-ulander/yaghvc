@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f6731d03ebbf59b8f201a81a5316e67",
+    "content-hash": "1b829c9d837327355604a8b67f55b4fc",
     "packages": [
         {
             "name": "badges/poser",
@@ -3760,16 +3760,16 @@
         },
         {
             "name": "simple-icons/simple-icons",
-            "version": "16.2.0",
+            "version": "16.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/simple-icons/simple-icons.git",
-                "reference": "6c4244d7f93cb2d1e7a0b4756ce1adf410a81f55"
+                "reference": "bb3e15c0aba0ebff564ffb280e59b99804f8b612"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simple-icons/simple-icons/zipball/6c4244d7f93cb2d1e7a0b4756ce1adf410a81f55",
-                "reference": "6c4244d7f93cb2d1e7a0b4756ce1adf410a81f55",
+                "url": "https://api.github.com/repos/simple-icons/simple-icons/zipball/bb3e15c0aba0ebff564ffb280e59b99804f8b612",
+                "reference": "bb3e15c0aba0ebff564ffb280e59b99804f8b612",
                 "shasum": ""
             },
             "type": "library",
@@ -3797,7 +3797,7 @@
                     "type": "opencollective"
                 }
             ],
-            "time": "2025-12-14T02:50:37+00:00"
+            "time": "2025-12-28T00:44:13+00:00"
         },
         {
             "name": "symfony/clock",
