@@ -21,7 +21,7 @@
         "badges/poser": "3.1.1",
         "intervention/image": "^3.11.4",
         "laravel/framework": "12.51.0",
-        "laravel/sanctum": "v4.2.4",
+        "laravel/sanctum": "v4.3.1",
         "laravel/tinker": "v2.11.0",
         "simple-icons/simple-icons": "^16.1.0",
         "webmozart/assert": "^2.1"
