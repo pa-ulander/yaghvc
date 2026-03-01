@@ -30,7 +30,7 @@
         "fakerphp/faker": "v1.24.1",
         "larastan/larastan": "3.9.2",
         "laravel/boost": "^2.1.2",
-        "laravel/pint": "v1.27.0",
+        "laravel/pint": "v1.27.1",
         "laravel/sail": "v1.53.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "8.8.3",
