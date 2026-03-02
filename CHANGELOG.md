@@ -15,6 +15,17 @@ All notable changes to this project are documented in this file.
 #### Security
 - Addressed PHPUnit unsafe deserialization advisory (GHSA-vvj3-c3rp-c85p / CVE-2026-24765) by bumping to 12.5.x.
 
+### [1.3.1] - 2026-03-02
+
+**Focus:** CI compatibility & tooling stability.**
+
+#### Changed
+- Set Composer platform to PHP 8.3 and refreshed the lockfile to install Symfony 7.4.x components, ensuring GitHub Actions (PHP 8.3) resolves dependencies cleanly.
+- Kept dependency set otherwise stable; no runtime code changes.
+
+#### Tooling
+- Composer installs on PHP 8.3 now work out-of-the-box in CI without requiring an update step.
+
 
 ### [1.2.0] - 2025-10-01
 
@@ -122,7 +133,8 @@ Initial stable release derived from the accumulated work on `main` up to this da
 ### Historical (Pre-1.0.0) Work
 Early WIP commits (March–October 2024) established the foundational Laravel application structure, initial badge endpoint, and iterative configuration/testing scaffolding before formal versioning.
 
-[Unreleased]: https://github.com/pa-ulander/yagvc/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/pa-ulander/yagvc/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/pa-ulander/yagvc/releases/tag/v1.3.1
 [1.3.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.3.0
 [1.2.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.2.0
 [1.1.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.1.0
