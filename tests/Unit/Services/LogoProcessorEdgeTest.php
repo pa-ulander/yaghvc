@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 namespace App\Services {
-    class BasePathTestShim
-    {
-        public static bool $throw = false;
-    }
+
+    use Tests\Unit\Services\BasePathTestShim;
 
     function base_path(string $path): string
     {
@@ -20,7 +18,6 @@ namespace App\Services {
 
 namespace Tests\Unit\Services {
 
-    use App\Services\BasePathTestShim;
     use App\Services\LogoProcessor;
 
     it('returns null for unknown slug', function () {
