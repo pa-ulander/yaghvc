@@ -3,6 +3,8 @@ includes:
 
 parameters:
 
+    tmpDir: storage/framework/cache/phpstan
+
     paths:
         - app/
         - routes/
