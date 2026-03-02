@@ -13,6 +13,7 @@ storage/*
 auth.json
 yarn-error.log
 /.vscode
+/.github/agents
 /.github/*.md
 
 
