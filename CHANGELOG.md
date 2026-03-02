@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented in this file.
 
+### [1.3.0] - 2026-03-02
+
+**Focus:** Dependency refresh & security hardening.
+
+#### Changed
+- Upgraded Laravel stack and tooling: framework 12.51.x, Sanctum 4.3.x, Boost 2.1.x, Sail 1.53.x, Tinker 2.11.x, Pint 1.27.x, PHP CS Fixer/PHPCS 4.0.1, and Larastan 3.9.x.
+- Refreshed badges/assets dependencies including simple-icons 16.8.x and webmozart/assert 2.1.x.
+- Testing and QA tooling updates: Pest 4.5.x, PHPUnit 12.5.x (includes GHSA-vvj3-c3rp-c85p fix), Collision 8.9.x, Paratest 7.19.x.
+- PHPStan cache path now uses a project-local writable directory to avoid container tmp permission issues.
+
+#### Security
+- Addressed PHPUnit unsafe deserialization advisory (GHSA-vvj3-c3rp-c85p / CVE-2026-24765) by bumping to 12.5.x.
+
+
 ### [1.2.0] - 2025-10-01
 
 **Focus:** Design Pattern Refactoring.  
@@ -108,7 +122,8 @@ Initial stable release derived from the accumulated work on `main` up to this da
 ### Historical (Pre-1.0.0) Work
 Early WIP commits (March–October 2024) established the foundational Laravel application structure, initial badge endpoint, and iterative configuration/testing scaffolding before formal versioning.
 
-[Unreleased]: https://github.com/pa-ulander/yaghvc/compare/v1.2.0...HEAD
-[1.2.0]: https://github.com/pa-ulander/yaghvc/releases/tag/v1.2.0
-[1.1.0]: https://github.com/pa-ulander/yaghvc/releases/tag/v1.1.0
-[1.0.0]: https://github.com/pa-ulander/yaghvc/releases/tag/v1.0.0
+[Unreleased]: https://github.com/pa-ulander/yagvc/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.3.0
+[1.2.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.2.0
+[1.1.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.1.0
+[1.0.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.0.0
