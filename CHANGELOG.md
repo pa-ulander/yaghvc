@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented in this file.
 
+### [1.4.0] - 2026-04-30
+
+**Focus:** Framework alignment, dependency upgrades, and tooling consistency.
+
+#### Changed
+- Upgraded key dependencies: Laravel Framework 12.54.1, Boost 2.3.4, Sail 1.54.0, Tinker 3.0.0, Pint 1.29.0, and simple-icons 16.12.0.
+- Updated cache configuration defaults to match newer framework expectations, including a revised cache prefix format and serializable classes support.
+- Aligned middleware naming with current Laravel conventions by switching to `PreventRequestForgery`.
+- Refined local development and automation setup (Docker ports and DNS settings, Makefile/composer command flow, and shell prompt updates).
+- Updated QA/tooling configuration (PHPUnit schema + cacheDirectory, PHPStan and coverage paths/metrics).
+
+#### Tests
+- Added stronger SVG badge assertions for label and status handling in logo embedding tests.
+- Cleaned temporary test artifacts and refreshed test command behavior.
+
+#### Tooling
+- Added MCP configuration for laravel-boost integration.
+- Expanded ignore rules with `node_modules`.
+
 ### [1.3.0] - 2026-03-02
 
 **Focus:** Dependency refresh & security hardening.
@@ -133,7 +152,8 @@ Initial stable release derived from the accumulated work on `main` up to this da
 ### Historical (Pre-1.0.0) Work
 Early WIP commits (March–October 2024) established the foundational Laravel application structure, initial badge endpoint, and iterative configuration/testing scaffolding before formal versioning.
 
-[Unreleased]: https://github.com/pa-ulander/yagvc/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/pa-ulander/yagvc/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.4.0
 [1.3.1]: https://github.com/pa-ulander/yagvc/releases/tag/v1.3.1
 [1.3.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.3.0
 [1.2.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.2.0
