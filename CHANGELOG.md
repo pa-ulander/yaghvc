@@ -4,10 +4,12 @@ All notable changes to this project are documented in this file.
 
 ### [1.4.0] - 2026-04-30
 
-**Focus:** Framework alignment, dependency upgrades, and tooling consistency.
+**Focus:** Major framework upgrade from Laravel 12 to Laravel 13.
 
 #### Changed
-- Upgraded key dependencies: Laravel Framework 12.54.1, Boost 2.3.4, Sail 1.54.0, Tinker 3.0.0, Pint 1.29.0, and simple-icons 16.12.0.
+- **Upgraded Laravel Framework from `12.54.1` to `^13.0` (major version update).**
+- Updated related Laravel ecosystem packages and constraints to align with Laravel 13 (including Sanctum/Tinker and dev tooling ranges).
+- Upgraded key dependencies in this release: Boost 2.3.4, Sail 1.54.0, Tinker 3.0.0, Pint 1.29.0, and simple-icons 16.12.0.
 - Updated cache configuration defaults to match newer framework expectations, including a revised cache prefix format and serializable classes support.
 - Aligned middleware naming with current Laravel conventions by switching to `PreventRequestForgery`.
 - Refined local development and automation setup (Docker ports and DNS settings, Makefile/composer command flow, and shell prompt updates).
