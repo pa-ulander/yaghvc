@@ -8,9 +8,10 @@ services:
                 uid: ${UID}
                 devuser: "${DEVUSER}"
         container_name: yagvc-app
+        hostname: yagvc-app
         restart: unless-stopped
         ports:
-            - 80:80
+            - 8080:80
             - 443:443
         depends_on:
             - db
@@ -19,6 +20,9 @@ services:
             - APACHE_RUN_GROUP=#${UID}
         volumes:
             - .:/var/www/html:cached
+        dns:
+            - 1.1.1.1
+            - 8.8.8.8
         networks:
             backend:
                 aliases:
