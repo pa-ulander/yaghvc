@@ -145,7 +145,7 @@ bash-db: prerequisite
 ##@ Launch unit tests
 test-php:
 	@echo "Start phpunit tests";
-	docker-compose run --rm yagvc-app su -s /bin/bash $(DEVUSER) -c "cd /var/www/html && composer test"
+	docker-compose run --rm yagvc-app su -s /bin/bash $(DEVUSER) -c "cd /var/www/html && rm -rf vendor/pestphp/pest/.temp/test-results vendor/pestphp/pest/.temp/code-coverage vendor/pestphp/pest/.temp/coverage.php && composer test"
 
 
 #################################################
