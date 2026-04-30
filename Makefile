@@ -16,7 +16,7 @@ default: up
 up: post-build-actions prerequisite
 	- npx kill-port 3306
 	- npx kill-port 443
-	- npx kill-port 80
+	- npx kill-port 8080
 	- docker-compose -f docker-compose.yml up -d
 
 ##@ Stop all containers
@@ -66,17 +66,17 @@ build-project: prepare-containers
 ##@ Install project and dependencies
 install-project:
 	# Update the composer dependencies
-	- docker-compose exec yagvc-app composer --ansi install
+	- docker-compose run --rm yagvc-app su -s /bin/bash $(DEVUSER) -c "cd /var/www/html && composer --ansi install"
 
 ##@ Update project and dependencies
 update-project:
 	# Update the composer dependencies
-	- docker-compose exec yagvc-app composer --ansi update
+	- docker-compose run --rm yagvc-app su -s /bin/bash $(DEVUSER) -c "cd /var/www/html && composer --ansi update"
 
 ##@ Upgrade project and dependencies
 upgrade-project:
 	# Update the composer dependencies
-	- docker-compose exec yagvc-app composer --ansi upgrade
+	- docker-compose run --rm yagvc-app su -s /bin/bash $(DEVUSER) -c "cd /var/www/html && composer --ansi upgrade"
 
 ##@ Run actions after setup
 post-build-actions:
@@ -126,12 +126,12 @@ status: prerequisite
 bash: prerequisite
 	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` yagvc-app bash
 	# - docker exec -it yagvc-app bash -c "sudo -u root /bin/bash"
-	- docker exec -it yagvc-app bash -c "sudo -u $(DEVUSER) /bin/bash"
+	- docker-compose run --rm yagvc-app su -s /bin/bash $(DEVUSER)
 
 ##@ Opens a bash prompt to the yagvc-app container as root
 bash-root: prerequisite
 	# - docker-compose exec --env COLUMNS=`tput cols` --env LINES=`tput lines` yagvc-app bash
-	- docker exec -it yagvc-app bash -c "sudo -u root /bin/bash"
+	- docker-compose run --rm --user root yagvc-app bash
 
 ##@ Opens a bash prompt to the db container
 bash-db: prerequisite
@@ -145,7 +145,7 @@ bash-db: prerequisite
 ##@ Launch unit tests
 test-php:
 	@echo "Start phpunit tests";
-	docker-compose exec yagvc-app bash -c "cd /var/www/html && composer test"
+	docker-compose run --rm yagvc-app su -s /bin/bash $(DEVUSER) -c "cd /var/www/html && composer test"
 
 
 #################################################
