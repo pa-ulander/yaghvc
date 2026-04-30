@@ -3,7 +3,7 @@ includes:
 
 parameters:
 
-    tmpDir: storage/framework/cache/phpstan
+    tmpDir: /tmp/phpstan/cache/PHPStan
 
     paths:
         - app/
