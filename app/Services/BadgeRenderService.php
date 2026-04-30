@@ -536,6 +536,7 @@ class BadgeRenderService
                 $this->debugLog(event: 'embedLogoInSvg:missing-label-rect');
                 return $this->simpleInjectLogo(svg: $svg, logoDataUri: $logoDataUri, width: $width, height: $height, y: $y);
             }
+            assert(isset($mLabel[1]));
             $labelWidth = (float) $mLabel[1];
             $statusMatch = preg_match(pattern: '/<rect[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*>/', subject: $svg, matches: $mStatus);
             if ($statusMatch === 0) {
@@ -545,6 +546,7 @@ class BadgeRenderService
                 $this->debugLog(event: 'embedLogoInSvg:missing-status-rect');
                 return $this->simpleInjectLogo(svg: $svg, logoDataUri: $logoDataUri, width: $width, height: $height, y: $y);
             }
+            assert(isset($mStatus[0], $mStatus[1], $mStatus[2], $mStatus[3]));
             if (preg_match('/^<rect[^>]*fill="#/i', $mStatus[0])) {
                 $statusX = (float) $mStatus[2];
                 $statusWidth = (float) $mStatus[3];
