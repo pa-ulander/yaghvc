@@ -19,7 +19,7 @@
     "require": {
         "php": "^8.3",
         "badges/poser": "3.1.1",
-        "intervention/image": "^3.11.4",
+        "intervention/image": "^4.0.2",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
