@@ -3776,16 +3776,16 @@
         },
         {
             "name": "simple-icons/simple-icons",
-            "version": "16.26.0",
+            "version": "16.27.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/simple-icons/simple-icons.git",
-                "reference": "e4378df744b2c1282917dcee88b50d52fff24825"
+                "reference": "44a643f819e3c71aba635d15f132c33c5cc3d000"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simple-icons/simple-icons/zipball/e4378df744b2c1282917dcee88b50d52fff24825",
-                "reference": "e4378df744b2c1282917dcee88b50d52fff24825",
+                "url": "https://api.github.com/repos/simple-icons/simple-icons/zipball/44a643f819e3c71aba635d15f132c33c5cc3d000",
+                "reference": "44a643f819e3c71aba635d15f132c33c5cc3d000",
                 "shasum": ""
             },
             "type": "library",
@@ -3813,7 +3813,7 @@
                     "type": "opencollective"
                 }
             ],
-            "time": "2026-07-12T02:48:43+00:00"
+            "time": "2026-07-19T01:37:54+00:00"
         },
         {
             "name": "symfony/clock",
