@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ["8.3", "8.4"]
+        php: ["8.4", "8.5"]
 
     name: PHP ${{ matrix.php }}
 
@@ -49,7 +49,7 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+        run: composer install --prefer-dist --no-interaction --no-progress --no-plugins --no-scripts
 
       - name: Prepare Laravel Application
         run: |
@@ -62,7 +62,7 @@ jobs:
         run: composer test
 
       - name: Upload coverage artifact
-        if: matrix.php == '8.4'
+        if: matrix.php == '8.5'
         uses: actions/upload-artifact@v4
         with:
           name: clover-coverage

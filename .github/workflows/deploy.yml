@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 env:
-  PHP_COMMAND: /opt/alt/php83/usr/bin/php 
-  COMPOSER_COMMAND: /opt/alt/php83/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
+  PHP_COMMAND: /opt/alt/php85/usr/bin/php 
+  COMPOSER_COMMAND: /opt/alt/php85/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader --no-plugins --no-scripts
 
 jobs:
   deploy:
