@@ -6,7 +6,9 @@
         "artisan",
         "boost:mcp"
       ],
-      "protocolVersion": "2025-06-18"
+      "tools": [
+        "*"
+      ]
     }
   }
 }
