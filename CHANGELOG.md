@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+### Unreleased
+
+#### Fixed
+- Made logos visible above flat and flat-square badge backgrounds.
+- Kept plastic badge backgrounds, gradients, and label/status boundaries aligned when adding logos.
+
 ### [1.4.0] - 2026-04-30
 
 **Focus:** Major framework upgrade from Laravel 12 to Laravel 13.
