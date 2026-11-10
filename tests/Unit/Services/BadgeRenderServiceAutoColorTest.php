@@ -17,7 +17,6 @@ final class BadgeRenderServiceAutoColorTest extends TestCase
         $svc = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($svc);
         $m = $ref->getMethod('deriveAutoLogoColor');
-        $m->setAccessible(true);
         return (string) $m->invoke($svc, $svg, $labelColor, $msgFill);
     }
 

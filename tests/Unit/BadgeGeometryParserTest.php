@@ -45,3 +45,13 @@ it('fails on width mismatch', function () {
     expect($result->success)->toBeFalse();
     expect($result->reason)->toBe(BadgeGeometryParser::REASON_WIDTH_MISMATCH);
 });
+
+it('parses plastic geometry with a full-width label background', function () {
+    $svg = '<svg width="100" height="18"><rect rx="4" width="100" height="18" fill="#555"/><rect rx="4" x="40" width="60" height="18" fill="#007ec6"/><rect x="40" width="4" height="18" fill="#007ec6"/><rect rx="4" width="100" height="18" fill="url(#smooth)"/></svg>';
+    $result = (new BadgeGeometryParser())->parse($svg);
+
+    expect($result->success)->toBeTrue();
+    expect($result->labelWidth)->toBe(40.0);
+    expect($result->statusX)->toBe(40.0);
+    expect($result->statusWidth)->toBe(60.0);
+});

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\ProfileViews;
+use DOMDocument;
+use DOMElement;
+use DOMXPath;
 use Tests\TestCase;
 
 /**
@@ -42,6 +45,43 @@ class BadgeRenderingTest extends TestCase
         // Uncomment for debugging: fwrite(STDERR, $response->getContent());
         $response->assertStatus(200)
             ->assertSee('<image', false); // embedded image element
+    }
+
+    /**
+     * Verify the reported plastic badge request keeps its colored segments aligned.
+     */
+    public function test_plastic_badge_with_large_logo_keeps_backgrounds_aligned(): void
+    {
+        $response = $this->get('/?username=plasticregression&label=Visitors%20for%20me&color=orange&style=plastic&logoSize=32&logo=github');
+        $response->assertOk()->assertHeader('Content-Type', 'image/svg+xml');
+
+        $badge = new DOMDocument();
+        $this->assertTrue($badge->loadXML($response->getContent()));
+        $root = $badge->documentElement;
+        $rectangles = $badge->getElementsByTagName('rect');
+        $label = $rectangles->item(0);
+        $status = $rectangles->item(1);
+        $seam = $rectangles->item(2);
+        $gradient = $rectangles->item(3);
+        $image = $badge->getElementsByTagName('image')->item(0);
+        foreach ([$root, $label, $status, $seam, $gradient, $image] as $element) {
+            $this->assertInstanceOf(DOMElement::class, $element);
+        }
+
+        $width = (float) $root->getAttribute('width');
+        $statusX = (float) $status->getAttribute('x');
+        $this->assertSame('32', $image->getAttribute('width'));
+        $this->assertSame('16', $image->getAttribute('height'));
+        $this->assertSame('#555', $label->getAttribute('fill'));
+        $this->assertSame('#fe7d37', $status->getAttribute('fill'));
+        $this->assertSame($width, (float) $label->getAttribute('width'));
+        $this->assertSame($width, (float) $gradient->getAttribute('width'));
+        $this->assertSame($statusX, (float) $seam->getAttribute('x'));
+        $this->assertEqualsWithDelta($width, $statusX + (float) $status->getAttribute('width'), 0.001);
+
+        $xpath = new DOMXPath($badge);
+        $xpath->registerNamespace('svg', 'http://www.w3.org/2000/svg');
+        $this->assertSame(0, $xpath->query('following::svg:rect', $image)->length);
     }
 
     public function test_embeds_base64_png_logo(): void

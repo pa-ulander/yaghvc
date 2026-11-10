@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented in this file.
 
+### [1.5.0] - 2026-11-10
+
+**Focus:** Badge logo rendering fixes and the PHP 8.5 upgrade.
+
+#### Breaking
+- PHP 8.5 is now required; PHP 8.3 and 8.4 are no longer supported.
+
+#### Fixed
+- Made logos visible above flat and flat-square badge backgrounds.
+- Kept plastic badge backgrounds, gradients, and label/status boundaries aligned when adding logos.
+- Handled badge geometry regex failures safely, avoiding access to missing matches and falling back to a usable badge.
+
+#### Changed
+- Upgraded Intervention Image from 3.x to 4.x and refreshed locked dependencies, including Laravel Framework, Simple Icons, and development tools.
+- Updated the Docker image to PHP 8.5 and aligned the test workflows with PHP 8.5 and Ubuntu 26.04.
+
+#### Tests
+- Added regression coverage for all four badge styles, representative logo sizes, SVG and raster logos, label color overrides, and plastic badge alignment.
+
 ### [1.4.0] - 2026-04-30
 
 **Focus:** Major framework upgrade from Laravel 12 to Laravel 13.

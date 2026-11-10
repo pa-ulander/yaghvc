@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace App\Services {
-
     use Tests\Unit\Services\BasePathTestShim;
 
     function base_path(string $path): string
@@ -60,7 +59,6 @@ namespace Tests\Unit\Services {
     it('injects width and height attributes when missing on slug', function () {
         $p = new LogoProcessor();
         $method = new \ReflectionMethod(LogoProcessor::class, 'resolveNamedLogo');
-        $method->setAccessible(true);
 
         $result = $method->invoke($p, 'github');
 
