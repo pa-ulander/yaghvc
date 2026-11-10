@@ -1,4 +1,4 @@
-FROM php:8.4-apache
+FROM php:8.5-apache
 
 RUN apt update
 
@@ -60,21 +60,19 @@ RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 EXPOSE 80
 EXPOSE 443
 
+# opcache, pdo and pdo_sqlite are built into the PHP 8.5 image
 RUN docker-php-ext-install \
-    gd \ 
-    pdo \
+    gd \
     zip \
     exif \
     bcmath \
-    opcache \
     calendar \
-    pdo_mysql \
-    pdo_sqlite
+    pdo_mysql
 
 # 5. composer
-COPY --from=composer:2.8.10 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.11.1 /usr/bin/composer /usr/bin/composer
 
-RUN pecl install xdebug-3.4.5 && \
+RUN pecl install xdebug-3.5.3 && \
     docker-php-ext-enable xdebug
 
 # 6. we need a user with the same UID/GID as the host user

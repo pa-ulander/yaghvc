@@ -1,1 +1,13 @@
+# The image only needs docker/apache/*; the app code is bind-mounted at runtime.
+# Database data dirs are owned by the container's mysql user (UID 999) and
+# are unreadable by the host user, which breaks the build context.
 docker/var
+docker/db/data
+docker/db/backups
+docker/db_test
+docker/backups
+.git
+node_modules
+vendor
+coverage
+storage

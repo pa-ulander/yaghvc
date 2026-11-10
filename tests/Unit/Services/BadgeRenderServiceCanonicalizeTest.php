@@ -17,7 +17,6 @@ final class BadgeRenderServiceCanonicalizeTest extends TestCase
         $svc = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($svc);
         $m = $ref->getMethod('canonicalizeDataUri');
-        $m->setAccessible(true);
         /** @var string $out */
         $out = $m->invoke($svc, $uri);
         return $out;

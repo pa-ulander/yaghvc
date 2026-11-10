@@ -107,7 +107,6 @@ final class LogoProcessorCacheTest extends TestCase
         $processor = new LogoProcessor();
         $ref = new \ReflectionClass($processor);
         $method = $ref->getMethod('configInt');
-        $method->setAccessible(true);
 
         $result = $method->invoke($processor, 'badge.logo_cache_ttl', 100);
         $this->assertSame(300, $result);
@@ -119,7 +118,6 @@ final class LogoProcessorCacheTest extends TestCase
         $processor = new LogoProcessor();
         $ref = new \ReflectionClass($processor);
         $method = $ref->getMethod('configInt');
-        $method->setAccessible(true);
 
         $result = $method->invoke($processor, 'badge.logo_cache_ttl', 100);
         $this->assertSame(300, $result);
@@ -131,7 +129,6 @@ final class LogoProcessorCacheTest extends TestCase
         $processor = new LogoProcessor();
         $ref = new \ReflectionClass($processor);
         $method = $ref->getMethod('configInt');
-        $method->setAccessible(true);
 
         $result = $method->invoke($processor, 'badge.logo_cache_ttl', 100);
         $this->assertSame(100, $result);

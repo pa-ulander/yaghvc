@@ -1,7 +1,10 @@
+node_modules
 docker/db/data
 docker/var
 /vendor
 /stubs
+/coverage/*
+!/coverage/*_badge.svg
 
 *.cache
 storage/*
@@ -21,4 +24,3 @@ yarn-error.log
 /docs
 /*.txt
 scratch.*
-node_modules

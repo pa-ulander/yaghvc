@@ -28,7 +28,6 @@ function invokeBadgePrivate(object $svc, string $method, array $args = [])
 {
     $ref = new ReflectionClass($svc);
     $m = $ref->getMethod($method);
-    $m->setAccessible(true);
     return $m->invokeArgs($svc, $args);
 }
 
@@ -217,7 +216,6 @@ it('formats number without abbreviation', function () {
     $badgeRenderService = makeBadgeRenderService();
     $reflection = new ReflectionClass($badgeRenderService);
     $method = $reflection->getMethod('formatNumber');
-    $method->setAccessible(true);
 
     $result = $method->invokeArgs($badgeRenderService, [1234567, false]);
     expect($result)->toBe('1,234,567');

@@ -56,7 +56,6 @@ final class AppServiceProviderTest extends TestCase
     {
         $ref = new \ReflectionClass(AppServiceProvider::class);
         $m = $ref->getMethod('intFromMixed');
-        $m->setAccessible(true);
         $this->assertSame(5, $m->invoke(null, 5, 1));
         $this->assertSame(6, $m->invoke(null, '6', 1));
         $this->assertSame(7, $m->invoke(null, 7.9, 1));
@@ -67,7 +66,6 @@ final class AppServiceProviderTest extends TestCase
     {
         $ref = new \ReflectionClass(AppServiceProvider::class);
         $m = $ref->getMethod('sanitizeKeySegment');
-        $m->setAccessible(true);
         $out = $m->invoke(null, 'User Name!*', '/[^A-Za-z0-9_-]/', 'none', 10);
         $this->assertSame('UserName', $out);
         $out2 = $m->invoke(null, null, '/[^A-Za-z0-9_-]/', 'none', 10);

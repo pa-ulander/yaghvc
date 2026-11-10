@@ -19,7 +19,6 @@ final class BadgeRenderServicePregReplaceTest extends TestCase
         $service = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($service);
         $method = $ref->getMethod('ensureAccessibleLabels');
-        $method->setAccessible(true);
 
         // Normal case - preg_replace should work
         $svg = '<svg aria-label="old"><title>old</title></svg>';
@@ -34,7 +33,6 @@ final class BadgeRenderServicePregReplaceTest extends TestCase
         $service = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($service);
         $method = $ref->getMethod('ensureAccessibleLabels');
-        $method->setAccessible(true);
 
         // No existing title - should inject one
         $svg = '<svg width="100" height="20"><rect/></svg>';

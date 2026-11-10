@@ -17,7 +17,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.5",
         "badges/poser": "3.1.1",
         "intervention/image": "^4.0.2",
         "laravel/framework": "^13.0",
@@ -30,7 +30,7 @@
         "fakerphp/faker": "^1.24",
         "larastan/larastan": "^3.9.3",
         "laravel/boost": "^2.1",
-        "laravel/pint": "^1.0",
+        "laravel/pint": "^1.13",
         "laravel/sail": "^1.58",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.9",
@@ -110,7 +110,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.3.0"
+            "php": "8.5"
         },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
