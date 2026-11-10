@@ -101,7 +101,6 @@ final class ProfileViewsRequestPassedValidationTest extends \Tests\TestCase
         $req = new ProfileViewsRequest();
         $ref = new \ReflectionClass($req);
         $m = $ref->getMethod('intConfig');
-        $m->setAccessible(true);
         $this->assertSame(123, $m->invoke($req, 'badge.logo_max_bytes', 77));
 
         Config::set('badge.logo_max_bytes', 456.0); // float numeric

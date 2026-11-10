@@ -17,7 +17,6 @@ final class BadgeRenderServiceEmbedFallbackTest extends TestCase
         $svc = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($svc);
         $m = $ref->getMethod('embedLogoInSvg');
-        $m->setAccessible(true);
         /** @var string $out */
         $out = $m->invoke($svc, $svg, $dataUri, $mime, $w, $h);
         return $out;

@@ -139,7 +139,6 @@ it('blocks non github clients in production when restrictions are enabled', func
 it('normalises boolean configuration values', function () {
     $middleware = new GithubCamoOnly();
     $method = new \ReflectionMethod(GithubCamoOnly::class, 'boolConfig');
-    $method->setAccessible(true);
 
     Config::set('auth.test.bool_true', 'YES');
     Config::set('auth.test.bool_false', 'no');
@@ -155,7 +154,6 @@ it('normalises boolean configuration values', function () {
 it('filters string list configuration values', function () {
     $middleware = new GithubCamoOnly();
     $method = new \ReflectionMethod(GithubCamoOnly::class, 'stringListConfig');
-    $method->setAccessible(true);
 
     Config::set('auth.test.list_valid', ['prod', 'staging', '']);
     Config::set('auth.test.list_invalid', 'prod');

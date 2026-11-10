@@ -18,7 +18,6 @@ final class BadgeRenderServiceDebugLogTest extends TestCase
         $svc = new BadgeRenderService(new BadgeRendererFactory());
         $ref = new \ReflectionClass($svc);
         $m = $ref->getMethod('debugLog');
-        $m->setAccessible(true);
         $m->invoke($svc, 'test-event', ['foo' => str_repeat('a', 300)]); // triggers truncation if enabled
     }
 

@@ -58,7 +58,6 @@ it('recolors label rect when fill attribute precedes geometry attributes', funct
     $svc = new BadgeRenderService(new BadgeRendererFactory());
     $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="99" height="20"><rect fill="#123456" x="0" width="37" height="20"/></svg>';
     $method = new \ReflectionMethod(BadgeRenderService::class, 'applyLabelColor');
-    $method->setAccessible(true);
     $result = $method->invoke($svc, $svg, 'ABCDEF');
     expect($result)->toContain('fill="#ABCDEF"')->toContain('x="0" width="37" height="20"');
 });

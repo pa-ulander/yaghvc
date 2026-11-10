@@ -136,7 +136,6 @@ it('renders badge with correct parameters', function () {
     $controller = app('test.controller');
     $reflectionClass = new \ReflectionClass($controller);
     $renderBadgeMethod = $reflectionClass->getMethod('renderBadge');
-    $renderBadgeMethod->setAccessible(true);
 
     $safe = [
         'username' => 'test-user',
@@ -161,7 +160,6 @@ it('creates response with correct headers', function () {
     $controller = app('test.controller');
     $reflectionClass = new \ReflectionClass($controller);
     $createResponseMethod = $reflectionClass->getMethod('createBadgeResponse');
-    $createResponseMethod->setAccessible(true);
 
     $svgContent = '<svg>Test SVG</svg>';
 
@@ -259,7 +257,6 @@ it('handles multiple repositories for same user', function () {
 it('returns 304 when if-none-match header matches badge etag', function () {
     $controller = app('test.controller');
     $method = new \ReflectionMethod(ProfileViewsController::class, 'createBadgeResponse');
-    $method->setAccessible(true);
 
     $badge = '<svg>etag-me</svg>';
     $etag = 'W/"' . sha1($badge) . '"';
@@ -284,7 +281,6 @@ it('returns 304 when if-none-match header matches badge etag', function () {
 it('normalises validated input and arrays consistently', function () {
     $controller = app('test.controller');
     $reflection = new \ReflectionMethod(ProfileViewsController::class, 'normaliseValidatedInput');
-    $reflection->setAccessible(true);
 
     $validated = new ValidatedInput(['foo' => 'bar']);
     $asArray = $reflection->invoke($controller, $validated);
@@ -306,7 +302,6 @@ it('normalises validated input and arrays consistently', function () {
 it('pulls query strings safely', function () {
     $controller = app('test.controller');
     $method = new \ReflectionMethod(ProfileViewsController::class, 'queryString');
-    $method->setAccessible(true);
 
     $originalQuery = request()->query->all();
 

@@ -17,28 +17,28 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.5",
         "badges/poser": "3.1.1",
-        "intervention/image": "^3.11.4",
-        "laravel/framework": "12.31.1",
-        "laravel/sanctum": "v4.2.0",
-        "laravel/tinker": "v2.10.1",
-        "simple-icons/simple-icons": "^15.16.0",
-        "webmozart/assert": "^1.11"
+        "intervention/image": "^4.0.2",
+        "laravel/framework": "^13.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^3.0",
+        "simple-icons/simple-icons": "^16.1.0",
+        "webmozart/assert": "^2.1"
     },
     "require-dev": {
-        "fakerphp/faker": "v1.24.1",
-        "larastan/larastan": "3.7.2",
-        "laravel/boost": "^1.2.1",
-        "laravel/pint": "v1.25.1",
-        "laravel/sail": "v1.46.0",
-        "mockery/mockery": "^1.6.12",
-        "nunomaduro/collision": "8.8.2",
-        "pestphp/pest": "4.1.0",
-        "pestphp/pest-plugin-type-coverage": "4.0.2",
-        "phpunit/phpunit": "^12.3.8",
-        "spatie/laravel-ignition": "^2.9.1",
-        "squizlabs/php_codesniffer": "4.0.0"
+        "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.9.3",
+        "laravel/boost": "^2.1",
+        "laravel/pint": "^1.13",
+        "laravel/sail": "^1.58",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.9",
+        "pestphp/pest": "^4.5",
+        "pestphp/pest-plugin-type-coverage": "^4.0",
+        "phpunit/phpunit": "^12.5",
+        "spatie/laravel-ignition": "^2.11",
+        "squizlabs/php_codesniffer": "^4.0"
     },
     "autoload": {
         "psr-4": {
@@ -109,6 +109,9 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform": {
+            "php": "8.5"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

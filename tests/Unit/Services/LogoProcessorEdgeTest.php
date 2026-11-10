@@ -63,7 +63,6 @@ namespace Tests\Unit\Services {
     it('injects width and height attributes when missing on slug', function () {
         $p = new LogoProcessor();
         $method = new \ReflectionMethod(LogoProcessor::class, 'resolveNamedLogo');
-        $method->setAccessible(true);
 
         $result = $method->invoke($p, 'github');
 
