@@ -43,13 +43,13 @@ jobs:
         id: composer-cache
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress --no-plugins --no-scripts
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
 
       - name: Prepare Laravel Application
         run: |
@@ -70,7 +70,7 @@ jobs:
 
   coverage-badge:
     needs: tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: needs.tests.result == 'success'
     permissions:
       contents: write
