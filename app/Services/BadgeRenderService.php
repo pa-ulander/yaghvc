@@ -576,17 +576,10 @@ class BadgeRenderService
             totalWidth: $totalWidth,
             labelWidth: $labelWidth,
             statusX: $statusX,
-            statusWidth: $statusWidth,
             segment: $segment,
-            badgeHeight: $badgeHeight,
         );
         $logoElement = '<image x="' . $padLeft . '" y="' . $y . '" width="' . $width . '" height="' . $height . '" href="' . $logoDataUri . '" />';
-        if (preg_match('/<g mask="url\(#a\)">/i', $svg, $gMatch, PREG_OFFSET_CAPTURE)) {
-            $insertPos = $gMatch[0][1] + strlen($gMatch[0][0]);
-            $svg = substr($svg, 0, $insertPos) . $logoElement . substr($svg, $insertPos);
-        } else {
-            $svg = str_replace('</svg>', $logoElement . '</svg>', $svg);
-        }
+        $svg = str_replace('</svg>', $logoElement . '</svg>', $svg);
         $this->debugLog('embedLogoInSvg:success', [
             'new_total_width' => $totalWidth + $segment,
             'segment_added' => $segment,
@@ -600,14 +593,11 @@ class BadgeRenderService
      * @param float $totalWidth Original total width of badge
      * @param float $labelWidth Width of label segment (to be expanded)
      * @param float $statusX X coordinate of status rect (shifted right)
-     * @param float $statusWidth Width of status rect (unchanged)
      * @param float $segment Width to insert (logo padding + logo + padding)
-     * @param float $badgeHeight Height of the badge for rect matching
      */
-    private function shiftGeometry(string $svg, float $totalWidth, float $labelWidth, float $statusX, float $statusWidth, float $segment, float $badgeHeight): string
+    private function shiftGeometry(string $svg, float $totalWidth, float $labelWidth, float $statusX, float $segment): string
     {
         $newTotal = $totalWidth + $segment;
-        $newLabelWidth = $labelWidth + $segment;
         $newStatusX = $statusX + $segment;
         // Adjust <svg width>
         $svg = preg_replace_callback('/<svg([^>]*)>/', function (array $m) use ($totalWidth, $newTotal) {
@@ -622,56 +612,21 @@ class BadgeRenderService
             }
             return $seg;
         }, $svg, 1) ?? $svg;
-        // Adjust background rect(s)
-        $svg = preg_replace(
-            '/<rect([^>]*?)width="' . preg_quote(str: (string) $totalWidth, delimiter: '/') . '"([^>]*?)height="' . $badgeHeight . '"([^>]*?)fill="#fff"\/>/',
-            '<rect$1width="' . $newTotal . '"$2height="' . $badgeHeight . '"$3fill="#fff"/>',
-            $svg,
-            1,
-        ) ?? $svg;
-        $svg = preg_replace(
-            '/<rect([^>]*?)width="' . preg_quote(str: (string) $totalWidth, delimiter: '/') . '"([^>]*?)height="' . $badgeHeight . '"([^>]*?)fill="url\(#b\)"\/>/',
-            '<rect$1width="' . $newTotal . '"$2height="' . $badgeHeight . '"$3fill="url(#b)"/>',
-            $svg,
-            1,
-        ) ?? $svg;
-        // Update label rect
-        $labelRectUpdated = false;
-        $svg = preg_replace_callback('/<rect[^>]*fill="#555"[^>]*>/', function (array $m) use ($labelWidth, $newLabelWidth, &$labelRectUpdated) {
-            if ($labelRectUpdated) {
+        // Include masks, gradients, and plastic's overlapping status seam.
+        $svg = preg_replace_callback('/<rect\b[^>]*>/', function (array $m) use ($totalWidth, $labelWidth, $segment, $statusX, $newStatusX): string {
+            if (! preg_match('/\bwidth="([0-9.]+)"/', $m[0], $mw)) {
                 return $m[0];
             }
-            if (!preg_match('/width="([0-9.]+)"/', $m[0], $mw)) {
-                return $m[0];
+            $x = preg_match('/\bx="([0-9.]+)"/', $m[0], $mx) ? (float) $mx[1] : 0.0;
+            if ($x === $statusX) {
+                return preg_replace('/\bx="[0-9.]+"/', 'x="' . $newStatusX . '"', $m[0], 1) ?? $m[0];
             }
-            if ((float) $mw[1] !== $labelWidth) {
-                return $m[0];
+            $width = (float) $mw[1];
+            if ($x === 0.0 && ($width === $totalWidth || $width === $labelWidth)) {
+                return preg_replace('/\bwidth="[0-9.]+"/', 'width="' . ($width + $segment) . '"', $m[0], 1) ?? $m[0];
             }
-            $labelRectUpdated = true;
-            return preg_replace(
-                '/width="' . preg_quote(str: $mw[1], delimiter: '/') . '"/',
-                'width="' . $newLabelWidth . '"',
-                $m[0],
-                1,
-            ) ?? $m[0];
-        }, $svg, 1) ?? $svg;
-        // Shift status rect
-        $statusRectUpdated = false;
-        $svg = preg_replace_callback('/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', function (array $m) use ($statusX, $statusWidth, $newStatusX, &$statusRectUpdated) {
-            if ($statusRectUpdated) {
-                return $m[0];
-            }
-            if ((float) $m[1] !== $statusX || (float) $m[2] !== $statusWidth) {
-                return $m[0];
-            }
-            $statusRectUpdated = true;
-            return preg_replace(
-                '/x="' . preg_quote(str: $m[1], delimiter: '/') . '"/',
-                'x="' . $newStatusX . '"',
-                $m[0],
-                1,
-            ) ?? $m[0];
-        }, $svg, 1) ?? $svg;
+            return $m[0];
+        }, $svg) ?? $svg;
         // Shift all text x positions right
         $svg = preg_replace_callback('/<text x="([0-9.]+)" y="([0-9.]+)"([^>]*)>/', function (array $m) use ($segment): string {
             $newX = (float) $m[1] + $segment;
