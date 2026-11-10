@@ -532,8 +532,11 @@ class BadgeRenderService
             if ($labelMatch === 0) {
                 $labelMatch = preg_match(pattern: '/<rect[^>]*width="([0-9.]+)"[^>]*fill="#555"[^>]*>/', subject: $svg, matches: $mLabel);
             }
-            if ($labelMatch === 0) {
-                $this->debugLog(event: 'embedLogoInSvg:missing-label-rect');
+            if ($labelMatch !== 1) {
+                $this->debugLog(
+                    event: $labelMatch === false ? 'embedLogoInSvg:label-regex-error' : 'embedLogoInSvg:missing-label-rect',
+                    context: $labelMatch === false ? ['error' => preg_last_error_msg()] : [],
+                );
                 return $this->simpleInjectLogo(svg: $svg, logoDataUri: $logoDataUri, width: $width, height: $height, y: $y);
             }
             $labelWidth = (float) $mLabel[1];
@@ -541,8 +544,11 @@ class BadgeRenderService
             if ($statusMatch === 0) {
                 $statusMatch = preg_match(pattern: '/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', subject: $svg, matches: $mStatus);
             }
-            if ($statusMatch === 0) {
-                $this->debugLog(event: 'embedLogoInSvg:missing-status-rect');
+            if ($statusMatch !== 1) {
+                $this->debugLog(
+                    event: $statusMatch === false ? 'embedLogoInSvg:status-regex-error' : 'embedLogoInSvg:missing-status-rect',
+                    context: $statusMatch === false ? ['error' => preg_last_error_msg()] : [],
+                );
                 return $this->simpleInjectLogo(svg: $svg, logoDataUri: $logoDataUri, width: $width, height: $height, y: $y);
             }
             if (preg_match('/^<rect[^>]*fill="#/i', $mStatus[0])) {
