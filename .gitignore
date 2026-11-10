@@ -3,8 +3,6 @@ docker/db/data
 docker/var
 /vendor
 /stubs
-/coverage/*
-!/coverage/*_badge.svg
 
 *.cache
 storage/*
