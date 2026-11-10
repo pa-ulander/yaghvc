@@ -30,17 +30,16 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      # Temporarily deploy without creating a backup.
-      # - name: Backup current deployment
-      #   run: |
-      #     ssh -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
-      #       cd ${{ secrets.SERVER_PATH }}
-      #       timestamp=$(date +%Y%m%d_%H%M%S)
-      #       backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
-      #       mkdir $backup_dir
-      #       cp -R ${{ secrets.SERVER_PATH }} $backup_dir
-      #       echo $backup_dir > /tmp/last_backup_path
-      #     EOF
+      - name: Backup current deployment
+        run: |
+          ssh -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+            cd ${{ secrets.SERVER_PATH }}
+            timestamp=$(date +%Y%m%d_%H%M%S)
+            backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
+            mkdir $backup_dir
+            cp -R ${{ secrets.SERVER_PATH }} $backup_dir
+            echo $backup_dir > /tmp/last_backup_path
+          EOF
 
       - name: Deploy to Webhost
         run: |
