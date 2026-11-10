@@ -34,14 +34,19 @@ final class BadgeGeometryParser
         $labelWidth = (float) $mLabel[1];
 
         // Match status rect (two ordering variants). If neither matches, fail early.
-        if (preg_match(pattern: '/<rect[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*>/', subject: $svg, matches: $mStatusColorFirst)) {
+        if (preg_match(pattern: '/<rect[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*\bx="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*>/', subject: $svg, matches: $mStatusColorFirst)) {
             $statusX = (float) $mStatusColorFirst[2];
             $statusWidth = (float) $mStatusColorFirst[3];
-        } elseif (preg_match(pattern: '/<rect[^>]*x="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', subject: $svg, matches: $mStatusXFirst)) {
+        } elseif (preg_match(pattern: '/<rect[^>]*\bx="([0-9.]+)"[^>]*width="([0-9.]+)"[^>]*fill="#([0-9a-fA-F]{3,8})"[^>]*>/', subject: $svg, matches: $mStatusXFirst)) {
             $statusX = (float) $mStatusXFirst[1];
             $statusWidth = (float) $mStatusXFirst[2];
         } else {
             return BadgeGeometryResult::failure(reason: self::REASON_NO_STATUS_RECT);
+        }
+
+        // Plastic paints the label across the badge, underneath the status.
+        if ($labelWidth === $totalWidth && abs(($statusX + $statusWidth) - $totalWidth) <= 0.05) {
+            $labelWidth = $statusX;
         }
 
         // Validate combined width within tolerance; statusX & statusWidth are guaranteed set here.
