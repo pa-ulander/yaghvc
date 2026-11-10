@@ -78,6 +78,22 @@ final class BadgeRenderServiceEmbedFallbackTest extends TestCase
     }
 
     /**
+     * Leave unrelated and widthless rectangles unchanged while expanding the badge.
+     */
+    public function testEmbeddingPreservesUnrelatedRectangles(): void
+    {
+        $svg = '<svg width="70" height="20"><rect fill="#555" width="30"/><rect fill="#4c1" x="30" width="40"/><rect x="4" width="2" height="2" fill="#fff"/><rect height="2" fill="#fff"/></svg>';
+        $dataUri = 'data:image/png;base64,' . base64_encode('px');
+        $out = $this->invokeEmbed($svg, $dataUri);
+
+        $this->assertStringContainsString('<svg width="94" height="20">', $out);
+        $this->assertStringContainsString('<rect fill="#555" width="54"/>', $out);
+        $this->assertStringContainsString('<rect fill="#4c1" x="54" width="40"/>', $out);
+        $this->assertStringContainsString('<rect x="4" width="2" height="2" fill="#fff"/>', $out);
+        $this->assertStringContainsString('<rect height="2" fill="#fff"/>', $out);
+    }
+
+    /**
      * An error in the first label regex must not read missing captures.
      */
     public function testParserFallbackHandlesFirstLabelRegexError(): void
