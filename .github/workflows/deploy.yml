@@ -2,10 +2,17 @@ name: Deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      server_port:
+        description: SSH port for the deployment server
+        required: false
+        default: "22"
+        type: string
 
 env:
-  PHP_COMMAND: /opt/alt/php85/usr/bin/php 
+  PHP_COMMAND: /opt/alt/php85/usr/bin/php
   COMPOSER_COMMAND: /opt/alt/php85/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader --no-plugins --no-scripts
+  SSH_PORT: ${{ inputs.server_port || '22' }}
 
 jobs:
   deploy:
@@ -25,7 +32,7 @@ jobs:
 
       - name: Backup current deployment
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+          ssh -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             cd ${{ secrets.SERVER_PATH }}
             timestamp=$(date +%Y%m%d_%H%M%S)
             backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
@@ -36,7 +43,7 @@ jobs:
 
       - name: Deploy to Webhost
         run: |
-          rsync -avz --delete \
+          rsync -avz --delete -e "ssh -p $SSH_PORT" \
             --exclude='.git*' \
             --exclude='.github*' \
             --exclude='.phan*' \
@@ -69,7 +76,7 @@ jobs:
 
       - name: Post-deployment tasks
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+          ssh -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             cd ${{ secrets.SERVER_PATH }}
             ${{ env.COMPOSER_COMMAND }}
             chmod -R 755 storage
