@@ -32,52 +32,42 @@ jobs:
 
       - name: Backup current deployment
         run: |
-          ssh -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
-            cd ${{ secrets.SERVER_PATH }}
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+            cd "${{ secrets.SERVER_PATH }}"
             timestamp=$(date +%Y%m%d_%H%M%S)
             backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
-            mkdir $backup_dir
-            cp -R ${{ secrets.SERVER_PATH }} $backup_dir
-            echo $backup_dir > /tmp/last_backup_path
+            mkdir "$backup_dir"
+            cp -R "${{ secrets.SERVER_PATH }}" "$backup_dir"
+            echo "$backup_dir" > /tmp/last_backup_path
           EOF
 
       - name: Deploy to Webhost
-        run: |
-          rsync -avz --delete -e "ssh -p $SSH_PORT" \
-            --exclude='.git*' \
-            --exclude='.github*' \
-            --exclude='.phan*' \
-            --exclude='.env*' \
-            --exclude='.vscode' \
-            --exclude='Makefile' \
-            --exclude='.dockerignore' \
-            --exclude='.styleci.yml' \
-            --exclude='README.md' \
-            --exclude='vendor' \
-            --exclude='docs' \
-            --exclude='scripts' \
-            --exclude='stubs' \
-            --exclude='docker' \
-            --exclude='Dockerfile' \
-            --exclude='docker-compose.yml' \
-            --exclude='tests' \
-            --exclude='db' \
-            --exclude='container' \
-            --exclude='php-artisan' \
-            --exclude='phpstan.neon' \
-            --exclude='phpunit*' \
-            --exclude='composer' \
-            --exclude='vite*' \
-            --exclude='devcontainer.json' \
-            --exclude='package.json' \
-            --exclude='ruleset.xml' \
-            --exclude='clover.xml' \
-            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
+        uses: easingthemes/ssh-deploy@v6.0.1
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_USER }}
+          REMOTE_PORT: ${{ env.SSH_PORT }}
+          SOURCE: "./"
+          TARGET: ${{ secrets.SERVER_PATH }}
+          ARGS: "-avz --delete"
+          # Comma-separated list; ssh-deploy splits on "," and trims each option.
+          SSH_CMD_ARGS: "-o StrictHostKeyChecking=yes, -o BatchMode=yes"
+          # Quote patterns because ssh-deploy builds a shell command.
+          EXCLUDE: >-
+            '.git*', '.github*', '.phan*', '.env*', '.vscode',
+            'Makefile', '.dockerignore', '.styleci.yml', 'README.md',
+            'vendor', 'docs', 'scripts', 'stubs', 'docker', 'Dockerfile',
+            'docker-compose.yml', 'tests', 'db', 'container', 'php-artisan',
+            'phpstan.neon', 'phpunit*', 'composer', 'vite*',
+            'devcontainer.json', 'package.json', 'ruleset.xml', 'clover.xml'
 
       - name: Post-deployment tasks
         run: |
-          ssh -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
-            cd ${{ secrets.SERVER_PATH }}
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$SSH_PORT" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+            cd "${{ secrets.SERVER_PATH }}"
             ${{ env.COMPOSER_COMMAND }}
             chmod -R 755 storage
             ${{ env.PHP_COMMAND }} artisan migrate --force
