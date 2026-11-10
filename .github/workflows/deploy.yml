@@ -10,8 +10,7 @@ on:
         type: string
 
 env:
-  PHP_COMMAND: /opt/alt/php85/usr/bin/php
-  COMPOSER_COMMAND: /opt/alt/php85/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader --no-plugins --no-scripts
+  COMPOSER_COMMAND: composer install --no-dev --optimize-autoloader --no-plugins --no-scripts
   SSH_PORT: ${{ inputs.server_port || '22' }}
 
 jobs:
