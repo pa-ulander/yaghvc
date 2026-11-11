@@ -10,6 +10,10 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_PATH: ${{ secrets.SERVER_PATH }}
 
     steps:
       - name: Checkout code
@@ -23,20 +27,36 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
+      - name: Validate SSH host key
+        shell: bash
+        run: |
+          if [ -z "$SERVER_HOST" ]; then
+            echo "::error::The SERVER_HOST secret is empty."
+            exit 1
+          fi
+
+          if ! ssh-keygen -F "$SERVER_HOST" -f "$HOME/.ssh/known_hosts" |
+            ssh-keygen -l -f /dev/stdin > /dev/null; then
+            echo "::error::KNOWN_HOSTS must contain a valid, verified host key for SERVER_HOST. See DEPLOYMENT.md."
+            exit 1
+          fi
+
       - name: Backup current deployment
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
-            cd ${{ secrets.SERVER_PATH }}
+          ssh -T -o BatchMode=yes -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" << 'EOF'
+            set -e
+            cd "${{ secrets.SERVER_PATH }}"
+            deployment_path="$PWD"
             timestamp=$(date +%Y%m%d_%H%M%S)
-            backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
-            mkdir $backup_dir
-            cp -R ${{ secrets.SERVER_PATH }} $backup_dir
-            echo $backup_dir > /tmp/last_backup_path
+            backup_dir="${deployment_path}_backup_${timestamp}"
+            mkdir "$backup_dir"
+            cp -R "$deployment_path" "$backup_dir"
+            echo "$backup_dir" > /tmp/last_backup_path
           EOF
 
       - name: Deploy to Webhost
         run: |
-          rsync -avz --delete \
+          rsync -avz --delete -e 'ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes' \
             --exclude='.git*' \
             --exclude='.github*' \
             --exclude='.phan*' \
@@ -65,12 +85,13 @@ jobs:
             --exclude='package.json' \
             --exclude='ruleset.xml' \
             --exclude='clover.xml' \
-            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
+            ./ "$SERVER_USER@$SERVER_HOST:$SERVER_PATH"
 
       - name: Post-deployment tasks
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
-            cd ${{ secrets.SERVER_PATH }}
+          ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
+            set -e
+            cd "${{ secrets.SERVER_PATH }}"
             ${{ env.COMPOSER_COMMAND }}
             chmod -R 755 storage
             ${{ env.PHP_COMMAND }} artisan migrate --force
