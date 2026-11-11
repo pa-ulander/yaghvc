@@ -5,7 +5,7 @@ on:
 
 env:
   PHP_COMMAND: php
-  COMPOSER_COMMAND: composer install --no-dev --optimize-autoloader --no-plugins --no-scripts
+  COMPOSER_COMMAND: composer install --no-dev --optimize-autoloader --no-plugins --no-scripts && composer dumpautoload
 
 jobs:
   deploy:
@@ -55,8 +55,10 @@ jobs:
           EOF
 
       - name: Deploy to Webhost
+        # Preserve server-side uploads, sessions, caches, and logs during --delete.
         run: |
           rsync -avz --delete -e 'ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes' \
+            --exclude='/storage' \
             --exclude='.git*' \
             --exclude='.github*' \
             --exclude='.phan*' \
@@ -92,8 +94,15 @@ jobs:
           ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
             set -e
             cd "${{ secrets.SERVER_PATH }}"
-            ${{ env.COMPOSER_COMMAND }}
+            # Composer autoload hooks boot Laravel and need these directories first.
+            mkdir -p storage/app/public \
+              storage/framework/cache/data \
+              storage/framework/sessions \
+              storage/framework/views \
+              storage/logs \
+              bootstrap/cache
             chmod -R 755 storage
+            ${{ env.COMPOSER_COMMAND }} || exit $?
             ${{ env.PHP_COMMAND }} artisan migrate --force
             ${{ env.PHP_COMMAND }} artisan view:clear
             ${{ env.PHP_COMMAND }} artisan config:cache
