@@ -25,7 +25,7 @@ jobs:
 
       - name: Backup current deployment
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
             cd ${{ secrets.SERVER_PATH }}
             timestamp=$(date +%Y%m%d_%H%M%S)
             backup_dir="${{ secrets.SERVER_PATH }}_backup_${timestamp}"
