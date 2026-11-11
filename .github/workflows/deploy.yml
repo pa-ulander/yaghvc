@@ -8,6 +8,7 @@ on:
 env:
   PHP_COMMAND: php
   COMPOSER_COMMAND: composer update --no-dev --optimize-autoloader --no-plugins --no-scripts && composer dumpautoload
+  DEPLOY_HEALTHCHECK_URL: ${{ vars.DEPLOY_HEALTHCHECK_URL || 'https://ghvc.kabelkultur.se/up' }}
 
 jobs:
   deploy:
@@ -44,16 +45,34 @@ jobs:
           fi
 
       - name: Backup current deployment
+        id: backup
         run: |
           ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
-            set -e
-            cd "${{ secrets.SERVER_PATH }}"
-            deployment_path="$PWD"
-            timestamp=$(date +%Y%m%d_%H%M%S)
-            backup_dir="${deployment_path}_backup_${timestamp}"
+            set -eu
+            deployment_path="${{ secrets.SERVER_PATH }}"
+            deployment_path="${deployment_path%/}"
+            case "$deployment_path" in
+              /*) ;;
+              *) echo "SERVER_PATH must be an absolute path." >&2; exit 1 ;;
+            esac
+            if [ ! -d "$deployment_path" ]; then
+              echo "Deployment directory does not exist: $deployment_path" >&2
+              exit 1
+            fi
+            if ! command -v rsync >/dev/null 2>&1; then
+              echo "rsync is required on the deployment server for backup and rollback." >&2
+              exit 1
+            fi
+            backup_dir="${deployment_path}_backup_${{ github.run_id }}_${{ github.run_attempt }}"
+            if [ -e "$backup_dir" ]; then
+              echo "Backup path already exists: $backup_dir" >&2
+              exit 1
+            fi
             mkdir "$backup_dir"
-            cp -R "$deployment_path" "$backup_dir"
-            echo "$backup_dir" > /tmp/last_backup_path
+            trap 'rm -rf -- "$backup_dir"' EXIT
+            rsync -a --delete --exclude='/storage' "$deployment_path/" "$backup_dir/files/"
+            touch "$backup_dir/complete"
+            trap - EXIT
           EOF
 
       - name: Deploy to Webhost
@@ -111,19 +130,26 @@ jobs:
             ${{ env.PHP_COMMAND }} artisan route:cache
           EOF
 
-      # - name: Rollback on failure
-      #   if: failure()
-      #   run: |
-      #     ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
-      #       backup_dir=$(cat /tmp/last_backup_path)
-      #       rm -rf ${{ secrets.SERVER_PATH }}
-      #       mv $backup_dir ${{ secrets.SERVER_PATH }}
-      #       cd ${{ secrets.SERVER_PATH }}
-      #       ${{ env.PHP_COMMAND }} artisan migrate:rollback
-      #       ${{ env.PHP_COMMAND }} artisan config:clear
-      #       ${{ env.PHP_COMMAND }} artisan route:clear
-      #       ${{ env.PHP_COMMAND }} artisan cache:clear
-      #     EOF
+      - name: Verify production health
+        run: |
+          curl --fail --silent --show-error --location \
+            --connect-timeout 5 --max-time 15 --retry 3 --retry-delay 2 \
+            "$DEPLOY_HEALTHCHECK_URL" > /dev/null
+
+      - name: Rollback on failure
+        if: failure() && steps.backup.outcome == 'success'
+        run: |
+          ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
+            set -eu
+            deployment_path="${{ secrets.SERVER_PATH }}"
+            deployment_path="${deployment_path%/}"
+            backup_dir="${deployment_path}_backup_${{ github.run_id }}_${{ github.run_attempt }}"
+            if [ ! -f "$backup_dir/complete" ] || [ ! -d "$backup_dir/files" ]; then
+              echo "A complete backup is unavailable; refusing to replace the deployment." >&2
+              exit 1
+            fi
+            rsync -a --delete --exclude='/storage' "$backup_dir/files/" "$deployment_path/"
+          EOF
 
       # - name: Cleanup old backups
       #   if: always()

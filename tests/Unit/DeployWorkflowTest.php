@@ -8,19 +8,29 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Get the shell commands for a deployment workflow step.
+ * Get a deployment workflow step by name.
+ *
+ * @return array<string, mixed>
  */
-function deployWorkflowCommands(string $name): string
+function deployWorkflowStep(string $name): array
 {
     $workflow = Yaml::parseFile(dirname(__DIR__, 2) . '/.github/workflows/deploy.yml');
 
     foreach ($workflow['jobs']['deploy']['steps'] as $step) {
-        if (($step['name'] ?? null) === $name && isset($step['run'])) {
-            return $step['run'];
+        if (($step['name'] ?? null) === $name) {
+            return $step;
         }
     }
 
     throw new RuntimeException("Deployment step not found: {$name}");
+}
+
+/**
+ * Get the shell commands for a deployment workflow step.
+ */
+function deployWorkflowCommands(string $name): string
+{
+    return deployWorkflowStep($name)['run'];
 }
 
 /**
@@ -36,9 +46,10 @@ function runDeployWorkflowCommands(string $commands, string $directory, array $e
         '${{ secrets.SERVER_USER }}' => 'deployer',
         '${{ secrets.SERVER_HOST }}' => 'deploy.example.test',
         '${{ secrets.SERVER_PATH }}' => $deploymentPath,
+        '${{ github.run_id }}' => '123456',
+        '${{ github.run_attempt }}' => '1',
         '${{ env.COMPOSER_COMMAND }}' => $workflow['env']['COMPOSER_COMMAND'],
         '${{ env.PHP_COMMAND }}' => $workflow['env']['PHP_COMMAND'],
-        '/tmp/last_backup_path' => escapeshellarg($directory . '/last_backup_path'),
     ]);
 
     $process = new Process(
@@ -50,9 +61,12 @@ function runDeployWorkflowCommands(string $commands, string $directory, array $e
             'SERVER_HOST' => 'deploy.example.test',
             'SERVER_USER' => 'deployer',
             'SERVER_PATH' => $deploymentPath,
+            'GITHUB_RUN_ID' => '123456',
+            'GITHUB_RUN_ATTEMPT' => '1',
+            'SYSTEM_RSYNC' => (new ExecutableFinder())->find('rsync') ?? '/nonexistent/rsync',
+            'EXECUTE_LOCAL_RSYNC' => '0',
             'SSH_ARGUMENTS_FILE' => $directory . '/ssh_arguments',
             'RSYNC_ARGUMENTS_FILE' => $directory . '/rsync_arguments',
-            'PHP_INVOKED_FILE' => $directory . '/php_invoked',
         ], $environment),
     );
     $process->run();
@@ -87,6 +101,12 @@ SH;
     $rsync = <<<'SH'
 #!/bin/sh
 printf '%s\n' "$@" > "$RSYNC_ARGUMENTS_FILE"
+if [ "${FAIL_RSYNC:-0}" = "1" ]; then
+    exit 35
+fi
+if [ "${EXECUTE_LOCAL_RSYNC:-0}" = "1" ]; then
+    exec "$SYSTEM_RSYNC" "$@"
+fi
 SH;
     file_put_contents($this->deployTestDirectory . '/bin/rsync', $rsync);
     chmod($this->deployTestDirectory . '/bin/rsync', 0700);
@@ -95,6 +115,54 @@ SH;
 afterEach(function () {
     (new Filesystem())->deleteDirectory($this->deployTestDirectory);
 });
+
+it('uses the Composer platform PHP version for web requests', function () {
+    $root = dirname(__DIR__, 2);
+    $composer = json_decode(file_get_contents($root . '/composer.json'), true, flags: JSON_THROW_ON_ERROR);
+    [$major, $minor] = explode('.', $composer['config']['platform']['php']);
+    $htaccess = file_get_contents($root . '/public_html/.htaccess');
+
+    preg_match_all('/^\s*AddType\s+application\/x-httpd-php(\d+)\s+\.php\s*$/m', $htaccess, $matches);
+
+    expect($matches[1])->toBe([$major . $minor]);
+});
+
+it('fails deployment when the public health check fails', function (int $curlExitCode) {
+    $curl = <<<'SH'
+#!/bin/sh
+printf '%s\n' "$@" > "$CURL_ARGUMENTS_FILE"
+exit "$CURL_EXIT_CODE"
+SH;
+    file_put_contents($this->deployTestDirectory . '/bin/curl', $curl);
+    chmod($this->deployTestDirectory . '/bin/curl', 0700);
+
+    $process = runDeployWorkflowCommands(
+        deployWorkflowCommands('Verify production health'),
+        $this->deployTestDirectory,
+        [
+            'DEPLOY_HEALTHCHECK_URL' => 'https://deploy.example.test/up',
+            'CURL_ARGUMENTS_FILE' => $this->deployTestDirectory . '/curl_arguments',
+            'CURL_EXIT_CODE' => (string) $curlExitCode,
+        ],
+    );
+
+    expect($process->getExitCode())->toBe($curlExitCode);
+    $arguments = file($this->deployTestDirectory . '/curl_arguments', FILE_IGNORE_NEW_LINES);
+    expect($arguments)
+        ->toContain('--fail')
+        ->toContain('--show-error')
+        ->toContain('--retry')
+        ->toContain('https://deploy.example.test/up');
+
+    $workflow = Yaml::parseFile(dirname(__DIR__, 2) . '/.github/workflows/deploy.yml');
+    $steps = array_column($workflow['jobs']['deploy']['steps'], 'name');
+    expect(array_search('Verify production health', $steps, true))
+        ->toBeGreaterThan(array_search('Post-deployment tasks', $steps, true))
+        ->toBeLessThan(array_search('Rollback on failure', $steps, true));
+})->with([
+    'healthy application' => [0],
+    'unhealthy application' => [22],
+]);
 
 it('rejects a known-hosts entry for a different deployment host', function () {
     if ((new ExecutableFinder())->find('ssh-keygen') === null) {
@@ -160,23 +228,10 @@ it('reports an empty deployment host before connecting', function () {
 });
 
 it('backs up the current deployment using remote shell variables', function () {
-    $deploymentPath = $this->deployTestDirectory . '/current deployment';
-    mkdir($deploymentPath);
-    file_put_contents($deploymentPath . '/index.php', 'existing deployment');
+    if ((new ExecutableFinder())->find('rsync') === null) {
+        $this->markTestSkipped('Rsync is required to verify deployment backups.');
+    }
 
-    $process = runDeployWorkflowCommands(deployWorkflowCommands('Backup current deployment'), $this->deployTestDirectory);
-
-    expect($process->isSuccessful())->toBeTrue();
-    $backupPath = trim(file_get_contents($this->deployTestDirectory . '/last_backup_path'));
-    expect($backupPath)->toMatch('/^' . preg_quote($deploymentPath, '/') . '_backup_\d{8}_\d{6}$/');
-    expect(file_get_contents($backupPath . '/current deployment/index.php'))->toBe('existing deployment');
-    expect(file_get_contents($this->deployTestDirectory . '/ssh_arguments'))
-        ->toContain('-T')
-        ->toContain('BatchMode=yes')
-        ->toContain('StrictHostKeyChecking=yes');
-});
-
-it('keeps the backup outside a deployment path with a trailing slash', function () {
     $deploymentPath = $this->deployTestDirectory . '/current deployment';
     mkdir($deploymentPath);
     file_put_contents($deploymentPath . '/index.php', 'existing deployment');
@@ -184,20 +239,93 @@ it('keeps the backup outside a deployment path with a trailing slash', function 
     $process = runDeployWorkflowCommands(
         deployWorkflowCommands('Backup current deployment'),
         $this->deployTestDirectory,
-        ['SERVER_PATH' => $deploymentPath . '/'],
+        ['EXECUTE_LOCAL_RSYNC' => '1'],
     );
 
     expect($process->isSuccessful())->toBeTrue();
-    $backupPath = trim(file_get_contents($this->deployTestDirectory . '/last_backup_path'));
-    expect($backupPath)->toMatch('/^' . preg_quote($deploymentPath, '/') . '_backup_\d{8}_\d{6}$/');
-    expect(file_get_contents($backupPath . '/current deployment/index.php'))->toBe('existing deployment');
+    $backupPath = $deploymentPath . '_backup_123456_1';
+    expect(file_get_contents($backupPath . '/files/index.php'))->toBe('existing deployment');
+    expect(file_exists($backupPath . '/complete'))->toBeTrue();
+    expect(file_get_contents($this->deployTestDirectory . '/ssh_arguments'))
+        ->toContain('-T')
+        ->toContain('BatchMode=yes')
+        ->toContain('StrictHostKeyChecking=yes');
+});
+
+it('keeps the backup outside a deployment path with a trailing slash', function () {
+    if ((new ExecutableFinder())->find('rsync') === null) {
+        $this->markTestSkipped('Rsync is required to verify deployment backups.');
+    }
+
+    $deploymentPath = $this->deployTestDirectory . '/current deployment';
+    mkdir($deploymentPath);
+    file_put_contents($deploymentPath . '/index.php', 'existing deployment');
+
+    $process = runDeployWorkflowCommands(
+        deployWorkflowCommands('Backup current deployment'),
+        $this->deployTestDirectory,
+        ['SERVER_PATH' => $deploymentPath . '/', 'EXECUTE_LOCAL_RSYNC' => '1'],
+    );
+
+    expect($process->isSuccessful())->toBeTrue();
+    $backupPath = $deploymentPath . '_backup_123456_1';
+    expect(file_get_contents($backupPath . '/files/index.php'))->toBe('existing deployment');
 });
 
 it('stops when the remote backup cannot be created', function () {
     $process = runDeployWorkflowCommands(deployWorkflowCommands('Backup current deployment'), $this->deployTestDirectory);
 
     expect($process->getExitCode())->not->toBe(0);
-    expect(file_exists($this->deployTestDirectory . '/last_backup_path'))->toBeFalse();
+    expect(file_exists($this->deployTestDirectory . '/current deployment_backup_123456_1'))->toBeFalse();
+});
+
+it('restores deployment files after a failed deployment without rolling back storage or the database', function () {
+    if ((new ExecutableFinder())->find('rsync') === null) {
+        $this->markTestSkipped('Rsync is required to verify deployment rollback.');
+    }
+
+    $deploymentPath = $this->deployTestDirectory . '/current deployment';
+    (new Filesystem())->makeDirectory($deploymentPath . '/storage/app/public', 0700, true);
+    file_put_contents($deploymentPath . '/index.php', 'previous deployment');
+    file_put_contents($deploymentPath . '/storage/app/public/upload.txt', 'existing upload');
+
+    $backup = runDeployWorkflowCommands(
+        deployWorkflowCommands('Backup current deployment'),
+        $this->deployTestDirectory,
+        ['EXECUTE_LOCAL_RSYNC' => '1'],
+    );
+    expect($backup->isSuccessful())->toBeTrue();
+
+    file_put_contents($deploymentPath . '/index.php', 'partially deployed code');
+    file_put_contents($deploymentPath . '/partial.php', 'partial deployment');
+
+    $rollback = runDeployWorkflowCommands(
+        deployWorkflowCommands('Rollback on failure'),
+        $this->deployTestDirectory,
+        ['EXECUTE_LOCAL_RSYNC' => '1'],
+    );
+
+    expect($rollback->isSuccessful())->toBeTrue();
+    expect(file_get_contents($deploymentPath . '/index.php'))->toBe('previous deployment');
+    expect(file_exists($deploymentPath . '/partial.php'))->toBeFalse();
+    expect(file_get_contents($deploymentPath . '/storage/app/public/upload.txt'))->toBe('existing upload');
+    expect(deployWorkflowStep('Rollback on failure')['if'])->toBe('failure() && steps.backup.outcome == \'success\'');
+    expect($rollback->getOutput())->not->toContain('migrate:rollback');
+});
+
+it('refuses to roll back when a complete backup is unavailable', function () {
+    $deploymentPath = $this->deployTestDirectory . '/current deployment';
+    mkdir($deploymentPath);
+    file_put_contents($deploymentPath . '/index.php', 'deployment remains untouched');
+
+    $rollback = runDeployWorkflowCommands(
+        deployWorkflowCommands('Rollback on failure'),
+        $this->deployTestDirectory,
+    );
+
+    expect($rollback->isSuccessful())->toBeFalse();
+    expect(file_get_contents($deploymentPath . '/index.php'))->toBe('deployment remains untouched');
+    expect($rollback->getErrorOutput())->toContain('complete backup');
 });
 
 it('stops post-deployment tasks when composer fails', function () {
@@ -320,7 +448,7 @@ SH;
 
     $arguments = file($this->deployTestDirectory . '/composer_arguments', FILE_IGNORE_NEW_LINES);
     expect($arguments)->toHaveCount(4);
-    expect($arguments[0])->toStartWith('install ');
+    expect($arguments[0])->toStartWith('update ');
     expect($arguments[1])->toBe('dumpautoload');
     if ($existingStorage) {
         expect(file_get_contents($deploymentPath . '/storage/app/public/upload.txt'))->toBe('existing upload');
