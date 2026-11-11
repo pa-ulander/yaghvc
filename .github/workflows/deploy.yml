@@ -1,4 +1,6 @@
 name: Deploy
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
@@ -37,7 +39,7 @@ jobs:
 
           if ! ssh-keygen -F "$SERVER_HOST" -f "$HOME/.ssh/known_hosts" |
             ssh-keygen -l -f /dev/stdin > /dev/null; then
-            echo "::error::KNOWN_HOSTS must contain a valid, verified host key for SERVER_HOST. See DEPLOYMENT.md."
+            echo "::error::KNOWN_HOSTS must contain a valid, verified host key for SERVER_HOST."
             exit 1
           fi
 

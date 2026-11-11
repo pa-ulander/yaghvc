@@ -1,4 +1,6 @@
 name: Encode Logo Smoke
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
