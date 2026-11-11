@@ -7,7 +7,7 @@ on:
 
 env:
   PHP_COMMAND: php
-  COMPOSER_COMMAND: composer install --no-dev --optimize-autoloader --no-plugins --no-scripts && composer dumpautoload
+  COMPOSER_COMMAND: composer update --no-dev --optimize-autoloader --no-plugins --no-scripts && composer dumpautoload
 
 jobs:
   deploy:
