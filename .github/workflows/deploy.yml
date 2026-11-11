@@ -43,7 +43,7 @@ jobs:
 
       - name: Backup current deployment
         run: |
-          ssh -T -o BatchMode=yes -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_HOST" << 'EOF'
+          ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
             set -e
             cd "${{ secrets.SERVER_PATH }}"
             deployment_path="$PWD"
