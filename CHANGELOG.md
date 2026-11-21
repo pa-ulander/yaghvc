@@ -173,10 +173,10 @@ Initial stable release derived from the accumulated work on `main` up to this da
 ### Historical (Pre-1.0.0) Work
 Early WIP commits (March–October 2024) established the foundational Laravel application structure, initial badge endpoint, and iterative configuration/testing scaffolding before formal versioning.
 
-[Unreleased]: https://github.com/pa-ulander/yagvc/compare/v1.4.0...HEAD
-[1.4.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.4.0
-[1.3.1]: https://github.com/pa-ulander/yagvc/releases/tag/v1.3.1
-[1.3.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.3.0
-[1.2.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.2.0
-[1.1.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.1.0
-[1.0.0]: https://github.com/pa-ulander/yagvc/releases/tag/v1.0.0
+[Unreleased]: https://github.com/pa-ulander/yet-another-github-visitor-counter/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/pa-ulander/yet-another-github-visitor-counter/releases/tag/v1.4.0
+[1.3.1]: https://github.com/pa-ulander/yet-another-github-visitor-counter/releases/tag/v1.3.1
+[1.3.0]: https://github.com/pa-ulander/yet-another-github-visitor-counter/releases/tag/v1.3.0
+[1.2.0]: https://github.com/pa-ulander/yet-another-github-visitor-counter/releases/tag/v1.2.0
+[1.1.0]: https://github.com/pa-ulander/yet-another-github-visitor-counter/releases/tag/v1.1.0
+[1.0.0]: https://github.com/pa-ulander/yet-another-github-visitor-counter/releases/tag/v1.0.0
